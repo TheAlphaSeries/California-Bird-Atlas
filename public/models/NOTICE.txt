@@ -1,0 +1,2 @@
+u2netp.onnx: U^2-Net small model (Qin et al., 2020), Apache License 2.0, https://github.com/xuebinqin/U-2-Net
+File as distributed by rembg (MIT): https://github.com/danielgatis/rembg

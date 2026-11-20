@@ -43,8 +43,8 @@ export default async function cover(view) {
           <button type="button" class="linkish" id="how-which">Not sure which region you're in?</button></li>
         <li><span class="n">2</span><h3>Get your nine birds</h3><p>Each season your region gets nine birds: three easy, three that take a trip, three that are hard to find.</p>
           <a class="mag-btn solid" href="/this-season" data-link>See this season's birds</a></li>
-        <li><span class="n">3</span><h3>Go out and photograph them</h3><p>Harder birds score more points. The best photos are published in the next issue and the year-end edition.</p>
-          <a class="mag-btn" href="/gallery" data-link>See the Gallery</a></li>
+        <li><span class="n">3</span><h3>Go out and photograph them</h3><p>Send your best shot. We cut the bird out and add it to the Bird Wall with your name. The best are published in the magazine.</p>
+          <a class="mag-btn" href="/wall" data-link>See the Bird Wall</a></li>
       </ol>
     </div>
   </section>`;

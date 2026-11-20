@@ -9,6 +9,10 @@ const routes = [
   [/^\/(?:birds|the-index)\/?$/, () => import('./views/theindex.js'), 'index'],
   [/^\/(?:birds|the-index)\/(WI-\d{3})\/?$/, () => import('./views/bird.js'), 'index'],
   [/^\/about\/?$/, () => import('./views/about.js'), 'about'],
+  [/^\/wall\/?$/, () => import('./views/wall.js'), 'wall'],
+  [/^\/submit\/?$/, () => import('./views/submit.js'), 'submit'],
+  [/^\/my-wall\/?$/, () => import('./views/mywall.js'), 'mywall'],
+  [/^\/review\/?$/, () => import('./views/review.js'), 'review'],
   [/^\/atlas\/?$/, () => import('./views/atlas.js'), 'atlas'],
   [/^\/archive\/?$/, () => import('./views/archive.js'), 'archive'],
   [/^\/guide\/?$/, () => import('./views/guide.js'), 'guide'],
@@ -19,14 +23,14 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
-const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about']);
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'mywall', 'review']);
 let renderSeq = 0;
 
 // Swap in a new page smoothly: build it off-screen, then cross-fade it in.
 function swapIn(view, tmp, mag) {
   const apply = () => {
     document.body.classList.toggle('mag', mag);
-    view.replaceChildren(...tmp.childNodes);
+    view.replaceChildren(tmp);
     if (!location.hash) window.scrollTo(0, 0);
   };
   if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(apply);
@@ -47,7 +51,7 @@ async function render() {
     try {
       const mod = await load();
       if (mag) {
-        const tmp = document.createElement('div');
+        const tmp = document.createElement('div'); tmp.className = 'page';
         await mod.default(tmp, ...m.slice(1));
         if (seq !== renderSeq) return; // a newer click won
         swapIn(view, tmp, true);
@@ -65,17 +69,18 @@ async function render() {
   view.innerHTML = `<div class="wrap page-head"><span class="label">Not found</span><h1>No such page</h1><p class="deck">Return to <a href="/" data-link>the cover</a>.</p></div>`;
 }
 
-const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/birds', 'index', 'All Birds'], ['/gallery', 'gallery', 'Gallery'], ['/about', 'about', 'How It Works']];
-const TOOLS_NAV = [['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
-const TOOL_PATHS = [/^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
+const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
+const TOOLS_NAV = [['/review', 'review', 'Review'], ['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
+const TOOL_PATHS = [/^\/review/, /^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
 export function renderChrome() {
   const link = ([href, key, label], cls = '') => `<a href="${href}" data-link data-nav="${key}"${cls ? ` class="${cls}"` : ''}>${label}</a>`;
   const onTool = TOOL_PATHS.some((re) => re.test(location.pathname));
   $('#primary-nav').innerHTML = S.owner && onTool
     ? link(PUBLIC_NAV[0]) + '<span class="tools-sep" aria-hidden="true"></span>' + TOOLS_NAV.map((x) => link(x, 'tool')).join('')
-    : PUBLIC_NAV.map((x) => link(x)).join('') + (S.owner ? '<span class="tools-sep" aria-hidden="true"></span>' + link(['/atlas', 'atlas', 'Tools'], 'tool') : '');
+    : PUBLIC_NAV.map((x) => link(x)).join('') + (S.owner ? '<span class="tools-sep" aria-hidden="true"></span>' + link(['/review', 'review', 'Tools'], 'tool') : '');
   const n = draftCount();
   $('#utilities').innerHTML = `
+    <a href="/submit" data-link class="cta u-send">Send a photo</a>
     <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region">Region: <b>${regionName()}</b></button>
     ${S.owner ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     <a href="/settings" data-link>${S.owner ? 'Settings' : 'Editor login'}</a>`;
@@ -122,7 +127,7 @@ $('#quick-entry').onclick = () => openObservation();
 (async () => {
   try {
     await loadAll(); renderChrome(); await render(); if (S.owner) syncDrafts();
-    const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'gallery', 'fieldwork', 'theindex', 'bird', 'about'].forEach((v) => import(`./views/${v}.js`)); };
+    const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'wall', 'fieldwork', 'theindex', 'bird', 'about', 'submit'].forEach((v) => import(`./views/${v}.js`)); };
     (window.requestIdleCallback || setTimeout)(warm);
   }
   catch (e) { $('#view').innerHTML = `<div class="wrap"><p class="empty">The atlas could not be opened: ${esc(e.message)}</p></div>`; }

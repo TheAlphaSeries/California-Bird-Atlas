@@ -1,7 +1,7 @@
 // California Bird Atlas — Cloudflare Worker (API + media). Static pages are served from ./public.
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '1';
+const SCHEMA_VERSION = '2';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -28,6 +28,11 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS custom_fields (id INTEGER PRIMARY KEY AUTOINCREMENT, tbl TEXT NOT NULL, key TEXT NOT NULL, label TEXT NOT NULL, type TEXT DEFAULT 'text', options TEXT DEFAULT '', UNIQUE (tbl, key))`,
   `CREATE TABLE IF NOT EXISTS saved_views (id INTEGER PRIMARY KEY AUTOINCREMENT, tbl TEXT NOT NULL, name TEXT NOT NULL, config TEXT NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS sources (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, url TEXT, note TEXT, updated_at TEXT)`,
+  `CREATE TABLE IF NOT EXISTS submissions (
+     id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, bird TEXT NOT NULL, sci TEXT, credit_name TEXT NOT NULL, contact TEXT DEFAULT '',
+     region TEXT DEFAULT '', note TEXT DEFAULT '', taken_at TEXT, camera TEXT DEFAULT '', width INTEGER, height INTEGER, store TEXT,
+     status TEXT DEFAULT 'pending', cut_w INTEGER, cut_h INTEGER, approved_at TEXT, featured INTEGER DEFAULT 0, ip TEXT)`,
+  `CREATE INDEX IF NOT EXISTS sub_status ON submissions(status)`,
   `CREATE INDEX IF NOT EXISTS obs_species ON observations(species_id)`,
   `CREATE INDEX IF NOT EXISTS photo_species ON photos(species_id)`,
 ];
@@ -130,6 +135,12 @@ async function getBlob(env, key, store) {
   let off = 0; for (const p of parts) { out.set(p, off); off += p.length; }
   return out;
 }
+async function deleteSubBlobs(env, id, store) {
+  for (const v of ['thumb', 'display', 'cutout']) {
+    const key = `subs/${id}/${v}`;
+    if (store === 'r2' && env.PHOTOS) await env.PHOTOS.delete(key); else await env.DB.prepare(`DELETE FROM blobs WHERE key = ?`).bind(key).run();
+  }
+}
 async function deleteBlobs(env, id, store) {
   for (const v of ['thumb', 'display', 'original']) {
     const key = `photos/${id}/${v}`;
@@ -211,6 +222,17 @@ async function route(request, env, url, path) {
   const body = async () => { try { return await request.json(); } catch { return {}; } };
   const need = () => { if (!owner) throw Object.assign(new Error('Sign in as the owner to make changes.'), { status: 401 }); };
   try {
+    // ----- media: submissions and the Bird Wall -----
+    if (seg[0] === 'media' && seg[1] === 'sub') {
+      const id = Number(seg[2]), variant = seg[3];
+      if (!['thumb', 'display', 'cutout'].includes(variant)) return fail(404, 'Not found');
+      const sub = await db.prepare(`SELECT status, store FROM submissions WHERE id = ?`).bind(id).first();
+      if (!sub) return fail(404, 'Not found');
+      if (!owner && sub.status !== 'approved') return fail(403, 'Not published');
+      const data = await getBlob(env, `subs/${id}/${variant}`, sub.store);
+      if (!data) return fail(404, 'Not found');
+      return new Response(data, { headers: { 'content-type': variant === 'cutout' ? 'image/png' : 'image/jpeg', 'cache-control': sub.status === 'approved' ? 'public, max-age=86400' : 'private, no-store' } });
+    }
     // ----- media -----
     if (seg[0] === 'media') {
       const id = Number(seg[1]), variant = seg[2];
@@ -379,6 +401,76 @@ async function route(request, env, url, path) {
       }
     }
 
+    // ----- submissions (public send, owner review) and the public Bird Wall -----
+    if (r === 'wall' && method === 'GET') {
+      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
+      return json(rows, 200, { 'cache-control': 'public, max-age=60' });
+    }
+    if (r === 'submissions') {
+      const id = Number(seg[2]);
+      if (method === 'POST' && !seg[2]) {
+        const form = await request.formData();
+        const meta = JSON.parse(form.get('meta') || '{}');
+        const display = form.get('display'), thumb = form.get('thumb');
+        const bird = String(meta.bird || '').trim(), name = String(meta.credit_name || '').trim().slice(0, 80);
+        if (!meta.consent) return fail(400, 'Please confirm that you took this photo and agree to the terms.');
+        if (!bird || !name) return fail(400, 'Choose the bird and enter the name to credit.');
+        if (!display || typeof display === 'string' || !thumb || typeof thumb === 'string') return fail(400, 'Attach a photo.');
+        if (display.size > 8 * 1024 * 1024 || thumb.size > 400 * 1024) return fail(413, 'That photo is too large. Try a smaller copy.');
+        const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(bird).first();
+        if (!sp) return fail(400, 'Choose a bird from the California list.');
+        const ip = await hmac(env.ADMIN_PASSWORD || 'wild-index', request.headers.get('cf-connecting-ip') || 'local');
+        const recent = await db.prepare(`SELECT COUNT(*) n FROM submissions WHERE ip = ? AND created_at > ?`).bind(ip, new Date(Date.now() - 864e5).toISOString()).first('n');
+        if (recent >= 12) return fail(429, 'You have sent 12 photos today. Please try again tomorrow.');
+        const waiting = await db.prepare(`SELECT COUNT(*) n FROM submissions WHERE status = 'pending'`).first('n');
+        if (waiting >= 1000) return fail(503, 'The review queue is full right now. Please try again in a few days.');
+        const store = env.PHOTOS ? 'r2' : 'd1';
+        const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, store, ip) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+          .bind(new Date().toISOString(), sp.common_name, sp.scientific_name, name, String(meta.contact || '').slice(0, 120), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, ip).run();
+        const sid = res.meta.last_row_id;
+        try {
+          await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
+          await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
+        } catch (e) { await deleteSubBlobs(env, sid, store); await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(sid).run(); throw e; }
+        return json({ id: sid });
+      }
+      need();
+      if (method === 'GET') {
+        const rows = (await db.prepare(`SELECT id, created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, status, cut_w, cut_h, approved_at, featured FROM submissions ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, id DESC LIMIT 3000`).all()).results;
+        return json(rows);
+      }
+      if (method === 'POST' && seg[3] === 'cutout' && id) {
+        const form = await request.formData();
+        const cut = form.get('cutout'); const w = Number(form.get('w')), h = Number(form.get('h'));
+        if (!cut || typeof cut === 'string') return fail(400, 'No cut-out received.');
+        const sub = await db.prepare(`SELECT store FROM submissions WHERE id = ?`).bind(id).first();
+        if (!sub) return fail(404, 'Not found');
+        await putBlob(env, `subs/${id}/cutout`, await cut.arrayBuffer(), 'image/png');
+        await db.prepare(`UPDATE submissions SET cut_w = ?, cut_h = ? WHERE id = ?`).bind(w || null, h || null, id).run();
+        return json({ ok: true });
+      }
+      if (method === 'PATCH' && id) {
+        const b = await body(); const sets = [], vals = [];
+        for (const k of ['credit_name', 'region', 'note', 'featured', 'status']) if (k in b) { sets.push(`${k} = ?`); vals.push(b[k]); }
+        if ('bird' in b) {
+          const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(String(b.bird)).first();
+          if (!sp) return fail(400, 'Choose a bird from the California list.');
+          sets.push('bird = ?', 'sci = ?'); vals.push(sp.common_name, sp.scientific_name);
+        }
+        if (b.status === 'approved') { sets.push('approved_at = ?'); vals.push(new Date().toISOString()); }
+        if (!sets.length) return json({ ok: true });
+        await db.prepare(`UPDATE submissions SET ${sets.join(', ')} WHERE id = ?`).bind(...vals, id).run();
+        return json({ ok: true });
+      }
+      if (method === 'DELETE' && id) {
+        const sub = await db.prepare(`SELECT store FROM submissions WHERE id = ?`).bind(id).first();
+        if (!sub) return fail(404, 'Not found');
+        await deleteSubBlobs(env, id, sub.store);
+        await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(id).run();
+        return json({ ok: true });
+      }
+    }
+
     // ----- custom fields, saved views, settings, export -----
     if (r === 'fields') {
       need();
@@ -404,7 +496,7 @@ async function route(request, env, url, path) {
     if (r === 'export' && method === 'GET') {
       need();
       const out = { exported_at: new Date().toISOString(), note: 'California Bird Atlas backup. Photograph files are not included; download originals from the Gallery.' };
-      for (const t of ['families', 'species', 'observations', 'photos', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
+      for (const t of ['families', 'species', 'observations', 'photos', 'submissions', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
       return new Response(JSON.stringify(out, null, 1), { headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="california-bird-atlas-backup-${out.exported_at.slice(0, 10)}.json"` } });
     }
     return fail(404, 'Not found');

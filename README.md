@@ -2,8 +2,9 @@
 
 A photography-led website about California's native birds.
 
-- **Public site:** Cover, Gallery, Fieldwork (this season's assignment and scoring), The Index (all 696 species
-  on the official state list, with each bird's level by region and season), and About.
+- **Public site:** Home (the cover), This Season (each region's nine birds and the scoring), the Bird Wall
+  (everyone's birds, cut out on black, with credits), All Birds (all 696 species with each bird's level by region
+  and season), How It Works, Send a photo, and My Wall (a private wall kept only in the visitor's browser).
 - **Owner tools,** behind a password: the atlas (field guide, life list, observation journal, explore, photo
   archive, editable catalog), photo uploads, and the cover editor.
 
@@ -32,6 +33,10 @@ Buy a domain (Cloudflare Registrar works), then Worker → **Settings** → **Do
 
 ## Day to day
 
+- **Review submissions:** sign in → **Tools** → **Review**. Open a photo, check the bird and the credit, choose
+  **Cut out the bird** (the background is removed automatically; adjust the cut-off or paint with Erase and Restore),
+  then **Publish to the wall**. Featured birds show first.
+
 - **Add a bird photo:** sign in → **Add observation** → choose the bird, attach the photo, set **Visibility** to
   **Public**. It appears in the Gallery and on the bird's page in The Index.
 - **Change the cover:** sign in → Cover → **Edit cover**. Pick any public photo, then edit the cover lines, season,
@@ -57,10 +62,27 @@ Uploaded display copies are re-encoded in the browser, which drops the camera's 
 - Regional levels are editorial estimates, checked against the USGS Breeding Bird Survey, National Park Service
   species lists and Audubon Christmas Bird Count results. See the Rules sheet of the regional table for details.
 
+## Cut-outs
+
+Backgrounds are removed in the browser, on the editor's or visitor's own device, with the U^2-Net small model
+(`public/models/u2netp.onnx`, Apache License 2.0) run by ONNX Runtime Web (`public/vendor/ort/`, MIT). Nothing is
+sent to another service. The first cut-out on a device downloads about 20 MB, once.
+
+## Submissions
+
+Anyone can send a photo: the bird, the name to credit, an optional private email, the region, and three
+confirmations (they took it, no bait or nest disturbance, permission to publish with credit). Location data is
+stripped in the browser before upload, and where a photo was taken is never asked for. Each visitor can send 12 a day,
+and the queue holds at most 1,000 waiting photos. Submissions and their photos are included in the Export backup.
+
+Photos are stored in the D1 database until R2 is enabled (see below). D1 is fine for hundreds of photos; turn on R2
+before it holds thousands.
+
 ## Not built yet
 
-- Member accounts, public photo submissions, star ratings and the leaderboards. Scoring rules are published on
-  the Fieldwork page, but nothing records points yet.
+- Member accounts, star ratings and the leaderboards. Scoring rules are published on This Season, but nothing
+  records points yet.
+- Bot protection on the submission form (Cloudflare Turnstile) if spam appears.
 - Season timing from open data (the CC BY eBird Observation Dataset on GBIF).
 - Keeping full-resolution originals: enable R2, create a bucket named `california-bird-atlas-photos`, and uncomment
   the `r2_buckets` block in `wrangler.jsonc`.

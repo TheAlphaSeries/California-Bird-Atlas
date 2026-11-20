@@ -21,7 +21,7 @@ export default async function fieldwork(view, seasonArg) {
       <ol class="steps-inline">
         <li><b>Find</b> any of these birds in your region this season. Tap a bird for where and when to look.</li>
         <li><b>Photograph</b> it. Any of the nine counts. Harder levels score more points.</li>
-        <li><b>Share</b> your best photo. Submissions open with the first issue.</li>
+        <li><b>Share</b> your best photo. <a href="/submit" data-link style="color:var(--mag-accent)">Send it in</a> and it goes on the Bird Wall with your name.</li>
       </ol>
       <div class="pills" role="group" aria-label="Season"><span class="pills-lbl">Season</span>${SEASON_ORDER.map((s) => `<button type="button" class="pill" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
       <div class="levels">${[1, 2, 3].map((L) => `<section class="level" aria-label="Level ${L}">
