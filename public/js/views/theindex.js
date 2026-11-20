@@ -1,34 +1,68 @@
-import { $, esc } from '../util.js';
-import { wi, SEASONS, SEASON_ORDER, CATEGORY, currentSeason, myRegion, setRegion, birdLink, birdName, levelOf, lvSpan } from '../wi.js';
+import { $, $$, S, esc } from '../util.js';
+import { wi, SEASONS, SEASON_ORDER, CATEGORY, BUILT_IN, currentSeason, myRegion, setRegion, birdLink, levelOf } from '../wi.js';
 
 let st = null;
+const SHOW = [['here', 'On the cards'], ['rare', 'Rare finds'], ['out', 'Not this edition'], ['all', 'All birds']];
+const SHORT = { W: 'Win', P: 'Spr', S: 'Sum', F: 'Fall' };
+
+function thumb(b) {
+  const sp = S.species.find((s) => s.common_name === b.n);
+  const src = sp?.photo_id ? `/media/${sp.photo_id}/thumb` : BUILT_IN[b.n]?.src;
+  return src
+    ? `<span class="ixc-img"><img loading="lazy" src="${esc(src)}" alt=""></span>`
+    : `<span class="ixc-img blank" aria-hidden="true"><span class="no">${esc(b.id.replace('WI-', 'No. '))}</span><span class="sc">No photo yet</span></span>`;
+}
+
+function strip(b, i) {
+  return `<span class="ixc-strip" aria-label="Level by season">${SEASON_ORDER.map((s) => {
+    const v = levelOf(b, i, s);
+    const cls = typeof v === 'number' ? `l${v}` : 'off';
+    return `<span class="sq ${cls}" title="${SEASONS[s]}: ${typeof v === 'number' ? 'Level ' + v : v === 'r' ? 'rare' : 'not expected'}"><i></i><b>${SHORT[s]}</b></span>`;
+  }).join('')}</span>`;
+}
+
+function badge(b, i, season) {
+  if (b.cat !== 'assign') return `<span class="ixc-badge cat">${esc(CATEGORY[b.cat])}</span>`;
+  const v = levelOf(b, i, season);
+  if (typeof v === 'number') return `<span class="ixc-badge l${v}">Level ${v}</span>`;
+  return `<span class="ixc-badge off">${v === 'r' ? 'Rare here' : 'Not this season'}</span>`;
+}
 
 export default async function theIndex(view) {
   document.body.classList.add('mag');
   const d = await wi();
   if (!st) st = { q: '', region: myRegion(d), season: currentSeason(), show: 'here' };
-  view.innerHTML = `<div class="mag-wrap mag-page">
-    <p class="mag-kicker">The Index</p>
-    <h1 class="mag-h">Every bird in California</h1>
-    <p class="mag-deck">All ${d.birds.length} species on the official state list. Choose a region and season to see each bird's level there.</p>
-    <form class="ix-filters" id="ixf">
-      <label>Search<input name="q" type="search" value="${esc(st.q)}" placeholder="Name or scientific name"></label>
-      <label>Region<select name="region">${d.regions.map((r) => `<option value="${r}" ${r === st.region ? 'selected' : ''}>${esc(d.region_names[r])}</option>`).join('')}</select></label>
-      <label>Season<select name="season">${SEASON_ORDER.map((s) => `<option value="${s}" ${s === st.season ? 'selected' : ''}>${SEASONS[s]}</option>`).join('')}</select></label>
-      <label>Show<select name="show">
-        <option value="here" ${st.show === 'here' ? 'selected' : ''}>Birds with a level here</option>
-        <option value="all" ${st.show === 'all' ? 'selected' : ''}>All birds</option>
-        <option value="rare" ${st.show === 'rare' ? 'selected' : ''}>Scarce and rare finds</option>
-        <option value="out" ${st.show === 'out' ? 'selected' : ''}>Native birds not on any card</option>
-      </select></label>
-    </form>
-    <p class="ix-count" id="ixc" aria-live="polite"></p>
-    <div class="ix-list" id="ixl"></div>
+  const n = (c) => d.birds.filter((b) => c.includes(b.cat)).length;
+  view.innerHTML = `<div class="ix">
+    <header class="mag-wrap ix-head">
+      <p class="mag-kicker">The Index</p>
+      <h1 class="ix-title">Every bird<br>in California</h1>
+      <p class="mag-deck">The official state list, bird by bird, with how hard each one is to find in your region, season by season.</p>
+      <dl class="ix-stats">
+        <div><dt>Species</dt><dd>${d.birds.length}</dd></div>
+        <div><dt>On the cards</dt><dd>${n(['assign'])}</dd></div>
+        <div><dt>Rare finds</dt><dd>${n(['rare', 'scarce'])}</dd></div>
+        <div><dt>Regions</dt><dd>${d.regions.length}</dd></div>
+      </dl>
+    </header>
+    <div class="ix-bar"><div class="mag-wrap">
+      <div class="ix-row1">
+        <label class="ix-search"><span class="vh">Search</span><input id="ixq" type="search" placeholder="Search by name" value="${esc(st.q)}"></label>
+        <div class="seg" role="group" aria-label="Show">${SHOW.map(([k, l]) => `<button type="button" data-show="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
+      </div>
+      <div class="ix-row2">
+        <div class="seg small" role="group" aria-label="Region">${d.regions.map((r) => `<button type="button" data-r="${r}" aria-pressed="${st.region === r}">${esc(d.region_names[r])}</button>`).join('')}</div>
+        <div class="seg small" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" data-s="${s}" aria-pressed="${st.season === s}">${SEASONS[s]}</button>`).join('')}</div>
+      </div>
+    </div></div>
+    <div class="mag-wrap ix-body">
+      <p class="ix-count" id="ixc" aria-live="polite"></p>
+      <div id="ixl"></div>
+      <p class="ix-key"><span class="sq l1"><i></i></span> Level 1, easy <span class="sq l2"><i></i></span> Level 2 <span class="sq l3"><i></i></span> Level 3, hard <span class="sq off"><i></i></span> Not expected. The four squares on each bird show its level in ${esc(d.region_names[st.region])} through the year.</p>
+    </div>
   </div>`;
-  const form = $('#ixf', view), list = $('#ixl', view);
+  const list = $('#ixl', view);
   const draw = () => {
-    Object.assign(st, Object.fromEntries(new FormData(form)));
-    setRegion(st.region);
     const i = d.regions.indexOf(st.region), q = st.q.trim().toLowerCase();
     const rows = d.birds.filter((b) => {
       if (q && !b.n.toLowerCase().includes(q) && !b.sci.toLowerCase().includes(q)) return false;
@@ -37,15 +71,26 @@ export default async function theIndex(view) {
       if (st.show === 'out') return ['sensitive', 'night', 'offshore'].includes(b.cat);
       return true;
     });
-    if (st.show === 'here') rows.sort((a, b) => levelOf(a, i, st.season) - levelOf(b, i, st.season));
-    $('#ixc', view).textContent = `${rows.length} bird${rows.length === 1 ? '' : 's'}`;
-    list.innerHTML = rows.map((b) => {
-      const lv = b.cat === 'assign' ? levelOf(b, i, st.season) : null;
-      const tag = b.cat === 'assign' ? (typeof lv === 'number' ? `Level <b>${lv}</b>` : lvSpan(lv)) : esc(CATEGORY[b.cat]);
-      return `<a class="ix-row" href="${birdLink(b)}" data-link><span>${birdName(b)}</span><span class="tag">${tag}</span></a>`;
-    }).join('') || '<p class="mag-deck" style="padding-top:16px">No birds match.</p>';
+    const groups = [];
+    for (const b of rows) { const g = groups[groups.length - 1]; if (g && g.fam === b.fam) g.birds.push(b); else groups.push({ fam: b.fam, birds: [b] }); }
+    const what = { here: `on the cards in the ${d.region_names[st.region]} this ${SEASONS[st.season].toLowerCase()}`, rare: 'scarce or rare in California', out: 'native but left out of the cards', all: 'on the state list' }[st.show];
+    $('#ixc', view).textContent = `${rows.length} bird${rows.length === 1 ? '' : 's'} ${what}, in ${groups.length} famil${groups.length === 1 ? 'y' : 'ies'}`;
+    list.innerHTML = groups.map((g) => `<section class="ix-fam">
+      <h2><span>${esc(g.fam)}</span><span class="ct">${g.birds.length}</span></h2>
+      <div class="ix-grid">${g.birds.map((b) => `<a class="ixc" href="${birdLink(b)}" data-link>
+        ${thumb(b)}
+        <span class="ixc-txt"><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>
+        <span class="ixc-foot">${badge(b, i, st.season)}${b.lv ? strip(b, i) : ''}</span></span>
+      </a>`).join('')}</div></section>`).join('') || '<p class="mag-deck" style="padding:40px 0">No birds match. Try another region, season or spelling.</p>';
   };
-  form.addEventListener('input', draw);
-  form.addEventListener('submit', (e) => e.preventDefault());
+  const press = (sel, key) => $$(sel, view).forEach((b) => (b.onclick = () => {
+    st[key] = b.dataset[key === 'show' ? 'show' : key === 'region' ? 'r' : 's'];
+    if (key === 'region') setRegion(st.region);
+    $$(sel, view).forEach((x) => x.setAttribute('aria-pressed', x === b));
+    if (key === 'region') $('.ix-key', view).lastChild.textContent = ` Not expected. The four squares on each bird show its level in ${d.region_names[st.region]} through the year.`;
+    draw();
+  }));
+  press('[data-show]', 'show'); press('[data-r]', 'region'); press('[data-s]', 'season');
+  $('#ixq', view).addEventListener('input', (e) => { st.q = e.target.value; draw(); });
   draw();
 }
