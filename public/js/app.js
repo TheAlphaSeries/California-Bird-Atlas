@@ -19,24 +19,47 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about']);
+let renderSeq = 0;
+
+// Swap in a new page smoothly: build it off-screen, then cross-fade it in.
+function swapIn(view, tmp, mag) {
+  const apply = () => {
+    document.body.classList.toggle('mag', mag);
+    view.replaceChildren(...tmp.childNodes);
+    if (!location.hash) window.scrollTo(0, 0);
+  };
+  if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(apply);
+  else { apply(); view.classList.remove('fade-in'); void view.offsetWidth; view.classList.add('fade-in'); }
+}
+
 async function render() {
+  const seq = ++renderSeq;
   const path = location.pathname;
   const view = $('#view');
-  document.body.classList.remove('menu-open', 'dark', 'mag');
+  document.body.classList.remove('menu-open', 'dark');
   renderChrome();
   for (const [re, load, nav] of routes) {
     const m = re.exec(path);
     if (!m) continue;
     $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
-    document.body.classList.remove('menu-open');
+    const mag = MAG.has(nav);
     try {
       const mod = await load();
-      await mod.default(view, ...m.slice(1));
+      if (mag) {
+        const tmp = document.createElement('div');
+        await mod.default(tmp, ...m.slice(1));
+        if (seq !== renderSeq) return; // a newer click won
+        swapIn(view, tmp, true);
+      } else {
+        document.body.classList.remove('mag');
+        await mod.default(view, ...m.slice(1));
+        if (!location.hash) window.scrollTo(0, 0);
+      }
     } catch (e) {
       console.error(e);
       view.innerHTML = `<div class="wrap"><p class="empty">This page could not be opened: ${esc(e.message)}</p></div>`;
     }
-    if (!location.hash) window.scrollTo(0, 0);
     return;
   }
   view.innerHTML = `<div class="wrap page-head"><span class="label">Not found</span><h1>No such page</h1><p class="deck">Return to <a href="/" data-link>the cover</a>.</p></div>`;
@@ -97,6 +120,10 @@ $('#menu-toggle').onclick = () => { const open = document.body.classList.toggle(
 $('#quick-entry').onclick = () => openObservation();
 
 (async () => {
-  try { await loadAll(); renderChrome(); await render(); if (S.owner) syncDrafts(); }
+  try {
+    await loadAll(); renderChrome(); await render(); if (S.owner) syncDrafts();
+    const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'gallery', 'fieldwork', 'theindex', 'bird', 'about'].forEach((v) => import(`./views/${v}.js`)); };
+    (window.requestIdleCallback || setTimeout)(warm);
+  }
   catch (e) { $('#view').innerHTML = `<div class="wrap"><p class="empty">The atlas could not be opened: ${esc(e.message)}</p></div>`; }
 })();

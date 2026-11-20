@@ -52,9 +52,11 @@ export const REGION_HINT = {
 export function regionName() { try { return REGION_NAMES[localStorage.getItem(REGION_KEY)] || 'Bay Area'; } catch { return 'Bay Area'; } }
 // Ask which region the visitor birds in. Nothing about their location is collected.
 export function pickRegion() {
-  const m = modal(`<span class="label">Your region</span><h2>Where do you go birding?</h2>
-    <p class="note">Pick the part of California you bird in most. It sets your nine birds each season and the levels you see. It is saved on this device only, and you can change it any time.</p>
-    <div class="region-pick">${REGIONS.map((r) => `<button type="button" data-r="${r}"><b>${REGION_NAMES[r]}</b><span>${REGION_HINT[r]}</span></button>`).join('')}</div>`, { wide: true });
+  let cur = null; try { cur = localStorage.getItem(REGION_KEY); } catch { /* storage off */ }
+  const m = modal(`<p class="mag-kicker">Your region</p><h2>Where do you go birding?</h2>
+    <p class="rp-note">Pick the part of California you bird in most. It sets your nine birds each season and the levels you see. It is saved on this device only, and you can change it any time.</p>
+    <div class="region-pick">${REGIONS.map((r) => `<button type="button" data-r="${r}" aria-pressed="${r === cur}"><b>${REGION_NAMES[r]}</b><span>${REGION_HINT[r]}</span></button>`).join('')}</div>`, { wide: true });
+  m.el.classList.add('mag-modal');
   m.el.querySelectorAll('[data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); m.close(); window.dispatchEvent(new Event('route')); }));
 }
 
