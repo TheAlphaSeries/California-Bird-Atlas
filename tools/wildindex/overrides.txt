@@ -1,0 +1,233 @@
+# WILD INDEX regional table v2: corrections applied on top of the first table.
+# Species | operations | reason
+# Operations:  REG=cell   set a cell (v2 syntax: seasons W winter, P spring, S summer, F fall, A all year, then level;
+#                         parts joined with +;  x = too rare to assign;  * keeps the first table's level)
+#              OLD>NEW    wherever the first table used season token OLD, use season set NEW (level kept)
+#              OLD>NEW@R1,R2   same, only in the listed regions
+#              ALL=x      every rated cell becomes "too rare to assign"
+# Regions: BAY NC CV SN CC SC DES
+
+# ---------------- waterfowl
+Snow Goose|W>WF CV=WF2 DES=WF2 SN=PF2|Leaves by early March; outside the Sacramento Valley it means a refuge trip
+Ross's Goose|W>WF CV=WF2 DES=WF2 SN=PF2|Leaves by early March; outside the Sacramento Valley it means a refuge trip
+Greater White-fronted Goose|W>WF CV=WPF2 SN=PF2|Found in fields and refuges, not everywhere; passage bird in the northeast
+Cackling Goose|CV=WPF2 SC=WF3 CC=WF3|Mixed in with other geese; scarce in the south
+Tundra Swan|W>WF CV=WF2|Present November to February; mostly the northern valley and Delta
+Brant|NC=WPF2 CC=WPF2|Tied to a few eelgrass bays
+Cinnamon Teal|CV=A2 SC=A2|Marsh bird, not on every pond
+Northern Pintail|CC=WPF2 SC=WPF2 DES=WPF2|Concentrated at a few wetlands in these regions
+Canvasback|SC=WF2|Gone by late March
+Greater Scaup|CC=WF2 SC=WF3|Gone by late March
+Lesser Scaup|CV=WPF2|Deeper ponds and lakes only
+Ring-necked Duck|SN=WPF2|Park lists: uncommon in the mountains
+Common Goldeneye|W>WF NC=WF2 CV=WF2|Gone by late March; rivers and deep water only
+Barrow's Goldeneye|W>WF DES=x|One stretch of the Colorado River only
+Hooded Merganser|CC=WF2 SC=WF3|Gone by late March
+Red-breasted Merganser|BAY=WPF2 NC=WPF2 CC=WPF2 SC=WPF2|Scattered on open salt water; takes scanning
+Harlequin Duck|ALL=x|A handful of birds statewide each winter
+Black Scoter|ALL=x|A handful among other scoters each winter
+White-winged Scoter|W>WF NC=WF3|Scarce among Surf Scoters
+Long-tailed Duck|ALL=x|A handful statewide each winter
+Eurasian Wigeon|W>WF|Present November to February
+# ---------------- grebes, pigeons, hummingbirds
+Horned Grebe|SC=WF2 DES=WF3|Gone by late March in the south
+Red-necked Grebe|W>WF NC=WF3|Scarce even on the north coast
+Eared Grebe|SN=A2 SC=WPF1 DES=A2|East-side and desert lakes only; winter counts show it stays in the Sierra region
+Western Grebe|SN=A2 DES=A2|Large lakes only
+Band-tailed Pigeon|CV=x CC=A2 SC=A2|Hill and mountain forest bird; irregular on the valley floor
+Rufous Hummingbird|BAY=P3 NC=P2 CV=P3 CC=P3 SC=P3 DES=P3 SN=S2|Spring passage in the lowlands, July and August in mountain meadows; almost none in fall; easily confused with Allen's
+Costa's Hummingbird|DES=P1+WF2|Easy across the desert only in spring; other seasons mainly low-desert gardens
+Black-chinned Hummingbird|DES=PS2|Riverside trees and towns only
+Inca Dove|DES=A3|Breeding survey 2% of runs; a few towns only and declining
+Common Ground Dove|DES=A2|Breeding survey 7% of runs; southern valleys and the Colorado River only
+White-winged Dove|DES=PS2|Breeding survey 23% of runs; scarce in the Mojave; gone by September
+Greater Roadrunner|DES=A2|Breeding survey 25% of runs; widespread but thinly spread
+# ---------------- cranes, rails
+Sandhill Crane|CV=WF2 DES=WF3 SN=PS3|Dependable only at known roost and feeding areas; leaves by early March
+Common Gallinule|CV=A2 DES=A2|Marsh edges only
+Virginia Rail|SN=PSF3|Present into fall
+Sora|SN=PSF3|Present into fall
+# ---------------- shorebirds
+Black-bellied Plover|W>A@BAY,NC,CC,SC DES=WPF2|Adults are back on the coast by July; in the desert mostly the Imperial Valley
+Semipalmated Plover|W>A@BAY,NC,CC,SC SN=PS3|Back on the coast by July; mountain passage is July and August
+Pacific Golden-Plover|ALL=x|A few birds at a few sites
+Mountain Plover|W>WF DES=WF3|Present November to February; declining
+Hudsonian Whimbrel|W>A@BAY,NC,CC,SC|Back on the coast by July
+Long-billed Curlew|W>A@BAY,NC,CC,SC DES=WPF2|Back on the coast by July; in the desert mostly the Imperial Valley
+Marbled Godwit|W>A@BAY,NC,CC,SC|Back on the coast by July
+Ruddy Turnstone|W>A@BAY,NC,CC,SC|Back on the coast by late July
+Black Turnstone|W>A@BAY,NC,CC,SC SC=A2|Back on the coast by July; fewer in the south
+Red Knot|SC=WPF3|Small flocks at a few bays
+Surfbird|W>A@BAY,NC,CC,SC NC=A2 CC=A2|Back by July; rocky shore and jetties only
+Sanderling|W>A@BAY,NC,CC,SC|Back on the coast by late July
+Dunlin|CV=WPF2|Flocks concentrate at refuges
+Baird's Sandpiper|ALL=x|Passes through in about four weeks
+Least Sandpiper|W>A@BAY,NC,CC,SC SN=PS2|Back by July; mountain passage is July and August
+Pectoral Sandpiper|SN=x DES=x|Too few inland
+Western Sandpiper|W>A@BAY,NC,CC,SC CV=WPF2 DES=WPF2 SN=PS2|Back by July; inland mostly a passage bird
+Short-billed Dowitcher|W>A@BAY,NC,CC,SC|Back on the coast by July
+Long-billed Dowitcher|W>A@BAY,NC,CC,SC|Back by late July
+Wilson's Snipe|CV=WPF2 SN=A2|Well hidden; winter counts show it stays in the Sierra region
+Spotted Sandpiper|W>A@BAY,CC,SC NC=PS2 SN=PS2|Present by July; thinly spread along mountain streams
+Wandering Tattler|W>A@BAY,NC,CC,SC|Back on rocky shores by late July
+Lesser Yellowlegs|BAY=SF3 NC=SF3 CV=SF2+WP3 SN=S3 CC=SF3 SC=SF2+WP3 DES=SF2+WP3|Mainly a July to October bird; few stay the winter
+Prairie Willet|W>A@BAY,NC,CC,SC|Back on the coast by July
+Greater Yellowlegs|W>A@BAY,NC,CC,SC|Back by July
+Wilson's Phalarope|BAY=S2 CV=PS2 SN=PS2 CC=S3 SC=S2 DES=PS2|Southbound in June to August; nearly gone by September; east-side lakes only in the Sierra region
+Red-necked Phalarope|BAY=SF2 NC=SF2 CV=SF3 SN=S2 CC=SF2 SC=SF2 DES=SF2|Southbound July to September; little spring passage on land; passage birds are never Level 1
+# ---------------- seabirds from shore, terns, gulls
+Common Murre|BAY=A2 CC=A2|Usually distant from shore
+Pigeon Guillemot|BAY=PS2|Outer rocky coast only
+Rhinoceros Auklet|CC=A3 SC=x|Scarce from shore
+Ancient Murrelet|ALL=x|Scarce from shore
+Tufted Puffin|ALL=x|A few pairs on offshore rocks
+Caspian Tern|CC=PSF2 DES=PSF2|Tied to a few colonies and estuaries
+Black Tern|CV=S2 SN=S2 SC=x DES=SF2|Arrives in May; in the desert only the Salton Sea
+Common Tern|DES=x|Too few inland
+Forster's Tern|DES=A2|Salton Sea and Colorado River only
+Royal Tern|SC=A1 CC=WF2|Now present all year in the south
+Gull-billed Tern|DES=S3|South end of the Salton Sea only
+Black Skimmer|SC=A2 DES=S3|A handful of bays and lagoons
+Bonaparte's Gull|BAY=WPF2 SC=WPF2|Irregular flocks
+Laughing Gull|ALL=x|A few at the Salton Sea in summer; rated in the first table by mistake
+Franklin's Gull|ALL=x|A few in spring
+Heermann's Gull|BAY=SF1 CC=SF1+W2|Leaves the northern coast by December
+American Herring Gull|BAY=WPF2 NC=WPF2 CV=WPF2 CC=WPF2 SC=WF2 DES=WF2|Has to be picked out of mixed gull flocks
+Iceland Gull|BAY=WF3 NC=WF3 CV=WF3 CC=WF3 SC=x DES=x|Hard to tell from other large gulls
+Glaucous-winged Gull|SC=WPF2|Fewer in the south
+Glaucous Gull|ALL=x|A few each winter
+Yellow-footed Gull|DES=SF3|Salton Sea shoreline only; numbers have fallen
+Red-throated Loon|BAY=WPF2 NC=WPF2 CC=WPF2 SC=WPF2|Usually distant on open water
+Pacific Loon|NC=WPF2 CC=WPF2 SC=WPF2|Usually distant on open water
+Common Loon|SC=WPF2|Fewer and farther out in the south
+Sooty Shearwater|CC=SF2|Seen from shore on some days, not others
+Pelagic Cormorant|BAY=A2 CC=A2|Outer rocky coast only
+Neotropic Cormorant|DES=A3|South end of the Salton Sea and nearby lakes only
+Double-crested Cormorant|SN=A2|Reservoirs and large lakes
+American White Pelican|CC=A2 SC=A2 DES=A2|Non-breeders arrive in summer; in the desert mostly the Salton Sea and Colorado River
+Brown Pelican|DES=SF3|Salton Sea numbers have fallen sharply
+American Egret|SN=A2|Winter counts show it stays in the foothills
+Great Blue Heron|SN=A2|Park lists: uncommon in the mountains
+Green Heron|NC=PSF2 CV=A2 SN=A3 SC=A2 DES=A2|Quiet and easily missed; leaves the north coast in winter; breeding survey finds it on 7% of Sierra runs
+# ---------------- raptors
+Osprey|BAY=A2 SN=PSF2 SC=A2|Tied to lakes, bays and large rivers
+White-tailed Kite|BAY=A2 CV=A2 CC=A2|Declining; open grassland and marsh edge
+Bald Eagle|SN=A2|Tied to large lakes and reservoirs
+Cooper's Hawk|BAY=A2 CV=A2 CC=A2 SC=A2|Common, but meetings are a matter of chance
+Northern Harrier|CC=A2 DES=WPF2|Open marsh and grassland
+Broad-winged Hawk|ALL=x|A few each fall at one hawk watch
+Rough-legged Hawk|W>WF|Present November to February
+Ferruginous Hawk|W>WF|Present October to February
+Swainson's Hawk|BAY=PS3|Breeding survey finds it on 16% of Bay Area runs (Solano and eastern Contra Costa)
+American Kestrel|BAY=A2 SC=A2|Declined near the coast
+# ---------------- woodpeckers, kingfisher
+Belted Kingfisher|NC=A2|Breeding survey 12% of runs; one bird per stretch of river
+Lewis's Woodpecker|SN=A3|Local and irregular
+Williamson's Sapsucker|SN=A3|High forest, quiet and thinly spread
+Red-naped Sapsucker|W>WF|Present October to February
+Downy Woodpecker|NC=A2 CV=A2 CC=A2|Breeding survey 20 to 40% of runs; streamside trees
+Ladder-backed Woodpecker|DES=A2|Breeding survey 32% of runs
+Pileated Woodpecker|BAY=A2|Breeding survey 32% of Bay Area runs
+# ---------------- flycatchers
+Brown-crested Flycatcher|DES=S3|Breeding survey none; a few riverside sites; arrives in May
+Tropical Kingbird|BAY=x NC=x CC=x SC=WF3|A few each fall and winter
+Cassin's Kingbird|DES=PS3|Breeding survey 7% of runs on desert-edge routes
+Olive-sided Flycatcher|BAY=S2 NC=S1 SN=S1 CC=S2 SC=S2 CV=x DES=x|Arrives in May; too brief on passage in the lowlands
+Western Wood-Pewee|BAY=S2 NC=S1 CV=S2 SN=S1 DES=x|Arrives in May; breeding survey finds it on 42% of valley runs
+Hammond's Flycatcher|BAY=x CV=x CC=x SC=P3 DES=P3 SN=PS2|Scarce on passage; hard to tell from other small flycatchers
+Gray Flycatcher|DES=P3|Spring passage
+Dusky Flycatcher|SN=PS2 DES=P3|Hard to tell from other small flycatchers
+Western Flycatcher|CV=P2 SN=PS2 SC=PS2 DES=P2|Shaded canyons; breeding survey 33 to 34% of runs
+Say's Phoebe|SN=A2 CC=WPF1|Breeding survey 18% of Central Coast runs in June; easy there from fall to spring
+# ---------------- vireos, shrikes, jays
+Hutton's Vireo|CV=A3|Breeding survey 16% of valley runs
+Cassin's Vireo|BAY=PS2 CV=P3 SC=PSF2 DES=P3|Breeding survey 30% of Bay Area runs in June
+Western Warbling-Vireo|SC=PSF2 DES=P2|Breeding survey 11% of southern runs
+Northern Shrike|W>WF|Present November to February
+Steller's Jay|CC=A2 SC=A2|Mountain and coastal forest only
+Woodhouse's Scrub-Jay|DES=A3|A few desert mountain ranges
+Clark's Nutcracker|SN=A2 SC=A3|Breeding survey 19% of Sierra runs; high country only
+Black-billed Magpie|SN=A2 DES=A3|Breeding survey 25% of Sierra runs and 3% of desert runs; east side only
+Yellow-billed Magpie|BAY=A2|Breeding survey 22% of Bay Area runs
+Common Raven|CV=A1|Breeding survey 64% of valley runs
+# ---------------- larks, swallows, small birds of brush and canopy
+Horned Lark|CV=A2|Bare fields; easily overlooked
+Tree Swallow|NC=PS1 CC=PS1 DES=WPF2|Gone from the north coast by fall; in the desert mostly the Salton Sea
+Violet-green Swallow|P>PS CV=PS2 DES=P2|Mostly gone by September; breeding survey finds it on 28% of valley runs
+Northern Rough-winged Swallow|P>PS|Gone by September
+Purple Martin|NC=PS3|A few colonies
+Wrentit|CV=A3|Breeding survey 22% of valley runs (riverside forest)
+Ruby-crowned Kinglet|SN=WPF2|Breeding survey 2% of runs in summer; winters in the foothills
+Golden-crowned Kinglet|NC=A2 SN=A2|Heard far more often than seen
+Phainopepla|SC=PSF2 SN=PS3|Foothill chaparral and oaks, not the coastal plain
+White-breasted Nuthatch|NC=A2 SC=A2|Inland oaks and mountains only; park list: occasional on the redwood coast
+Pygmy Nuthatch|BAY=A2 SN=A2 CC=A2 SC=A2|Breeding survey 17 to 33% of runs; pine forest only
+Black-tailed Gnatcatcher|DES=A2|Breeding survey 18% of runs
+Rock Wren|SN=A2|Winter counts show it stays in the Sierra region
+Cactus Wren|SC=A3|Breeding survey 15% of southern runs; the first table wrongly called it too rare
+Western Marsh-Wren|NC=A2 SN=A2|Breeding survey 6% of north coast runs; marshes are few there
+Northern House Wren|BAY=PSF2 NC=PSF2|Breeding survey 26 to 28% of runs; inland oak woodland
+California Thrasher|DES=A3|Breeding survey 16% of desert-edge runs
+# ---------------- thrushes, pipit
+Mountain Bluebird|W>WF SN=A2|Breeding survey 21% of Sierra runs; east side and high meadows; elsewhere present November to February
+Swainson's Thrush|BAY=S2 NC=S2 CC=S2 SN=S3 SC=S3 CV=x DES=x|Arrives in May; too brief and too shy on passage
+Hermit Thrush|BAY=A2 NC=A2 CV=WPF2 SN=A2 CC=WPF2 SC=WPF2|Common but stays in deep shade
+American Pipit|SN=WPF2|Breeding survey none; alpine nesters are few, winter flocks are the dependable ones
+# ---------------- finches
+Evening Grosbeak|SN=A3|Wanders; never dependable
+Cassin's Finch|SN=PSF1|Leaves the high country in winter
+Red Crossbill|SN=A3|Wanders; never dependable
+Pine Siskin|NC=A2 SN=A2|Breeding survey 23 to 27% of runs; numbers swing from year to year
+Lesser Goldfinch|NC=A1 SN=A1|Breeding survey 64 to 71% of runs
+Lawrence's Goldfinch|DES=P3|Erratic; spring on the desert edge
+Lapland Longspur|ALL=x|A few each winter
+# ---------------- sparrows, towhees
+Lark Sparrow|NC=PSF3 CC=A2|Inland grassland; scarce on the north coast in winter
+Black-chinned Sparrow|BAY=x|Irregular this far north
+Brewer's Sparrow|SN=PS2 DES=WPF2|Breeding survey 32% of Sierra runs; east-side sagebrush only
+Fox Sparrow|BAY=WPF2 NC=WPF2 SN=PS1+WF2 CC=WPF2 SC=WPF2|Keeps to dense brush in winter; sings in the open on mountain chaparral in summer
+White-crowned Sparrow|BAY=WPF1+S2 SN=A2 CC=WPF1+S2|Breeding survey 6 to 18% of runs in June: in summer only on the immediate coast or in high mountain meadows
+White-throated Sparrow|W>WF|Present October to February
+Bell's Sparrow|NC=A3|Breeding survey 7% of runs on 5 routes
+Savannah Sparrow|BAY=WPF1 NC=WPF1+S2 SN=A2 CC=WPF1 SC=WPF1|Breeding survey 1 to 18% of coastal runs in June; summer birds on the south coast are a protected race
+Lincoln's Sparrow|SN=A2|Mountain meadows in summer, foothills in winter
+Abert's Towhee|DES=A2|Breeding survey 10% of runs; Colorado River and southern valleys only
+California Towhee|DES=A2|Breeding survey 16% of runs; common on the Joshua Tree park list; the first table wrongly called it too rare
+Green-tailed Towhee|SN=S1 SC=S2 DES=P3|Arrives in May
+Mountain Quail|BAY=A3|Breeding survey 11% of Bay Area runs
+# ---------------- chat, blackbirds, orioles
+Yellow-breasted Chat|NC=S2 SN=S3|Arrives in May
+Yellow-headed Blackbird|SN=PS2|Breeding survey 16% of runs; northeastern marshes only
+Red-winged Blackbird|SN=A1|Winter counts show it stays in the Sierra region
+Hooded Oriole|DES=PS2|Breeding survey 8% of runs; palms in towns and oases
+Great-tailed Grackle|CC=A3 SC=A2|Breeding survey 0% and 12% of runs; park lakes and a few marshes
+Mourning Dove|SN=A1|Winter counts show it stays in the Sierra region
+# ---------------- warblers, tanagers, buntings
+Orange-crowned Warbler|SN=PSF1|Abundant in the mountains into fall
+Lucy's Warbler|DES=PS3|Breeding survey 2% of runs; mesquite groves at a few sites
+Nashville Warbler|M>P|Little fall passage in the lowlands
+MacGillivray's Warbler|CV=P3 CC=P3 SC=P3 DES=P3|Stays hidden low in brush
+Common Yellowthroat|NC=A2 DES=A2|Breeding survey 10 to 18% of runs; marshes are few
+Yellow Warbler|NC=PS2 DES=P2|Streamside trees only
+Black-throated Gray Warbler|BAY=PSF2 CC=PSF2 SC=PSF2 DES=P2|Breeding survey 22% of Bay Area runs in June: it nests here
+Townsend's Warbler|DES=P2|Spring passage
+Hermit Warbler|BAY=PS3 CC=PS3 CV=x SC=P3 DES=P3|Breeding survey 17 to 19% of runs in June: it nests in the Santa Cruz Mountains
+Wilson's Warbler|DES=P2|Spring passage
+Summer Tanager|DES=PS3|Breeding survey 1% of runs; a few riverside groves
+Western Tanager|BAY=PSF2 CC=PSF2 SC=PSF2 DES=P2|Breeding survey 36 to 48% of runs in June: it nests in the hills
+Black-headed Grosbeak|DES=P2|Spring passage
+Blue Grosbeak|S>S|Arrives in May
+Lazuli Bunting|NC=PS1 DES=P3|Breeding survey 71% of north coast runs
+# ---------------- Sierra and Northeast: birds of the east side or of one elevation band
+American Avocet|SN=PS2|East-side alkali lakes only
+Pinyon Jay|SN=A3|Wandering flocks; never dependable
+Common Merganser|BAY=A2|Breeding survey 38% of Bay Area runs in June: it nests here
+# ---------------- Southern Coast and Deserts: birds of one corner of the region
+Mountain Chickadee|SC=A2|Mountains only
+Canada Goose|DES=A2|Now resident at desert lakes and golf courses
+White-faced Ibis|DES=A2|Imperial Valley and Colorado River only
+Black-crowned Night Heron|DES=A2|Salton Sea, Colorado River and a few ponds
+Western Cattle-Egret|DES=A2|Imperial and Coachella valleys only
+Dark-eyed Junco|DES=WPF2|Towns, oases and desert mountains in winter
+Broad-tailed Hummingbird|ALL=x|A few remote desert mountain canyons
+Rock Sandpiper|ALL=x|A few birds on north coast jetties

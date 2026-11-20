@@ -1,0 +1,25 @@
+{
+  "name": "california-bird-atlas",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*", "/media/*"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "california-bird-atlas",
+      "database_id": "b2d1fee0-dda7-46aa-b89d-d4a037ac380d"
+    }
+  ]
+  // PHOTO ORIGINALS: once R2 is enabled in the Cloudflare dashboard and a bucket
+  // named "california-bird-atlas-photos" exists, add a comma after the ] above
+  // and uncomment the block below. Until then, display-size copies are kept in D1
+  // and full-resolution originals are not archived.
+  // "r2_buckets": [
+  //   { "binding": "PHOTOS", "bucket_name": "california-bird-atlas-photos" }
+  // ]
+}

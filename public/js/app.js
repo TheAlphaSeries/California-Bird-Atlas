@@ -1,0 +1,100 @@
+import { S, $, $$, api, loadAll, toast, modal, go, esc } from './util.js';
+import { openObservation, syncDrafts, draftCount } from './observe.js';
+
+const routes = [
+  [/^\/$/, () => import('./views/cover.js'), 'cover'],
+  [/^\/gallery\/?$/, () => import('./views/gallery.js'), 'gallery'],
+  [/^\/fieldwork\/?$/, () => import('./views/fieldwork.js'), 'fieldwork'],
+  [/^\/the-index\/?$/, () => import('./views/theindex.js'), 'index'],
+  [/^\/the-index\/(WI-\d{3})\/?$/, () => import('./views/bird.js'), 'index'],
+  [/^\/about\/?$/, () => import('./views/about.js'), 'about'],
+  [/^\/atlas\/?$/, () => import('./views/atlas.js'), 'atlas'],
+  [/^\/archive\/?$/, () => import('./views/archive.js'), 'archive'],
+  [/^\/guide\/?$/, () => import('./views/guide.js'), 'guide'],
+  [/^\/species\/(\d+)\/?$/, () => import('./views/species.js'), 'guide'],
+  [/^\/life-list\/?$/, () => import('./views/lifelist.js'), 'life-list'],
+  [/^\/journal\/?$/, () => import('./views/journal.js'), 'journal'],
+  [/^\/explore\/?$/, () => import('./views/explore.js'), 'explore'],
+  [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
+];
+
+async function render() {
+  const path = location.pathname;
+  const view = $('#view');
+  document.body.classList.remove('menu-open', 'dark', 'mag');
+  renderChrome();
+  for (const [re, load, nav] of routes) {
+    const m = re.exec(path);
+    if (!m) continue;
+    $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
+    document.body.classList.remove('menu-open');
+    try {
+      const mod = await load();
+      await mod.default(view, ...m.slice(1));
+    } catch (e) {
+      console.error(e);
+      view.innerHTML = `<div class="wrap"><p class="empty">This page could not be opened: ${esc(e.message)}</p></div>`;
+    }
+    if (!location.hash) window.scrollTo(0, 0);
+    return;
+  }
+  view.innerHTML = `<div class="wrap page-head"><span class="label">Not found</span><h1>No such page</h1><p class="deck">Return to <a href="/" data-link>the cover</a>.</p></div>`;
+}
+
+const PUBLIC_NAV = [['/', 'cover', 'Cover'], ['/gallery', 'gallery', 'Gallery'], ['/fieldwork', 'fieldwork', 'Fieldwork'], ['/the-index', 'index', 'The Index'], ['/about', 'about', 'About']];
+const TOOLS_NAV = [['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
+const TOOL_PATHS = [/^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
+export function renderChrome() {
+  const link = ([href, key, label], cls = '') => `<a href="${href}" data-link data-nav="${key}"${cls ? ` class="${cls}"` : ''}>${label}</a>`;
+  const onTool = TOOL_PATHS.some((re) => re.test(location.pathname));
+  $('#primary-nav').innerHTML = S.owner && onTool
+    ? link(PUBLIC_NAV[0]) + '<span class="tools-sep" aria-hidden="true"></span>' + TOOLS_NAV.map((x) => link(x, 'tool')).join('')
+    : PUBLIC_NAV.map((x) => link(x)).join('') + (S.owner ? '<span class="tools-sep" aria-hidden="true"></span>' + link(['/atlas', 'atlas', 'Tools'], 'tool') : '');
+  const n = draftCount();
+  $('#utilities').innerHTML = `
+    <a href="/the-index" data-link>Search</a>
+    ${S.owner ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
+    <a href="/settings" data-link>${S.owner ? 'Settings' : 'Sign in'}</a>`;
+  if (S.owner) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
+  $('#quick-entry').hidden = !S.owner;
+  const src = S.sources || [];
+  $('#colophon').innerHTML = `<span>California Bird Atlas. California's native birds, photographed.</span>
+    <span>${S.species.length} species on the official California list. <a href="/about" data-link>About</a> · <a href="/settings#sources" data-link>Sources and data notes</a></span>`;
+}
+
+export async function refresh() { await loadAll(); renderChrome(); await render(); }
+
+export function signIn() {
+  const m = modal(`<span class="label">Owner access</span><h2>Sign in</h2>
+    ${S.configured ? '' : '<p class="note">No owner password has been set for this site yet. Add a secret named ADMIN_PASSWORD to the Worker in the Cloudflare dashboard, then return here.</p>'}
+    <form><label class="field"><span>Password</span><input type="password" name="password" autocomplete="current-password" required></label>
+    <button class="btn solid" type="submit">Sign in</button></form>`);
+  $('form', m.el).onsubmit = async (e) => {
+    e.preventDefault();
+    try { await api('/login', { method: 'POST', body: { password: e.target.password.value } }); m.close(); toast('Signed in.'); await refresh(); syncDrafts(); }
+    catch (err) { toast(err.message, true); }
+  };
+}
+export async function signOut() { await api('/logout', { method: 'POST' }); toast('Signed out.'); await refresh(); }
+
+document.addEventListener('click', (e) => {
+  const a = e.target.closest('a[data-link]');
+  if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+  const url = new URL(a.href);
+  if (url.origin !== location.origin) return;
+  e.preventDefault();
+  if (url.pathname === location.pathname && url.hash) { location.hash = url.hash; return; }
+  history.pushState({}, '', url.pathname + url.hash);
+  render().then(() => { if (url.hash) document.getElementById(url.hash.slice(1))?.scrollIntoView(); });
+});
+window.addEventListener('popstate', render);
+window.addEventListener('route', render);
+window.addEventListener('atlas:changed', refresh);
+window.addEventListener('online', () => syncDrafts());
+$('#menu-toggle').onclick = () => { const open = document.body.classList.toggle('menu-open'); $('#menu-toggle').setAttribute('aria-expanded', open); };
+$('#quick-entry').onclick = () => openObservation();
+
+(async () => {
+  try { await loadAll(); renderChrome(); await render(); if (S.owner) syncDrafts(); }
+  catch (e) { $('#view').innerHTML = `<div class="wrap"><p class="empty">The atlas could not be opened: ${esc(e.message)}</p></div>`; }
+})();

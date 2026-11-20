@@ -1,0 +1,769 @@
+# > Order | Family | Family common name | default habitats
+# Species lines: Common name|CODE[flags]|optional habitat override
+# CODE: R resident, S summer/breeding visitor, W winter visitor, M migrant, P pelagic visitor, V rare visitor
+# flags: * CBRC review species, I introduced, X extirpated, E endemic to California
+> Anseriformes | Anatidae | Ducks, Geese, and Swans | Wetlands; Lakes & ponds
+Black-bellied Whistling-Duck|V*
+Fulvous Whistling-Duck|V*
+Emperor Goose|V*|Coast
+Snow Goose|W
+Ross's Goose|W
+Greater White-fronted Goose|W
+Taiga Bean-Goose|V*
+Tundra Bean-Goose|V*
+Brant|W|Bays & estuaries
+Cackling Goose|W
+Canada Goose|R
+Mute Swan|RI
+Trumpeter Swan|V*
+Tundra Swan|W
+Whooper Swan|V*
+Egyptian Goose|RI
+Wood Duck|R
+Baikal Teal|V*
+Garganey|V*
+Blue-winged Teal|M
+Cinnamon Teal|R
+Northern Shoveler|W
+Gadwall|R
+Falcated Duck|V*
+Eurasian Wigeon|W
+American Wigeon|W
+Mallard|R
+Mexican Duck|V*
+American Black Duck|V*
+Northern Pintail|W
+Green-winged Teal|W
+Canvasback|W
+Redhead|R
+Common Pochard|V*
+Ring-necked Duck|W
+Tufted Duck|W
+Greater Scaup|W|Bays & estuaries
+Lesser Scaup|W
+Steller's Eider|V*|Coast
+King Eider|V*|Coast
+Common Eider|V*|Coast
+Harlequin Duck|W|Rocky coast
+Surf Scoter|W|Coast; Bays & estuaries
+White-winged Scoter|W|Coast; Bays & estuaries
+Stejneger's Scoter|V*|Coast
+Common Scoter|V*|Coast
+Black Scoter|W|Coast
+Long-tailed Duck|W|Coast; Bays & estuaries
+Bufflehead|W|Bays & estuaries; Lakes & ponds
+Common Goldeneye|W|Bays & estuaries; Lakes & ponds
+Barrow's Goldeneye|W|Bays & estuaries; Lakes & ponds
+Smew|V*
+Hooded Merganser|W
+Common Merganser|R|Rivers; Lakes & ponds
+Red-breasted Merganser|W|Coast; Bays & estuaries
+Ruddy Duck|R
+> Galliformes | Odontophoridae | New World Quail | Chaparral & scrub
+Mountain Quail|R|Mountains; Chaparral & scrub
+California Quail|R
+Gambel's Quail|R|Desert
+> Galliformes | Phasianidae | Pheasants, Grouse, and Allies | Grassland; Forest
+Wild Turkey|RI|Oak woodland
+Ruffed Grouse|R|Forest
+Greater Sage-Grouse|R|Sagebrush
+White-tailed Ptarmigan|RI|Alpine
+Sooty Grouse|R|Conifer forest; Mountains
+Sharp-tailed Grouse|RX|Grassland
+Ring-necked Pheasant|RI|Farmland; Grassland
+Chukar|RI|Desert; Rocky slopes
+> Podicipediformes | Podicipedidae | Grebes | Lakes & ponds; Bays & estuaries
+Least Grebe|V*
+Pied-billed Grebe|R
+Horned Grebe|W
+Red-necked Grebe|W|Coast
+Eared Grebe|R
+Western Grebe|R
+Clark's Grebe|R
+> Columbiformes | Columbidae | Pigeons and Doves | Urban & gardens; Woodland
+Rock Pigeon|RI
+Band-tailed Pigeon|R|Oak woodland; Conifer forest
+Oriental Turtle-Dove|V*
+Eurasian Collared-Dove|RI
+Spotted Dove|RI
+Inca Dove|R|Desert; Urban & gardens
+Common Ground Dove|R|Desert; Farmland
+Ruddy Ground Dove|V
+White-winged Dove|S|Desert
+Mourning Dove|R
+> Cuculiformes | Cuculidae | Cuckoos | Riparian woodland
+Common Cuckoo|V*
+Yellow-billed Cuckoo|S
+Black-billed Cuckoo|V*
+Greater Roadrunner|R|Desert; Chaparral & scrub
+Groove-billed Ani|V*
+> Caprimulgiformes | Caprimulgidae | Nightjars | Desert; Open woodland
+Lesser Nighthawk|S
+Common Nighthawk|S|Mountains; Sagebrush
+Common Poorwill|R|Chaparral & scrub; Desert
+Chuck-will's-widow|V*
+Buff-collared Nightjar|V*
+Eastern Whip-poor-will|V*
+Mexican Whip-poor-will|S|Mountains
+> Apodiformes | Apodidae | Swifts | Aerial; Cliffs
+Black Swift|S|Waterfalls; Sea cliffs
+White-collared Swift|V*
+Chimney Swift|V
+Vaux's Swift|S|Conifer forest; Aerial
+Common Swift|V*
+White-throated Swift|R
+> Apodiformes | Trochilidae | Hummingbirds | Urban & gardens; Chaparral & scrub
+Mexican Violetear|V*
+Rivoli's Hummingbird|V*
+Blue-throated Mountain-gem|V*
+Ruby-throated Hummingbird|V*
+Black-chinned Hummingbird|S|Riparian woodland
+Anna's Hummingbird|R
+Costa's Hummingbird|R|Desert; Chaparral & scrub
+Calliope Hummingbird|S|Mountains
+Rufous Hummingbird|M
+Allen's Hummingbird|S|Coastal scrub; Urban & gardens
+Broad-tailed Hummingbird|S|Mountains
+Broad-billed Hummingbird|V
+Violet-crowned Hummingbird|V*
+Xantus's Hummingbird|V*
+> Gruiformes | Rallidae | Rails, Gallinules, and Coots | Marshes
+Ridgway's Rail|R|Salt marsh
+Virginia Rail|R
+Sora|R
+Common Gallinule|R
+American Coot|R|Lakes & ponds; Marshes
+Purple Gallinule|V*
+Yellow Rail|W
+Black Rail|R|Salt marsh; Marshes
+> Gruiformes | Gruidae | Cranes | Farmland; Wetlands
+Sandhill Crane|W
+Common Crane|V*
+> Charadriiformes | Recurvirostridae | Stilts and Avocets | Mudflats; Wetlands
+Black-necked Stilt|R
+American Avocet|R
+> Charadriiformes | Haematopodidae | Oystercatchers | Rocky coast
+American Oystercatcher|V*
+Black Oystercatcher|R
+> Charadriiformes | Charadriidae | Plovers | Beaches; Mudflats
+Black-bellied Plover|W
+American Golden-Plover|M
+Pacific Golden-Plover|W
+Eurasian Dotterel|V*
+Killdeer|R|Farmland; Wetlands; Urban & gardens
+Common Ringed Plover|V*
+Semipalmated Plover|W
+Piping Plover|V*
+Siberian Sand-Plover|V*
+Greater Sand-Plover|V*
+Wilson's Plover|V*
+Snowy Plover|R|Beaches; Alkali flats
+Mountain Plover|W|Grassland; Farmland
+> Charadriiformes | Scolopacidae | Sandpipers and Allies | Mudflats; Beaches
+Upland Sandpiper|V*
+Bristle-thighed Curlew|V*
+Whimbrel|W
+Little Curlew|V*
+Long-billed Curlew|W|Mudflats; Grassland
+Bar-tailed Godwit|V
+Black-tailed Godwit|V*
+Hudsonian Godwit|V*
+Marbled Godwit|W
+Ruddy Turnstone|W|Rocky coast; Beaches
+Black Turnstone|W|Rocky coast
+Great Knot|V*
+Red Knot|W
+Surfbird|W|Rocky coast
+Ruff|V
+Sharp-tailed Sandpiper|V
+Stilt Sandpiper|M
+Curlew Sandpiper|V*
+Long-toed Stint|V*
+Red-necked Stint|V*
+Sanderling|W|Beaches
+Dunlin|W
+Rock Sandpiper|W|Rocky coast
+Purple Sandpiper|V*
+Baird's Sandpiper|M
+Little Stint|V*
+Least Sandpiper|W
+White-rumped Sandpiper|V*
+Buff-breasted Sandpiper|V
+Pectoral Sandpiper|M
+Semipalmated Sandpiper|M
+Western Sandpiper|W
+Short-billed Dowitcher|W
+Long-billed Dowitcher|W|Wetlands; Mudflats
+Jack Snipe|V*
+American Woodcock|V*
+Common Snipe|V*
+Wilson's Snipe|W|Marshes; Wet meadows
+Terek Sandpiper|V*
+Spotted Sandpiper|R|Rivers; Lakes & ponds
+Solitary Sandpiper|M|Lakes & ponds
+Gray-tailed Tattler|V*
+Wandering Tattler|W|Rocky coast
+Lesser Yellowlegs|W|Wetlands
+Willet|W
+Spotted Redshank|V*
+Common Greenshank|V*
+Greater Yellowlegs|W|Wetlands; Mudflats
+Wood Sandpiper|V*
+Marsh Sandpiper|V*
+Wilson's Phalarope|S|Wetlands; Alkali lakes
+Red-necked Phalarope|M|Ocean; Bays & estuaries
+Red Phalarope|M|Ocean
+> Charadriiformes | Stercorariidae | Skuas and Jaegers | Ocean
+South Polar Skua|P
+Pomarine Jaeger|P
+Parasitic Jaeger|P|Ocean; Coast
+Long-tailed Jaeger|P
+> Charadriiformes | Alcidae | Auks, Murres, and Puffins | Ocean; Sea cliffs
+Common Murre|R
+Thick-billed Murre|V*
+Pigeon Guillemot|R|Rocky coast; Ocean
+Long-billed Murrelet|V*
+Marbled Murrelet|R|Ocean; Old-growth forest
+Kittlitz's Murrelet|V*
+Scripps's Murrelet|S
+Guadalupe Murrelet|P
+Craveri's Murrelet|P
+Ancient Murrelet|W
+Cassin's Auklet|R
+Parakeet Auklet|V*
+Least Auklet|V*
+Crested Auklet|V*
+Rhinoceros Auklet|R
+Horned Puffin|V
+Tufted Puffin|R
+> Charadriiformes | Laridae | Gulls, Terns, and Skimmers | Coast; Bays & estuaries
+Swallow-tailed Gull|V*
+Black-legged Kittiwake|W|Ocean
+Red-legged Kittiwake|V*
+Ivory Gull|V*
+Sabine's Gull|P|Ocean
+Bonaparte's Gull|W
+Black-headed Gull|V*
+Little Gull|V*
+Ross's Gull|V*
+Laughing Gull|V
+Franklin's Gull|M
+Belcher's Gull|V*
+Black-tailed Gull|V*
+Heermann's Gull|W
+Short-billed Gull|W
+Ring-billed Gull|R|Lakes & ponds; Urban & gardens; Coast
+Western Gull|R
+Yellow-footed Gull|S|Salton Sea
+California Gull|R|Lakes & ponds; Coast
+American Herring Gull|W
+Iceland Gull|W
+Lesser Black-backed Gull|V
+Slaty-backed Gull|V
+Glaucous-winged Gull|W
+Glaucous Gull|W
+Great Black-backed Gull|V*
+Kelp Gull|V*
+Sooty Tern|V*
+Bridled Tern|V*
+Least Tern|S|Beaches; Bays & estuaries
+Gull-billed Tern|S
+Caspian Tern|R
+Black Tern|S|Marshes; Lakes & ponds
+White-winged Tern|V*
+Common Tern|M
+Arctic Tern|P|Ocean
+Forster's Tern|R
+Royal Tern|W
+Sandwich Tern|V*
+Elegant Tern|S
+Black Skimmer|R
+> Phaethontiformes | Phaethontidae | Tropicbirds | Ocean
+White-tailed Tropicbird|V*
+Red-billed Tropicbird|P
+Red-tailed Tropicbird|V*
+> Gaviiformes | Gaviidae | Loons | Coast; Bays & estuaries
+Red-throated Loon|W
+Arctic Loon|V*
+Pacific Loon|W
+Common Loon|W|Coast; Lakes & ponds
+Yellow-billed Loon|V*
+> Procellariiformes | Diomedeidae | Albatrosses | Ocean
+White-capped Albatross|V*
+Chatham Albatross|V*
+Salvin's Albatross|V*
+Light-mantled Albatross|V*
+Wandering Albatross|V*
+Laysan Albatross|P
+Black-footed Albatross|P
+Short-tailed Albatross|V*
+> Procellariiformes | Oceanitidae | Southern Storm-Petrels | Ocean
+Wilson's Storm-Petrel|P
+> Procellariiformes | Hydrobatidae | Northern Storm-Petrels | Ocean
+Fork-tailed Storm-Petrel|P
+Ringed Storm-Petrel|V*
+Leach's Storm-Petrel|P
+Townsend's Storm-Petrel|P
+Ashy Storm-Petrel|R
+Wedge-rumped Storm-Petrel|V*
+Black Storm-Petrel|P
+Tristram's Storm-Petrel|V*
+Least Storm-Petrel|P
+> Procellariiformes | Procellariidae | Shearwaters and Petrels | Ocean
+Northern Fulmar|P
+Gray-faced Petrel|V*
+Murphy's Petrel|P
+Mottled Petrel|V
+Hawaiian Petrel|P
+Cook's Petrel|P
+Stejneger's Petrel|V*
+Bulwer's Petrel|V*
+Jouanin's Petrel|V*
+White-chinned Petrel|V*
+Parkinson's Petrel|V*
+Streaked Shearwater|V*
+Cory's Shearwater|V*
+Wedge-tailed Shearwater|V*
+Buller's Shearwater|P
+Short-tailed Shearwater|P
+Sooty Shearwater|P
+Great Shearwater|V*
+Pink-footed Shearwater|P
+Flesh-footed Shearwater|P
+Manx Shearwater|P
+Newell's Shearwater|V*
+Black-vented Shearwater|P
+> Ciconiiformes | Ciconiidae | Storks | Wetlands
+Wood Stork|V*
+> Suliformes | Fregatidae | Frigatebirds | Ocean; Coast
+Magnificent Frigatebird|V
+Great Frigatebird|V*
+Lesser Frigatebird|V*
+> Suliformes | Sulidae | Boobies and Gannets | Ocean; Coast
+Masked Booby|V
+Nazca Booby|V
+Blue-footed Booby|V
+Brown Booby|P
+Cocos Booby|P
+Red-footed Booby|V
+Northern Gannet|V*
+> Suliformes | Anhingidae | Anhingas | Wetlands
+Anhinga|V*
+> Suliformes | Phalacrocoracidae | Cormorants | Coast; Bays & estuaries
+Brandt's Cormorant|R|Rocky coast; Ocean
+Pelagic Cormorant|R|Rocky coast; Sea cliffs
+Double-crested Cormorant|R|Lakes & ponds; Bays & estuaries; Coast
+Neotropic Cormorant|R|Lakes & ponds
+> Pelecaniformes | Pelecanidae | Pelicans | Coast; Bays & estuaries
+American White Pelican|W|Lakes & ponds; Bays & estuaries
+Brown Pelican|R
+> Pelecaniformes | Ardeidae | Herons, Egrets, and Bitterns | Wetlands; Marshes
+American Bittern|R
+Least Bittern|R
+Great Blue Heron|R|Wetlands; Coast; Grassland
+Great Egret|R
+Snowy Egret|R
+Little Blue Heron|V
+Tricolored Heron|V*
+Reddish Egret|W|Bays & estuaries
+Western Cattle-Egret|R|Farmland
+Green Heron|R|Riparian woodland; Lakes & ponds
+Black-crowned Night Heron|R
+Yellow-crowned Night Heron|R|Bays & estuaries
+> Pelecaniformes | Threskiornithidae | Ibises and Spoonbills | Wetlands
+White Ibis|V*
+Glossy Ibis|V*
+White-faced Ibis|R|Wetlands; Farmland
+Roseate Spoonbill|V*
+> Cathartiformes | Cathartidae | New World Vultures | Open country; Mountains
+California Condor|R|Mountains; Coast ranges
+Black Vulture|V*
+Turkey Vulture|R
+> Accipitriformes | Pandionidae | Osprey | Lakes & ponds; Coast
+Osprey|R
+> Accipitriformes | Accipitridae | Hawks, Eagles, and Kites | Open country; Woodland
+White-tailed Kite|R|Grassland; Farmland
+Swallow-tailed Kite|V*
+Golden Eagle|R|Mountains; Grassland
+Northern Harrier|R|Marshes; Grassland
+Sharp-shinned Hawk|W|Woodland
+Cooper's Hawk|R|Woodland; Urban & gardens
+American Goshawk|R|Conifer forest
+Bald Eagle|R|Lakes & ponds; Rivers
+White-tailed Eagle|V*
+Mississippi Kite|V*
+Common Black Hawk|V*
+Harris's Hawk|V*|Desert
+Gray Hawk|V*
+Red-shouldered Hawk|R|Riparian woodland; Urban & gardens
+Broad-winged Hawk|M
+Swainson's Hawk|S|Farmland; Grassland
+Zone-tailed Hawk|V
+Red-tailed Hawk|R
+Rough-legged Hawk|W|Grassland
+Ferruginous Hawk|W|Grassland
+> Strigiformes | Tytonidae | Barn-Owls | Farmland; Grassland
+American Barn Owl|R
+> Strigiformes | Strigidae | Owls | Woodland; Forest
+Flammulated Owl|S|Conifer forest
+Western Screech-Owl|R|Oak woodland; Riparian woodland
+Great Horned Owl|R
+Snowy Owl|V*
+Northern Pygmy-Owl|R|Conifer forest
+Elf Owl|S|Desert
+Burrowing Owl|R|Grassland; Farmland
+Spotted Owl|R|Old-growth forest
+Barred Owl|R|Forest
+Great Gray Owl|R|Mountain meadows; Conifer forest
+Long-eared Owl|R|Riparian woodland
+Short-eared Owl|W|Marshes; Grassland
+Northern Saw-whet Owl|R|Conifer forest
+> Coraciiformes | Alcedinidae | Kingfishers | Rivers; Lakes & ponds; Coast
+Belted Kingfisher|R
+> Piciformes | Picidae | Woodpeckers | Woodland; Forest
+Lewis's Woodpecker|R|Oak woodland
+Red-headed Woodpecker|V*
+Acorn Woodpecker|R|Oak woodland
+Gila Woodpecker|R|Desert
+Williamson's Sapsucker|R|Conifer forest; Mountains
+Yellow-bellied Sapsucker|W
+Red-naped Sapsucker|W
+Red-breasted Sapsucker|R|Conifer forest; Riparian woodland
+Black-backed Woodpecker|R|Burned forest; Conifer forest
+Downy Woodpecker|R|Riparian woodland
+Nuttall's Woodpecker|R|Oak woodland
+Ladder-backed Woodpecker|R|Desert
+Hairy Woodpecker|R|Conifer forest
+White-headed Woodpecker|R|Conifer forest; Mountains
+Northern Flicker|R
+Gilded Flicker|R|Desert
+Pileated Woodpecker|R|Old-growth forest; Conifer forest
+> Falconiformes | Falconidae | Falcons and Caracaras | Open country
+Crested Caracara|V
+Eurasian Kestrel|V*
+American Kestrel|R|Grassland; Farmland
+Merlin|W
+Gyrfalcon|V*
+Peregrine Falcon|R|Coast; Cliffs; Urban & gardens
+Prairie Falcon|R|Desert; Grassland
+> Psittaciformes | Psittaculidae | Old World Parrots | Urban & gardens
+Rose-ringed Parakeet|RI
+> Psittaciformes | Psittacidae | New World Parrots | Urban & gardens
+Yellow-chevroned Parakeet|RI
+Red-crowned Amazon|RI
+Lilac-crowned Amazon|RI
+Nanday Parakeet|RI
+Mitred Parakeet|RI
+Red-masked Parakeet|RI
+> Passeriformes | Tyrannidae | Tyrant Flycatchers | Woodland; Riparian woodland
+Dusky-capped Flycatcher|V
+Ash-throated Flycatcher|S|Oak woodland; Chaparral & scrub
+Nutting's Flycatcher|V*
+Great Crested Flycatcher|V
+Brown-crested Flycatcher|S|Desert; Riparian woodland
+Sulphur-bellied Flycatcher|V*
+Tropical Kingbird|W|Coast
+Couch's Kingbird|V*
+Cassin's Kingbird|R|Open woodland; Farmland
+Thick-billed Kingbird|V*
+Western Kingbird|S|Grassland; Farmland
+Eastern Kingbird|V
+Scissor-tailed Flycatcher|V
+Fork-tailed Flycatcher|V*
+Olive-sided Flycatcher|S|Conifer forest
+Greater Pewee|V*
+Western Wood-Pewee|S
+Eastern Wood-Pewee|V*
+Yellow-bellied Flycatcher|V*
+Alder Flycatcher|V*
+Willow Flycatcher|S|Riparian woodland; Wet meadows
+Least Flycatcher|V
+Hammond's Flycatcher|S|Conifer forest
+Gray Flycatcher|S|Sagebrush; Pinyon-juniper
+Dusky Flycatcher|S|Mountains; Chaparral & scrub
+Western Flycatcher|S|Forest; Riparian woodland
+Black Phoebe|R|Rivers; Lakes & ponds; Urban & gardens
+Eastern Phoebe|V
+Say's Phoebe|R|Open country; Desert
+Vermilion Flycatcher|R|Desert; Riparian woodland
+> Passeriformes | Vireonidae | Vireos | Woodland; Riparian woodland
+White-eyed Vireo|V*
+Bell's Vireo|S|Riparian woodland
+Gray Vireo|S|Chaparral & scrub; Pinyon-juniper
+Hutton's Vireo|R|Oak woodland
+Yellow-throated Vireo|V
+Cassin's Vireo|S|Conifer forest; Oak woodland
+Blue-headed Vireo|V*
+Plumbeous Vireo|W
+Philadelphia Vireo|V
+Western Warbling-Vireo|S
+Red-eyed Vireo|V
+Yellow-green Vireo|V*
+> Passeriformes | Laniidae | Shrikes | Open country
+Brown Shrike|V*
+Loggerhead Shrike|R|Grassland; Desert
+Northern Shrike|W
+> Passeriformes | Corvidae | Jays, Crows, and Magpies | Woodland; Urban & gardens
+Canada Jay|R|Conifer forest
+Pinyon Jay|R|Pinyon-juniper
+Steller's Jay|R|Conifer forest
+Blue Jay|V*
+Island Scrub-Jay|RE|Santa Cruz Island
+California Scrub-Jay|R|Oak woodland; Urban & gardens
+Woodhouse's Scrub-Jay|R|Pinyon-juniper
+Clark's Nutcracker|R|Mountains; Conifer forest
+Black-billed Magpie|R|Sagebrush; Farmland
+Yellow-billed Magpie|RE|Oak savanna; Farmland
+American Crow|R
+Common Raven|R|Open country; Coast; Mountains
+> Passeriformes | Remizidae | Penduline-Tits | Desert
+Verdin|R
+> Passeriformes | Paridae | Chickadees and Titmice | Woodland; Forest
+Black-capped Chickadee|R|Riparian woodland
+Mountain Chickadee|R|Conifer forest; Mountains
+Chestnut-backed Chickadee|R|Conifer forest; Urban & gardens
+Oak Titmouse|R|Oak woodland
+Juniper Titmouse|R|Pinyon-juniper
+> Passeriformes | Alaudidae | Larks | Grassland; Open country
+Eurasian Skylark|V*
+Horned Lark|R
+> Passeriformes | Hirundinidae | Swallows | Aerial; Wetlands
+Bank Swallow|S|Rivers; Coast bluffs
+Tree Swallow|R
+Violet-green Swallow|S|Woodland; Aerial
+Northern Rough-winged Swallow|S
+Purple Martin|S|Conifer forest; Aerial
+Barn Swallow|S|Farmland; Aerial
+Cliff Swallow|S
+Cave Swallow|V*
+> Passeriformes | Aegithalidae | Bushtits | Chaparral & scrub; Urban & gardens
+Bushtit|R
+> Passeriformes | Phylloscopidae | Leaf Warblers | Coastal scrub
+Dusky Warbler|V*
+Arctic Warbler|V*
+> Passeriformes | Locustellidae | Grassbirds and Allies | Coastal scrub
+Lanceolated Warbler|V*
+> Passeriformes | Paradoxornithidae | Parrotbills and Wrentit | Chaparral & scrub; Coastal scrub
+Wrentit|R
+> Passeriformes | Zosteropidae | White-eyes | Urban & gardens
+Swinhoe's White-eye|RI||Zosterops simplex
+> Passeriformes | Regulidae | Kinglets | Conifer forest; Woodland
+Golden-crowned Kinglet|R
+Ruby-crowned Kinglet|W|Woodland; Urban & gardens
+> Passeriformes | Bombycillidae | Waxwings | Woodland; Urban & gardens
+Bohemian Waxwing|W
+Cedar Waxwing|W
+> Passeriformes | Ptiliogonatidae | Silky-flycatchers | Desert; Oak woodland
+Phainopepla|R
+> Passeriformes | Sittidae | Nuthatches | Conifer forest; Woodland
+Red-breasted Nuthatch|R
+White-breasted Nuthatch|R|Oak woodland
+Pygmy Nuthatch|R|Pine forest
+> Passeriformes | Certhiidae | Treecreepers | Conifer forest; Woodland
+Brown Creeper|R
+> Passeriformes | Polioptilidae | Gnatcatchers | Chaparral & scrub
+Blue-gray Gnatcatcher|R
+California Gnatcatcher|R|Coastal sage scrub
+Black-tailed Gnatcatcher|R|Desert
+> Passeriformes | Troglodytidae | Wrens | Chaparral & scrub; Woodland
+Rock Wren|R|Rocky slopes; Desert
+Canyon Wren|R|Canyons; Cliffs
+Northern House Wren|S|Woodland; Urban & gardens
+Pacific Wren|R|Conifer forest
+Winter Wren|V*
+Sedge Wren|V*
+Marsh Wren|R|Marshes
+Bewick's Wren|R
+Cactus Wren|R|Desert
+> Passeriformes | Mimidae | Mockingbirds and Thrashers | Chaparral & scrub; Desert
+Gray Catbird|V
+Curve-billed Thrasher|V*
+Brown Thrasher|V
+Bendire's Thrasher|S|Desert
+California Thrasher|R|Chaparral & scrub
+LeConte's Thrasher|R|Desert
+Crissal Thrasher|R|Desert
+Sage Thrasher|S|Sagebrush
+Northern Mockingbird|R|Urban & gardens
+> Passeriformes | Sturnidae | Starlings | Urban & gardens; Farmland
+European Starling|RI
+> Passeriformes | Cinclidae | Dippers | Mountain streams
+American Dipper|R
+> Passeriformes | Turdidae | Thrushes | Woodland; Forest
+Western Bluebird|R|Oak woodland; Grassland
+Mountain Bluebird|R|Mountains; Open country
+Townsend's Solitaire|R|Conifer forest; Mountains
+Veery|V*
+Gray-cheeked Thrush|V*
+Swainson's Thrush|S|Riparian woodland; Forest
+Hermit Thrush|W
+Wood Thrush|V*
+Eyebrowed Thrush|V*
+Song Thrush|V*
+Rufous-backed Robin|V*
+American Robin|R|Urban & gardens; Woodland
+Varied Thrush|W|Conifer forest
+> Passeriformes | Muscicapidae | Old World Flycatchers | Coastal scrub
+Dark-sided Flycatcher|V*
+Red-flanked Bluetail|V*
+Taiga Flycatcher|V*
+Asian Stonechat|V*
+Northern Wheatear|V*
+> Passeriformes | Ploceidae | Weavers | Urban & gardens
+Northern Red Bishop|RI
+> Passeriformes | Estrildidae | Waxbills | Urban & gardens
+Scaly-breasted Munia|RI
+> Passeriformes | Viduidae | Indigobirds and Whydahs | Urban & gardens
+Pin-tailed Whydah|RI
+> Passeriformes | Passeridae | Old World Sparrows | Urban & gardens
+House Sparrow|RI
+> Passeriformes | Motacillidae | Wagtails and Pipits | Open country; Coast
+Eastern Yellow Wagtail|V*
+Gray Wagtail|V*
+White Wagtail|V*
+Olive-backed Pipit|V*
+Red-throated Pipit|V
+American Pipit|W|Grassland; Beaches; Farmland
+Sprague's Pipit|V
+> Passeriformes | Fringillidae | Finches | Woodland; Urban & gardens
+Brambling|V*
+Evening Grosbeak|R|Conifer forest
+Pine Grosbeak|R|Mountains; Conifer forest
+Gray-crowned Rosy-Finch|R|Alpine
+Black Rosy-Finch|V*
+House Finch|R
+Purple Finch|R|Conifer forest; Oak woodland
+Cassin's Finch|R|Mountains; Conifer forest
+Common Rosefinch|V*
+Oriental Greenfinch|V*
+Redpoll|V*
+Red Crossbill|R|Conifer forest
+White-winged Crossbill|V*
+Pine Siskin|R|Conifer forest
+Lesser Goldfinch|R
+Lawrence's Goldfinch|R|Oak woodland; Chaparral & scrub
+American Goldfinch|R|Riparian woodland; Urban & gardens
+> Passeriformes | Calcariidae | Longspurs and Snow Buntings | Grassland; Open country
+Lapland Longspur|W
+Chestnut-collared Longspur|W
+Smith's Longspur|V*
+Thick-billed Longspur|W
+Snow Bunting|V*
+> Passeriformes | Emberizidae | Old World Buntings | Coastal scrub
+Little Bunting|V*
+Rustic Bunting|V*
+> Passeriformes | Passerellidae | New World Sparrows | Chaparral & scrub; Grassland
+Cassin's Sparrow|V*
+Grasshopper Sparrow|S|Grassland
+Black-throated Sparrow|R|Desert
+Lark Sparrow|R|Oak savanna; Grassland
+Lark Bunting|V
+Chipping Sparrow|S|Open woodland
+Clay-colored Sparrow|V
+Black-chinned Sparrow|S|Chaparral & scrub
+Field Sparrow|V*
+Brewer's Sparrow|S|Sagebrush
+Fox Sparrow|W|Chaparral & scrub; Woodland
+American Tree Sparrow|V
+Dark-eyed Junco|R|Conifer forest; Urban & gardens
+White-crowned Sparrow|R|Coastal scrub; Urban & gardens
+Golden-crowned Sparrow|W|Coastal scrub; Urban & gardens
+Harris's Sparrow|V
+White-throated Sparrow|W
+Sagebrush Sparrow|R|Sagebrush
+Bell's Sparrow|R|Chaparral & scrub
+Vesper Sparrow|W|Grassland; Sagebrush
+LeConte's Sparrow|V*
+Nelson's Sparrow|W|Salt marsh
+Baird's Sparrow|V*
+Savannah Sparrow|R|Grassland; Salt marsh
+Song Sparrow|R|Marshes; Riparian woodland; Urban & gardens
+Lincoln's Sparrow|W|Wet meadows; Riparian woodland
+Swamp Sparrow|W|Marshes
+Abert's Towhee|R|Desert; Riparian woodland
+California Towhee|R|Chaparral & scrub; Urban & gardens
+Rufous-crowned Sparrow|R|Rocky slopes; Coastal sage scrub
+Green-tailed Towhee|S|Mountains; Chaparral & scrub
+Spotted Towhee|R|Chaparral & scrub; Woodland
+> Passeriformes | Icteriidae | Yellow-breasted Chat | Riparian woodland
+Yellow-breasted Chat|S
+> Passeriformes | Icteridae | Blackbirds and Orioles | Marshes; Farmland
+Yellow-headed Blackbird|R|Marshes
+Bobolink|V
+Western Meadowlark|R|Grassland
+Chihuahuan Meadowlark|V*
+Orchard Oriole|V
+Hooded Oriole|S|Urban & gardens; Riparian woodland
+Streak-backed Oriole|V*
+Bullock's Oriole|S|Riparian woodland; Oak woodland
+Baltimore Oriole|V
+Scott's Oriole|S|Desert
+Red-winged Blackbird|R
+Tricolored Blackbird|R|Marshes; Farmland
+Bronzed Cowbird|S|Desert; Farmland
+Brown-headed Cowbird|R|Farmland; Woodland
+Rusty Blackbird|V
+Brewer's Blackbird|R|Urban & gardens; Farmland
+Common Grackle|V*
+Great-tailed Grackle|R|Urban & gardens; Wetlands
+> Passeriformes | Parulidae | New World Warblers | Woodland; Riparian woodland
+Ovenbird|V
+Worm-eating Warbler|V*
+Louisiana Waterthrush|V*
+Northern Waterthrush|M
+Golden-winged Warbler|V*
+Blue-winged Warbler|V*
+Black-and-white Warbler|V
+Prothonotary Warbler|V
+Tennessee Warbler|V
+Orange-crowned Warbler|R|Chaparral & scrub; Woodland
+Lucy's Warbler|S|Desert; Riparian woodland
+Nashville Warbler|S|Mountains; Oak woodland
+Virginia's Warbler|S|Mountains
+Connecticut Warbler|V*
+MacGillivray's Warbler|S|Mountains; Riparian woodland
+Mourning Warbler|V*
+Kentucky Warbler|V*
+Common Yellowthroat|R|Marshes
+Hooded Warbler|V
+American Redstart|V
+Cape May Warbler|V*
+Cerulean Warbler|V*
+Northern Parula|V
+Magnolia Warbler|V
+Bay-breasted Warbler|V
+Blackburnian Warbler|V
+Yellow Warbler|S|Riparian woodland
+Chestnut-sided Warbler|V
+Blackpoll Warbler|V
+Black-throated Blue Warbler|V
+Palm Warbler|V
+Pine Warbler|V*
+Yellow-rumped Warbler|R|Conifer forest; Woodland; Urban & gardens
+Yellow-throated Warbler|V*
+Prairie Warbler|V
+Grace's Warbler|V*
+Black-throated Gray Warbler|S|Oak woodland; Conifer forest
+Townsend's Warbler|W|Conifer forest; Urban & gardens
+Hermit Warbler|S|Conifer forest
+Golden-cheeked Warbler|V*
+Black-throated Green Warbler|V
+Canada Warbler|V
+Wilson's Warbler|S|Riparian woodland; Coastal scrub
+Red-faced Warbler|V*
+Painted Redstart|V
+> Passeriformes | Cardinalidae | Cardinals, Tanagers, and Buntings | Woodland; Riparian woodland
+Hepatic Tanager|S|Mountains
+Summer Tanager|S|Riparian woodland; Desert
+Scarlet Tanager|V
+Western Tanager|S|Conifer forest
+Northern Cardinal|R|Riparian woodland
+Pyrrhuloxia|V*
+Rose-breasted Grosbeak|V
+Black-headed Grosbeak|S|Oak woodland; Riparian woodland
+Blue Grosbeak|S|Riparian woodland; Farmland
+Lazuli Bunting|S|Chaparral & scrub
+Indigo Bunting|V
+Varied Bunting|V*
+Painted Bunting|V
+Dickcissel|V
