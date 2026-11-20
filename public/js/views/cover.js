@@ -1,5 +1,5 @@
 import { S, $, api, esc, modal, toast } from '../util.js';
-import { BUILT_IN } from '../wi.js';
+import { BUILT_IN, REGION_NAMES, REGIONS, hasRegion, myRegion, setRegion, pickRegion } from '../wi.js';
 
 export const DEFAULT_COVER = {
   line1: 'The Marshes at Dawn', line2: "California's Great Herons", line3: 'A Coastal Sanctuary',
@@ -31,12 +31,25 @@ export default async function cover(view) {
       <div class="cover-right"><p>${esc(c.aside)}</p></div>
     </div>
     <p class="cover-credit">Cover: ${esc(c.bird)}${c.credit ? ' · ' + esc(c.credit) : ''}</p>
-    <div class="cover-actions">
-      <a class="mag-btn solid" href="/fieldwork" data-link>This season's assignment</a>
-      <a class="mag-btn" href="/gallery" data-link>The Gallery</a>
-      ${S.owner ? '<button type="button" class="mag-btn" id="edit-cover">Edit cover</button>' : ''}
+    ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
+  </article>
+  <section class="how" aria-labelledby="how-h">
+    <div class="mag-wrap">
+      <p class="mag-kicker">How it works</p>
+      <h2 id="how-h">Photograph California's birds, one season at a time.</h2>
+      <ol class="how-steps">
+        <li><span class="n">1</span><h3>Pick your region</h3><p>Tell us where you go birding. Nothing about your location is collected.</p>
+          <div class="how-regions" role="group" aria-label="Your region">${REGIONS.map((r) => `<button type="button" data-r="${r}" aria-pressed="${hasRegion() && myRegion({ regions: REGIONS }) === r}">${REGION_NAMES[r]}</button>`).join('')}</div>
+          <button type="button" class="linkish" id="how-which">Not sure which region you're in?</button></li>
+        <li><span class="n">2</span><h3>Get your nine birds</h3><p>Each season your region gets nine birds: three easy, three that take a trip, three that are hard to find.</p>
+          <a class="mag-btn solid" href="/this-season" data-link>See this season's birds</a></li>
+        <li><span class="n">3</span><h3>Go out and photograph them</h3><p>Harder birds score more points. The best photos are published in the next issue and the year-end edition.</p>
+          <a class="mag-btn" href="/gallery" data-link>See the Gallery</a></li>
+      </ol>
     </div>
-  </article>`;
+  </section>`;
+  view.querySelectorAll('.how-regions [data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); window.dispatchEvent(new Event('route')); }));
+  $('#how-which', view).onclick = pickRegion;
   if (S.owner) $('#edit-cover', view).onclick = () => editCover(c);
 }
 

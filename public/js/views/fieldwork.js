@@ -1,5 +1,5 @@
 import { $, $$, esc } from '../util.js';
-import { wi, SEASONS, SEASON_ORDER, currentSeason, seasonLabel, myRegion, setRegion, birdLink, birdName, levelOf } from '../wi.js';
+import { wi, SEASONS, SEASON_ORDER, currentSeason, seasonLabel, myRegion, pickRegion, hasRegion, birdLink, birdName, levelOf } from '../wi.js';
 
 const BLURB = { 1: 'Common and widespread. Expect them on an ordinary outing.', 2: 'Go to the right habitat. Usually found when you do.', 3: 'Scarce, local or hard to see. May take several tries.' };
 
@@ -15,17 +15,21 @@ export default async function fieldwork(view, seasonArg) {
     const card = d.cards[season][region];
     const frequent = d.birds.filter((b) => b.cat === 'assign' && levelOf(b, ri, season) && ![...card['1'], ...card['2'], ...card['3']].includes(b.id)).length;
     view.innerHTML = `<div class="mag-wrap mag-page">
-      <p class="mag-kicker">Fieldwork · ${esc(season === now ? seasonLabel(season) : SEASONS[season])}</p>
-      <h1 class="mag-h">${season === now ? "This season's assignment" : `The ${SEASONS[season].toLowerCase()} card`}</h1>
-      <p class="mag-deck">Nine birds for your region, three at each level. Pick the region you bird in. Nothing about where you are is collected.</p>
-      <div class="pills" role="group" aria-label="Your region">${d.regions.map((r) => `<button type="button" class="pill" data-r="${r}" aria-pressed="${r === region}">${esc(d.region_names[r])}</button>`).join('')}</div>
-      <div class="pills" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" class="pill" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
+      <p class="mag-kicker">This season · ${esc(season === now ? seasonLabel(season) : SEASONS[season])}</p>
+      <h1 class="mag-h">${season === now ? 'Your nine birds' : `Your ${SEASONS[season].toLowerCase()} birds`}</h1>
+      <p class="mag-deck" style="font-size:19px;color:#e6e2da">For birders in the <b style="color:var(--mag-accent);font-weight:600">${esc(d.region_names[region])}</b>${season === now ? ' right now' : ` in ${SEASONS[season].toLowerCase()}`}. <button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button></p>
+      <ol class="steps-inline">
+        <li><b>Find</b> any of these birds in your region this season. Tap a bird for where and when to look.</li>
+        <li><b>Photograph</b> it. Any of the nine counts. Harder levels score more points.</li>
+        <li><b>Share</b> your best photo. Submissions open with the first issue.</li>
+      </ol>
+      <div class="pills" role="group" aria-label="Season"><span class="pills-lbl">Season</span>${SEASON_ORDER.map((s) => `<button type="button" class="pill" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
       <div class="levels">${[1, 2, 3].map((L) => `<section class="level" aria-label="Level ${L}">
-        <div class="top"><h3>Level ${L}</h3><span class="pts">${sc.base.assign[L - 1]} points</span></div>
+        <div class="top"><h3>Level ${L}</h3><span class="pts">${sc.base.assign[L - 1]} points each</span></div>
         <p class="bl">${BLURB[L]}</p>
         ${card[String(L)].map((id) => d.byId.get(id)).map((b) => `<a class="bird" href="${birdLink(b)}" data-link>${birdName(b)}</a>`).join('') || '<p class="bl">To be announced.</p>'}
       </section>`).join('')}</div>
-      <p class="mag-deck" style="margin-top:28px">Not on your card? ${frequent} other birds can be found in the ${esc(d.region_names[region])} this ${SEASONS[season].toLowerCase()}, and every one counts as a frequent visitor. <a href="/the-index" data-link style="color:var(--mag-accent)">Browse them in The Index</a>.</p>
+      <p class="mag-deck" style="margin-top:28px">Spotted something else? ${frequent} other birds can be found in the ${esc(d.region_names[region])} this ${SEASONS[season].toLowerCase()}. Photos of those count too, as frequent visitors. <a href="/birds" data-link style="color:var(--mag-accent)">See them all</a>.</p>
       <p class="mag-deck">This card is a trial run. Cards become final when the editor approves them before each season.</p>
 
       <section class="mag-section" aria-labelledby="sc-h">
@@ -51,7 +55,7 @@ export default async function fieldwork(view, seasonArg) {
         <p class="mag-deck" style="margin-top:20px">No points for photos taken with bait, playback, or by flushing birds or disturbing nests. No exact location is ever published for a scarce or rare bird.</p>
       </section>
     </div>`;
-    $$('[data-r]', view).forEach((b) => (b.onclick = () => { region = b.dataset.r; setRegion(region); draw(); }));
+    $('#chg', view).onclick = pickRegion;
     $$('[data-s]', view).forEach((b) => (b.onclick = () => { season = b.dataset.s; draw(); }));
   };
   draw();

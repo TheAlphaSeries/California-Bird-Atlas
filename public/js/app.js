@@ -1,12 +1,13 @@
 import { S, $, $$, api, loadAll, toast, modal, go, esc } from './util.js';
 import { openObservation, syncDrafts, draftCount } from './observe.js';
+import { regionName, pickRegion } from './wi.js';
 
 const routes = [
   [/^\/$/, () => import('./views/cover.js'), 'cover'],
   [/^\/gallery\/?$/, () => import('./views/gallery.js'), 'gallery'],
-  [/^\/fieldwork\/?$/, () => import('./views/fieldwork.js'), 'fieldwork'],
-  [/^\/the-index\/?$/, () => import('./views/theindex.js'), 'index'],
-  [/^\/the-index\/(WI-\d{3})\/?$/, () => import('./views/bird.js'), 'index'],
+  [/^\/(?:this-season|fieldwork)\/?$/, () => import('./views/fieldwork.js'), 'fieldwork'],
+  [/^\/(?:birds|the-index)\/?$/, () => import('./views/theindex.js'), 'index'],
+  [/^\/(?:birds|the-index)\/(WI-\d{3})\/?$/, () => import('./views/bird.js'), 'index'],
   [/^\/about\/?$/, () => import('./views/about.js'), 'about'],
   [/^\/atlas\/?$/, () => import('./views/atlas.js'), 'atlas'],
   [/^\/archive\/?$/, () => import('./views/archive.js'), 'archive'],
@@ -41,7 +42,7 @@ async function render() {
   view.innerHTML = `<div class="wrap page-head"><span class="label">Not found</span><h1>No such page</h1><p class="deck">Return to <a href="/" data-link>the cover</a>.</p></div>`;
 }
 
-const PUBLIC_NAV = [['/', 'cover', 'Cover'], ['/gallery', 'gallery', 'Gallery'], ['/fieldwork', 'fieldwork', 'Fieldwork'], ['/the-index', 'index', 'The Index'], ['/about', 'about', 'About']];
+const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/birds', 'index', 'All Birds'], ['/gallery', 'gallery', 'Gallery'], ['/about', 'about', 'How It Works']];
 const TOOLS_NAV = [['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
 const TOOL_PATHS = [/^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
 export function renderChrome() {
@@ -52,9 +53,10 @@ export function renderChrome() {
     : PUBLIC_NAV.map((x) => link(x)).join('') + (S.owner ? '<span class="tools-sep" aria-hidden="true"></span>' + link(['/atlas', 'atlas', 'Tools'], 'tool') : '');
   const n = draftCount();
   $('#utilities').innerHTML = `
-    <a href="/the-index" data-link>Search</a>
+    <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region">Region: <b>${regionName()}</b></button>
     ${S.owner ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
-    <a href="/settings" data-link>${S.owner ? 'Settings' : 'Sign in'}</a>`;
+    <a href="/settings" data-link>${S.owner ? 'Settings' : 'Editor login'}</a>`;
+  $('#u-region').onclick = pickRegion;
   if (S.owner) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;
   const src = S.sources || [];

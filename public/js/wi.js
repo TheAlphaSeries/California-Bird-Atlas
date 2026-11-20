@@ -1,5 +1,5 @@
 // WILD INDEX data: regional levels, seasonal cards and scoring, from /data/wildindex.json.
-import { S, esc } from './util.js';
+import { S, esc, modal } from './util.js';
 
 export const SEASONS = { W: 'Winter', P: 'Spring', S: 'Summer', F: 'Fall' };
 export const SEASON_ORDER = ['W', 'P', 'S', 'F'];
@@ -37,6 +37,26 @@ export function myRegion(d) {
   return 'BAY';
 }
 export function setRegion(r) { try { localStorage.setItem(REGION_KEY, r); } catch { /* storage off */ } }
+export function hasRegion() { try { return !!localStorage.getItem(REGION_KEY); } catch { return false; } }
+export const REGIONS = ['BAY', 'NC', 'CV', 'SN', 'CC', 'SC', 'DES'];
+export const REGION_NAMES = { BAY: 'Bay Area', NC: 'North Coast', CV: 'Central Valley', SN: 'Sierra & Northeast', CC: 'Central Coast', SC: 'Southern Coast', DES: 'Deserts' };
+export const REGION_HINT = {
+  BAY: 'San Francisco, Oakland, San Jose, Marin, Napa, Sonoma',
+  NC: 'Mendocino, Humboldt, Del Norte, Lake, Trinity',
+  CV: 'Sacramento, Stockton, Modesto, Fresno, Bakersfield',
+  SN: 'Sierra Nevada and foothills, Tahoe, Yosemite, Mount Shasta, Modoc',
+  CC: 'Santa Cruz, Monterey, San Luis Obispo, Santa Barbara',
+  SC: 'Ventura, Los Angeles, Orange, San Diego, Inland Empire',
+  DES: 'Mojave, Palm Springs, Salton Sea, Death Valley, Owens Valley',
+};
+export function regionName() { try { return REGION_NAMES[localStorage.getItem(REGION_KEY)] || 'Bay Area'; } catch { return 'Bay Area'; } }
+// Ask which region the visitor birds in. Nothing about their location is collected.
+export function pickRegion() {
+  const m = modal(`<span class="label">Your region</span><h2>Where do you go birding?</h2>
+    <p class="note">Pick the part of California you bird in most. It sets your nine birds each season and the levels you see. It is saved on this device only, and you can change it any time.</p>
+    <div class="region-pick">${REGIONS.map((r) => `<button type="button" data-r="${r}"><b>${REGION_NAMES[r]}</b><span>${REGION_HINT[r]}</span></button>`).join('')}</div>`, { wide: true });
+  m.el.querySelectorAll('[data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); m.close(); window.dispatchEvent(new Event('route')); }));
+}
 
 // level of bird b in region index i and season s: 1..3, 'r' (rare/brief), or null
 export function levelOf(b, i, s) {
@@ -55,6 +75,6 @@ export function pointsLabel(b, d) {
 
 // The species record in the database for an index bird (for photographs), if any.
 export const dbSpecies = (b) => S.species.find((s) => s.common_name === b.n);
-export const birdLink = (b) => `/the-index/${b.id}`;
+export const birdLink = (b) => `/birds/${b.id}`;
 export const lvSpan = (v) => v == null ? '<span class="lv none">–</span>' : v === 'r' ? '<span class="lv none">rare</span>' : `<span class="lv l${v}">${v}</span>`;
 export const birdName = (b) => `<span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>`;

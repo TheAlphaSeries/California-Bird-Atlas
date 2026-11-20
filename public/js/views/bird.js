@@ -5,7 +5,7 @@ export default async function bird(view, id) {
   document.body.classList.add('mag');
   const d = await wi();
   const b = d.byId.get(id);
-  if (!b) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">No such bird</h1><p class="mag-deck"><a href="/the-index" data-link style="color:var(--mag-accent)">Back to The Index</a></p></div>'; return; }
+  if (!b) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">No such bird</h1><p class="mag-deck"><a href="/birds" data-link style="color:var(--mag-accent)">Back to all birds</a></p></div>'; return; }
   const sp = dbSpecies(b);
   const img = sp?.photo_id ? `/media/${sp.photo_id}/display` : BUILT_IN[b.n]?.src;
   const seasons = SEASON_ORDER.filter((s) => b.lv && b.lv[s].replace(/-/g, ''));
@@ -16,7 +16,7 @@ export default async function bird(view, id) {
   view.innerHTML = `<div class="mag-wrap mag-page"><article class="bird">
     <div class="art">${img ? `<img src="${esc(img)}" alt="${esc(b.n)}">` : '<div class="ph">Not yet photographed</div>'}</div>
     <div class="facts">
-      <p class="mag-kicker"><a href="/the-index" data-link style="color:inherit;text-decoration:none">The Index</a> · ${esc(b.id)}</p>
+      <p class="mag-kicker"><a href="/birds" data-link style="color:inherit;text-decoration:none">All birds</a> · ${esc(b.id)}</p>
       <h1 class="mag-h" style="font-size:clamp(40px,5vw,68px)">${esc(b.n)}</h1>
       <p class="mag-sci" style="font-size:18px;margin:0">${esc(b.sci)}</p>
       <dl>
