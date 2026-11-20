@@ -1,10 +1,10 @@
-import { $, $$, api, esc, fmtDate } from '../util.js';
+import { S, $, $$, api, esc, fmtDate } from '../util.js';
 import { wi, REGION_NAMES, birdLink } from '../wi.js';
 
 // The Bird Wall: everyone's birds, cut out and set on black. Click a bird for the credits.
 export default async function wall(view) {
   document.body.classList.add('mag');
-  const [rows, d] = await Promise.all([api('/wall'), wi()]);
+  const [rows, d] = await Promise.all([api(S.owner ? '/wall?fresh=' + Date.now() : '/wall'), wi()]);
   let region = '', q = '';
   view.innerHTML = `<div class="wall-page">
     <header class="mag-wrap wall-head">
@@ -56,12 +56,13 @@ export function openBird(r, d) {
         <p class="mag-sci" style="margin:0 0 20px">${esc(r.sci || '')}</p>
         <dl>
           <dt>Photograph</dt><dd>${esc(r.credit_name)}</dd>
+          ${r.license ? `<dt>Licence</dt><dd>${r.license_url ? `<a class="linkish" href="${esc(r.license_url)}" target="_blank" rel="noopener">${esc(r.license)}</a>` : esc(r.license)}</dd>` : ''}
           ${r.region ? `<dt>Region</dt><dd>${esc(REGION_NAMES[r.region] || r.region)}</dd>` : ''}
           ${r.taken_at ? `<dt>Taken</dt><dd>${esc(fmtDate(r.taken_at))}</dd>` : ''}
           ${r.camera ? `<dt>Camera</dt><dd>${esc(r.camera)}</dd>` : ''}
         </dl>
         <p class="wm-links"><button type="button" class="linkish" id="wm-full">See the full photo</button>${b ? ` · <a class="linkish" href="${birdLink(b)}" data-link>About this bird</a>` : ''}</p>
-        <p class="wm-note">© ${esc(r.credit_name)}. Shown with permission. Please don't reuse without asking.</p>
+        ${r.sample ? `<p class="wm-note">Sample photo from <a class="linkish" href="${esc(r.source_url)}" target="_blank" rel="noopener">Wikimedia Commons</a>, cut out by California Bird Atlas. Shown under its licence until community photos fill the wall.</p>` : `<p class="wm-note">© ${esc(r.credit_name)}. Shown with permission. Please don't reuse without asking.</p>`}
       </div>
     </div></div>`;
   document.body.appendChild(el);

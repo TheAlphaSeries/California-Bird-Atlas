@@ -290,3 +290,10 @@ body.mag .utilities .cta.u-send { background: var(--mag-accent); border-color: v
 .clip-actions { display: flex; flex-wrap: wrap; gap: 10px; }
 @media (max-width: 860px) { .clipper { grid-template-columns: 1fr; grid-template-rows: minmax(0, 55vh) auto; overflow-y: auto; } .clip-side { border-left: 0; border-top: 1px solid #222; } }
 .wall-head .ix-title { font-size: clamp(48px, 7vw, 96px); }
+
+.rv-samples { display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap; border: 1px solid rgba(255,255,255,.18); padding: 18px 20px; margin: 8px 0 28px; }
+.rv-samples > div:first-child { flex: 1 1 360px; display: grid; gap: 6px; }
+.rv-samples b { font-family: Oswald, sans-serif; text-transform: uppercase; letter-spacing: .08em; font-size: 13px; color: #f2c200; }
+.rv-samples span { color: rgba(255,255,255,.75); line-height: 1.5; }
+.rv-sbtn { display: flex; gap: 10px; flex-wrap: wrap; }
+.region-chip { white-space: nowrap; }

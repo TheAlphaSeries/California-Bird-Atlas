@@ -2,6 +2,7 @@ import { S, $, $$, api, esc, toast, fmtDate } from '../util.js';
 import { wi, REGION_NAMES } from '../wi.js';
 import { openClipper, warmClipper } from '../clip.js';
 import { birdOptions } from './submit.js';
+import { fillSamples, clearSamples, SAMPLES } from '../samples.js';
 
 // Owner only: review submitted photos, cut the bird out and publish it to the Bird Wall.
 let tab = 'pending';
@@ -15,6 +16,10 @@ export default async function review(view) {
   view.innerHTML = `<div class="mag-wrap mag-page">
     <p class="mag-kicker">Editor</p><h1 class="mag-h">Review submissions</h1>
     <p class="mag-deck">Open a photo, check the bird and the credit, cut the bird out, then publish it to the Bird Wall.</p>
+    <div class="rv-samples">
+      <div><b>Sample birds</b><span id="smp-s">${rows.some((r) => r.sample) ? `${rows.filter((r) => r.sample).length} sample birds are on the wall. They're openly licensed photos from Wikimedia Commons, credited to their photographers. Remove them when your own photos are up.` : `The wall is empty until photos arrive. Fill it with ${SAMPLES.length} openly licensed photos of California birds from Wikimedia Commons, cut out automatically and credited to their photographers.`}</span></div>
+      <div class="rv-sbtn"><button type="button" class="mag-btn solid" id="smp-add">${rows.some((r) => r.sample) ? 'Add any missing' : 'Fill with sample birds'}</button>${rows.some((r) => r.sample) ? '<button type="button" class="mag-btn" id="smp-del">Remove sample birds</button>' : ''}</div>
+    </div>
     <div class="seg" role="group" aria-label="Show">${[['pending', 'Waiting'], ['approved', 'On the wall'], ['rejected', 'Declined']].map(([k, l]) => `<button type="button" data-t="${k}" aria-pressed="${tab === k}">${l} (${count(k)})</button>`).join('')}</div>
     <div class="rv-grid" id="rvl"></div>
   </div>`;
@@ -23,9 +28,22 @@ export default async function review(view) {
     const shown = rows.filter((r) => r.status === tab);
     list.innerHTML = shown.map((r) => `<button type="button" class="rv-card" data-id="${r.id}">
       <img loading="lazy" src="/media/sub/${r.id}/${r.cut_w ? 'cutout' : 'thumb'}" alt="" class="${r.cut_w ? 'cut' : ''}">
-      <span class="rv-t"><b>${esc(r.bird)}</b><span>${esc(r.credit_name)} · ${esc(REGION_NAMES[r.region] || r.region || '')}</span><span>${esc(fmtDate(r.created_at))}${r.cut_w ? ' · cut out' : ''}${r.featured ? ' · featured' : ''}</span></span></button>`).join('')
+      <span class="rv-t"><b>${esc(r.bird)}</b><span>${esc(r.credit_name)} · ${esc(REGION_NAMES[r.region] || r.region || '')}</span><span>${esc(fmtDate(r.created_at))}${r.cut_w ? ' · cut out' : ''}${r.featured ? ' · featured' : ''}${r.sample ? ' · sample' : ''}</span></span></button>`).join('')
       || `<p class="mag-deck" style="padding-top:20px">${tab === 'pending' ? 'Nothing waiting. New submissions show up here.' : 'None yet.'}</p>`;
     $$('.rv-card', list).forEach((b) => (b.onclick = () => openSub(rows.find((r) => r.id === +b.dataset.id), d)));
+  };
+  $('#smp-add', view).onclick = async (e) => {
+    const b = e.currentTarget, st = $('#smp-s', view); b.disabled = true;
+    try {
+      const { added, problems } = await fillSamples((i, n, msg) => { st.textContent = `${msg} (${i} of ${n}). Keep this page open; it takes a few minutes.`; });
+      toast(`Added ${added} sample bird${added === 1 ? '' : 's'}.${problems.length ? ` ${problems.length} skipped.` : ''}`);
+      if (problems.length) console.warn('Skipped samples:\n' + problems.join('\n'));
+      window.dispatchEvent(new Event('route'));
+    } catch (err) { toast(err.message, true); b.disabled = false; }
+  };
+  const del = $('#smp-del', view); if (del) del.onclick = async () => {
+    if (!confirm('Remove every sample bird from the wall? Real submissions are not affected.')) return;
+    try { const { removed } = await clearSamples(); toast(`Removed ${removed} sample birds.`); window.dispatchEvent(new Event('route')); } catch (err) { toast(err.message, true); }
   };
   $$('[data-t]', view).forEach((b) => (b.onclick = () => { tab = b.dataset.t; $$('[data-t]', view).forEach((x) => x.setAttribute('aria-pressed', x === b)); draw(); }));
   draw();

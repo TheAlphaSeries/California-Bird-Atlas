@@ -82,10 +82,10 @@ export function renderChrome() {
   $('#utilities').innerHTML = `
     <a href="/submit" data-link class="cta u-send">Send a photo</a>
     <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region">Region: <b>${regionName()}</b></button>
-    ${S.owner ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
+    ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     <a href="/settings" data-link>${S.owner ? 'Settings' : 'Editor login'}</a>`;
   $('#u-region').onclick = pickRegion;
-  if (S.owner) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
+  if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;
   const src = S.sources || [];
   $('#colophon').innerHTML = `<span>California Bird Atlas. California's native birds, photographed.</span>

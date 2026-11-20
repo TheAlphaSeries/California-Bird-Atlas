@@ -159,3 +159,10 @@ export function openClipper(src, { title = 'Cut out the bird' } = {}) {
     })();
   });
 }
+
+// Cut out without the editor, using the default settings. Resolves with { blob, width, height }.
+export async function autoCut(src) {
+  const img = await loadImage(src);
+  const sal = await saliency(img);
+  return finish(compose(img, maskFrom(sal, img.width, img.height, 0.5, 0.2)));
+}

@@ -1,7 +1,7 @@
 // California Bird Atlas — Cloudflare Worker (API + media). Static pages are served from ./public.
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '2';
+const SCHEMA_VERSION = '3';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -31,7 +31,8 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS submissions (
      id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, bird TEXT NOT NULL, sci TEXT, credit_name TEXT NOT NULL, contact TEXT DEFAULT '',
      region TEXT DEFAULT '', note TEXT DEFAULT '', taken_at TEXT, camera TEXT DEFAULT '', width INTEGER, height INTEGER, store TEXT,
-     status TEXT DEFAULT 'pending', cut_w INTEGER, cut_h INTEGER, approved_at TEXT, featured INTEGER DEFAULT 0, ip TEXT)`,
+     status TEXT DEFAULT 'pending', cut_w INTEGER, cut_h INTEGER, approved_at TEXT, featured INTEGER DEFAULT 0, ip TEXT,
+     license TEXT DEFAULT '', license_url TEXT DEFAULT '', source_url TEXT DEFAULT '', sample INTEGER DEFAULT 0)`,
   `CREATE INDEX IF NOT EXISTS sub_status ON submissions(status)`,
   `CREATE INDEX IF NOT EXISTS obs_species ON observations(species_id)`,
   `CREATE INDEX IF NOT EXISTS photo_species ON photos(species_id)`,
@@ -54,6 +55,10 @@ async function init(env) {
   try { v = await db.prepare(`SELECT value FROM settings WHERE key='schema_version'`).first('value'); } catch { /* first run */ }
   if (v === SCHEMA_VERSION) return;
   await db.batch(SCHEMA.map((s) => db.prepare(s)));
+  // Columns added after the first release; each fails harmlessly if it is already there.
+  for (const col of [`license TEXT DEFAULT ''`, `license_url TEXT DEFAULT ''`, `source_url TEXT DEFAULT ''`, `sample INTEGER DEFAULT 0`]) {
+    try { await db.prepare(`ALTER TABLE submissions ADD COLUMN ${col}`).run(); } catch { /* exists */ }
+  }
   const n = await db.prepare(`SELECT COUNT(*) n FROM species`).first('n');
   if (!n) {
     const now = new Date().toISOString();
@@ -403,8 +408,39 @@ async function route(request, env, url, path) {
 
     // ----- submissions (public send, owner review) and the public Bird Wall -----
     if (r === 'wall' && method === 'GET') {
-      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
+      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
       return json(rows, 200, { 'cache-control': 'public, max-age=60' });
+    }
+    // Sample birds: openly licensed photos the editor's browser fetched and cut out, shown until real photos arrive.
+    if (r === 'samples') {
+      need();
+      if (method === 'GET') return json((await db.prepare(`SELECT source_url FROM submissions WHERE sample = 1`).all()).results.map((x) => x.source_url));
+      if (method === 'DELETE') {
+        const rows = (await db.prepare(`SELECT id, store FROM submissions WHERE sample = 1`).all()).results;
+        for (const x of rows) await deleteSubBlobs(env, x.id, x.store);
+        await db.prepare(`DELETE FROM submissions WHERE sample = 1`).run();
+        return json({ removed: rows.length });
+      }
+      if (method === 'POST') {
+        const form = await request.formData();
+        const meta = JSON.parse(form.get('meta') || '{}');
+        const display = form.get('display'), thumb = form.get('thumb'), cut = form.get('cutout');
+        if ([display, thumb, cut].some((f) => !f || typeof f === 'string')) return fail(400, 'Missing image.');
+        const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(String(meta.bird || '')).first();
+        if (!sp) return fail(400, 'Not on the California list: ' + meta.bird);
+        const src = String(meta.source_url || '').slice(0, 400);
+        if (src && await db.prepare(`SELECT id FROM submissions WHERE source_url = ?`).bind(src).first()) return json({ skipped: true });
+        const store = env.PHOTOS ? 'r2' : 'd1', now = new Date().toISOString();
+        const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, region, note, width, height, store, status, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample) VALUES (?,?,?,?,?,?,?,?,?,'approved',?,?,?,?,?,?,?,1)`)
+          .bind(now, sp.common_name, sp.scientific_name, String(meta.credit_name || 'Unknown').slice(0, 120), String(meta.region || '').slice(0, 40), 'Sample photo from Wikimedia Commons', clean(meta.width), clean(meta.height), store, clean(meta.cut_w), clean(meta.cut_h), now, meta.featured ? 1 : 0, String(meta.license || '').slice(0, 80), String(meta.license_url || '').slice(0, 400), src).run();
+        const sid = res.meta.last_row_id;
+        try {
+          await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
+          await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
+          await putBlob(env, `subs/${sid}/cutout`, await cut.arrayBuffer(), 'image/png');
+        } catch (e) { await deleteSubBlobs(env, sid, store); await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(sid).run(); throw e; }
+        return json({ id: sid });
+      }
     }
     if (r === 'submissions') {
       const id = Number(seg[2]);
@@ -436,7 +472,7 @@ async function route(request, env, url, path) {
       }
       need();
       if (method === 'GET') {
-        const rows = (await db.prepare(`SELECT id, created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, status, cut_w, cut_h, approved_at, featured FROM submissions ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, id DESC LIMIT 3000`).all()).results;
+        const rows = (await db.prepare(`SELECT id, created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, status, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample FROM submissions ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, id DESC LIMIT 3000`).all()).results;
         return json(rows);
       }
       if (method === 'POST' && seg[3] === 'cutout' && id) {

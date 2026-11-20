@@ -62,6 +62,14 @@ Uploaded display copies are re-encoded in the browser, which drops the camera's 
 - Regional levels are editorial estimates, checked against the USGS Breeding Bird Survey, National Park Service
   species lists and Audubon Christmas Bird Count results. See the Rules sheet of the regional table for details.
 
+## Sample birds
+
+Until community photos arrive, **Review → Fill with sample birds** puts about 35 California birds on the wall. Each
+is the lead photo from the bird's Wikipedia article (always freely licensed on Wikimedia Commons). Your browser
+fetches it, cuts it out and uploads it with the photographer's name, the licence and a link to the original.
+Photos under licences that aren't open enough are skipped. **Remove sample birds** takes them all off in one step
+and leaves real submissions alone. Any sample can also be re-cut, edited or deleted on its own in Review.
+
 ## Cut-outs
 
 Backgrounds are removed in the browser, on the editor's or visitor's own device, with the U^2-Net small model
