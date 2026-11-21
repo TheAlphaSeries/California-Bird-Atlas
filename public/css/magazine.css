@@ -361,3 +361,4 @@ body.mag .utilities .cta.u-send { background: var(--mag-accent); border-color: v
 .ad-status { color: var(--mag-accent, #f2c200); font-size: 13px; letter-spacing: .04em; }
 .add-bar { position: sticky; bottom: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 14px 0; background: rgba(0,0,0,.94); border-top: 1px solid var(--mag-rule, #2a2a2a); color: #cfcac0; z-index: 5; }
 @media (max-width: 760px) { .add-row { grid-template-columns: 1fr; } }
+.wall-sample-note { margin: -4px 0 22px; padding: 10px 14px; border-left: 3px solid var(--mag-accent, #f2c200); color: #cfcac0; font-size: 14px; line-height: 1.5; max-width: 720px; }
