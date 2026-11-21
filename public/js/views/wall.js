@@ -20,7 +20,7 @@ export default async function wall(view) {
     <div class="mag-wrap">
       <p class="ix-count" id="wc" aria-live="polite"></p>
       <div class="wall" id="wl"></div>
-      ${rows.length ? '' : `<div class="wall-empty"><p class="wall-empty-h">The wall is waiting for its first birds.</p><p class="mag-deck">Photograph a California bird, send it in, and it could be the first one up.</p><a class="mag-btn solid" href="/submit" data-link>Send a photo</a></div>`}
+      ${rows.length ? '' : `<div class="wall-empty"><p class="wall-empty-h">The wall is waiting for its first birds.</p><p class="mag-deck">Photograph a California bird, send it in, and it could be the first one up.</p>${S.owner ? '<a class="mag-btn solid" href="/review" data-link>Fill with sample birds (in Review)</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}</div>`}
     </div>
   </div>`;
   if (!rows.length) return;

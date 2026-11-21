@@ -33,7 +33,7 @@ function swapIn(view, tmp, mag) {
     view.replaceChildren(tmp);
     if (!location.hash) window.scrollTo(0, 0);
   };
-  if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches) document.startViewTransition(apply);
+  if (document.startViewTransition && !document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) { const t = document.startViewTransition(apply); for (const p of [t.ready, t.finished, t.updateCallbackDone]) p?.catch(() => {}); }
   else { apply(); view.classList.remove('fade-in'); void view.offsetWidth; view.classList.add('fade-in'); }
 }
 
