@@ -99,14 +99,6 @@ async function hmac(secret, msg) {
   return hex(await crypto.subtle.sign('HMAC', key, enc.encode(msg)));
 }
 function same(a, b) { if (a.length !== b.length) return false; let d = 0; for (let i = 0; i < a.length; i++) d |= a.charCodeAt(i) ^ b.charCodeAt(i); return d === 0; }
-// A one-time setup key, set in the settings table by the site's maintainer and deleted after use.
-// It allows only adding sample birds and looking up reference photos.
-async function hasSetupKey(request, db) {
-  const k = request.headers.get('x-setup-key');
-  if (!k || k.length < 24) return false;
-  const v = await db.prepare(`SELECT value FROM settings WHERE key = 'setup_key'`).first('value');
-  return !!v && v.length >= 24 && v === k;
-}
 async function isOwner(request, env) {
   if (!env.ADMIN_PASSWORD) return false;
   const m = /(?:^|;\s*)atlas_session=([^;]+)/.exec(request.headers.get('cookie') || '');
@@ -344,8 +336,8 @@ async function route(request, env, url, path) {
 
     // ----- reference image -----
     if (r === 'reference' && method === 'POST') {
+      need();
       const id = Number(seg[2]); const b = await body();
-      if (!(owner || (!b.clear && !b.file && await hasSetupKey(request, db)))) need();
       const sp = await db.prepare(`SELECT id, scientific_name, common_name FROM species WHERE id = ?`).bind(id).first();
       if (!sp) return fail(404, 'Species not found');
       if (b.clear) { await db.prepare(`UPDATE photo_reports SET status = 'fixed' WHERE species_id = ? AND status = 'open'`).bind(id).run(); await db.prepare(`UPDATE species SET ref_url = NULL, ref_thumb = NULL, ref_credit = NULL, ref_license = NULL, ref_license_url = NULL, ref_source_url = NULL, ref_fetched_at = NULL WHERE id = ?`).bind(id).run(); return json({ ok: true }); }
@@ -450,7 +442,7 @@ async function route(request, env, url, path) {
     }
     // Sample birds: openly licensed photos the editor's browser fetched and cut out, shown until real photos arrive.
     if (r === 'samples') {
-      if (!(owner || (method !== 'DELETE' && await hasSetupKey(request, db)))) need();
+      need();
       if (method === 'GET') return json((await db.prepare(`SELECT source_url FROM submissions WHERE sample = 1`).all()).results.map((x) => x.source_url));
       if (method === 'DELETE') {
         const rows = (await db.prepare(`SELECT id, store FROM submissions WHERE sample = 1`).all()).results;
