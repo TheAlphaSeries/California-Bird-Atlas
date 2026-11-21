@@ -70,6 +70,19 @@ generator seeded by season, year and region, then dealt out three at a time, wit
 turn and a mix of families on every card. Everyone in a region sees the same birds, every year is different, and
 upcoming cards stay hidden. To check the draw, run `node tools/check-rotation.mjs`.
 
+## Reference photos
+
+So people know what each bird looks like, every bird can show a reference photo until a real one is published:
+the lead photo of its Wikipedia article (looked up by scientific name, then English name), kept only if it is on
+Wikimedia Commons under an open licence (public domain, CC0, CC BY or CC BY-SA). The photographer, licence and a link
+to the original are shown with it, and it is always labelled "Reference photo". Images are linked from Wikimedia,
+not stored here.
+
+- **Load them:** Review → **Load missing photos** (about 10 minutes for all 696; keep the tab open).
+- **Wrong photo:** visitors press **Wrong photo? Tell us** and pick a reason. Reports collect under Review →
+  **Photo reports**, where you can keep the photo, remove it, or pick a replacement from a grid of openly licensed
+  Commons photos of that species. Signed in, the same button on a bird page reads **Change photo**.
+
 ## Sample birds
 
 Until community photos arrive, **Review → Fill with sample birds** puts about 35 California birds on the wall. Each

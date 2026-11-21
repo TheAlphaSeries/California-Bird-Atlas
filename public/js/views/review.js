@@ -3,6 +3,8 @@ import { wi, REGION_NAMES } from '../wi.js';
 import { openClipper, warmClipper } from '../clip.js';
 import { birdOptions } from './submit.js';
 import { fillSamples, clearSamples, SAMPLES } from '../samples.js';
+import { pickReference } from '../refpick.js';
+import { loadAll } from '../util.js';
 
 // Owner only: review submitted photos, cut the bird out and publish it to the Bird Wall.
 let tab = 'pending';
@@ -10,9 +12,10 @@ let tab = 'pending';
 export default async function review(view) {
   document.body.classList.add('mag');
   if (!S.owner) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">Review</h1><p class="mag-deck">Sign in with Editor login to review submissions.</p></div>'; return; }
-  const [rows, d] = await Promise.all([api('/submissions'), wi()]);
+  const [rows, d, reports] = await Promise.all([api('/submissions'), wi(), api('/reports')]);
   warmClipper();
-  const count = (s) => rows.filter((r) => r.status === s).length;
+  const count = (s) => (s === 'reports' ? new Set(reports.map((r) => r.species_id)).size : rows.filter((r) => r.status === s).length);
+  const withRef = S.species.filter((x) => x.ref_url).length;
   view.innerHTML = `<div class="mag-wrap mag-page">
     <p class="mag-kicker">Editor</p><h1 class="mag-h">Review submissions</h1>
     <p class="mag-deck">Open a photo, check the bird and the credit, cut the bird out, then publish it to the Bird Wall.</p>
@@ -20,11 +23,24 @@ export default async function review(view) {
       <div><b>Sample birds</b><span id="smp-s">${rows.some((r) => r.sample) ? `${rows.filter((r) => r.sample).length} sample birds are on the wall. They're openly licensed photos from Wikimedia Commons, credited to their photographers. Remove them when your own photos are up.` : `The wall is empty until photos arrive. Fill it with ${SAMPLES.length} openly licensed photos of California birds from Wikimedia Commons, cut out automatically and credited to their photographers.`}</span></div>
       <div class="rv-sbtn"><button type="button" class="mag-btn solid" id="smp-add">${rows.some((r) => r.sample) ? 'Add any missing' : 'Fill with sample birds'}</button>${rows.some((r) => r.sample) ? '<button type="button" class="mag-btn" id="smp-del">Remove sample birds</button>' : ''}</div>
     </div>
-    <div class="seg" role="group" aria-label="Show">${[['pending', 'Waiting'], ['approved', 'On the wall'], ['rejected', 'Declined']].map(([k, l]) => `<button type="button" data-t="${k}" aria-pressed="${tab === k}">${l} (${count(k)})</button>`).join('')}</div>
+    <div class="rv-samples">
+      <div><b>Reference photos</b><span id="ref-s">${withRef} of ${S.species.length} birds have a reference photo, so people know what to look for. Missing ones are looked up from each bird's Wikipedia article and kept only if openly licensed, with the photographer credited.</span></div>
+      <div class="rv-sbtn">${withRef < S.species.length ? `<button type="button" class="mag-btn solid" id="ref-run">Load ${S.species.length - withRef} missing photos</button><button type="button" class="mag-btn" id="ref-stop" hidden>Stop</button>` : ''}</div>
+    </div>
+    <div class="seg" role="group" aria-label="Show">${[['pending', 'Waiting'], ['approved', 'On the wall'], ['rejected', 'Declined'], ['reports', 'Photo reports']].map(([k, l]) => `<button type="button" data-t="${k}" aria-pressed="${tab === k}">${l} (${count(k)})</button>`).join('')}</div>
     <div class="rv-grid" id="rvl"></div>
   </div>`;
   const list = $('#rvl', view);
   const draw = () => {
+    if (tab === 'reports') {
+      const by = new Map(); for (const r of reports) { if (!by.has(r.species_id)) by.set(r.species_id, []); by.get(r.species_id).push(r); }
+      list.innerHTML = [...by.values()].map((rs) => `<button type="button" class="rv-card" data-sp="${rs[0].species_id}">
+        <img loading="lazy" src="${esc(rs[0].ref_thumb || '')}" alt="">
+        <span class="rv-t"><b>${esc(rs[0].common_name)}</b><span>${rs.length} report${rs.length > 1 ? 's' : ''}</span><span>${esc(fmtDate(rs[0].created_at))}</span></span></button>`).join('')
+        || '<p class="mag-deck" style="padding-top:20px">No reports. When someone says a reference photo is wrong, it shows up here.</p>';
+      $$('[data-sp]', list).forEach((b) => (b.onclick = () => pickReference(+b.dataset.sp, by.get(+b.dataset.sp), () => window.dispatchEvent(new Event('route')))));
+      return;
+    }
     const shown = rows.filter((r) => r.status === tab);
     list.innerHTML = shown.map((r) => `<button type="button" class="rv-card" data-id="${r.id}">
       <img loading="lazy" src="/media/sub/${r.id}/${r.cut_w ? 'cutout' : 'thumb'}" alt="" class="${r.cut_w ? 'cut' : ''}">
@@ -40,6 +56,23 @@ export default async function review(view) {
       if (problems.length) console.warn('Skipped samples:\n' + problems.join('\n'));
       window.dispatchEvent(new Event('route'));
     } catch (err) { toast(err.message, true); b.disabled = false; }
+  };
+  let stop = false;
+  const run = $('#ref-run', view);
+  if (run) run.onclick = async () => {
+    const todo = S.species.filter((x) => !x.ref_url), st = $('#ref-s', view), halt = $('#ref-stop', view);
+    run.disabled = true; halt.hidden = false; stop = false; halt.onclick = () => (stop = true);
+    let ok = 0, miss = 0, i = 0;
+    const worker = async () => {
+      while (!stop && i < todo.length) {
+        const x = todo[i++];
+        try { const r = await api('/reference/' + x.id, { method: 'POST', body: {} }); if (r.ok) ok++; else miss++; } catch { miss++; }
+        st.textContent = `Looking up ${i} of ${todo.length}: ${ok} found, ${miss} without a usable photo. Keep this page open.`;
+      }
+    };
+    await Promise.all([worker(), worker(), worker()]);
+    toast(`Reference photos: ${ok} added${miss ? `, ${miss} without a usable photo` : ''}${stop ? ' (stopped)' : ''}.`);
+    await loadAll(); window.dispatchEvent(new Event('route'));
   };
   const del = $('#smp-del', view); if (del) del.onclick = async () => {
     if (!confirm('Remove every sample bird from the wall? Real submissions are not affected.')) return;

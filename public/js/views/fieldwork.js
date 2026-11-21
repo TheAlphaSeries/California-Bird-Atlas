@@ -1,4 +1,5 @@
 import { $, $$, esc } from '../util.js';
+import { birdPic } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, birdName, levelOf } from '../wi.js';
 import { seasonCards, latestOccurrence, windowSpan, WINDOWS } from '../rotation.js';
 
@@ -45,7 +46,7 @@ export default async function fieldwork(view, seasonArg) {
       <div class="levels">${[1, 2, 3].map((L) => `<section class="level" aria-label="Level ${L}">
         <div class="top"><h3>Level ${L}</h3><span class="pts">${sc.base.assign[L - 1]} points each</span></div>
         <p class="bl">${BLURB[L]}</p>
-        ${card[String(L)].map((id) => d.byId.get(id)).map((b) => `<a class="bird" href="${birdLink(b)}" data-link>${birdName(b)}</a>`).join('') || '<p class="bl">To be announced.</p>'}
+        ${card[String(L)].map((id) => d.byId.get(id)).map((b) => { const pic = birdPic(b, 'thumb'); return `<a class="bird has-thumb" href="${birdLink(b)}" data-link><span class="bt">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : ''}</span><span>${birdName(b)}</span></a>`; }).join('') || '<p class="bl">To be announced.</p>'}
       </section>`).join('')}</div>
       <p class="mag-deck" style="margin-top:28px">Spotted something else? ${frequent} other birds can be found in the ${esc(d.region_names[region])} this ${SEASONS[season].toLowerCase()}. Photos of those count too, as frequent visitors. <a href="/birds" data-link style="color:var(--mag-accent)">See them all</a>.</p>
       <p class="mag-deck">Birds are drawn at random from those findable in your region this season, three per level, with no repeats until every bird has had a turn and a mix of bird families on every card. Everyone in your region gets the same nine. <a href="/about#rotation" data-link style="color:var(--mag-accent)">How the draw works</a>.</p>

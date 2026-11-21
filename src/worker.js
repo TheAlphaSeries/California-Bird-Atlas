@@ -1,7 +1,7 @@
 // California Bird Atlas — Cloudflare Worker (API + media). Static pages are served from ./public.
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '3';
+const SCHEMA_VERSION = '4';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -34,6 +34,8 @@ const SCHEMA = [
      status TEXT DEFAULT 'pending', cut_w INTEGER, cut_h INTEGER, approved_at TEXT, featured INTEGER DEFAULT 0, ip TEXT,
      license TEXT DEFAULT '', license_url TEXT DEFAULT '', source_url TEXT DEFAULT '', sample INTEGER DEFAULT 0)`,
   `CREATE INDEX IF NOT EXISTS sub_status ON submissions(status)`,
+  `CREATE TABLE IF NOT EXISTS photo_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, species_id INTEGER NOT NULL, ref_url TEXT, reason TEXT, note TEXT DEFAULT '', ip TEXT, status TEXT DEFAULT 'open')`,
+  `CREATE INDEX IF NOT EXISTS rep_status ON photo_reports(status, species_id)`,
   `CREATE INDEX IF NOT EXISTS obs_species ON observations(species_id)`,
   `CREATE INDEX IF NOT EXISTS photo_species ON photos(species_id)`,
 ];
@@ -174,10 +176,13 @@ async function commonsInfo(fileTitle) {
 async function findReference(sp, fileTitle) {
   let title = fileTitle;
   if (!title) {
-    const d = await wiki(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=name&titles=${encodeURIComponent(sp.scientific_name)}`);
-    const page = Object.values(d?.query?.pages || {})[0];
-    if (!page?.pageimage) return { error: 'No lead image on the Wikipedia article' };
-    title = 'File:' + page.pageimage;
+    // Scientific name first (unambiguous), then the English name, for birds whose taxonomy changed recently.
+    for (const name of [sp.scientific_name, sp.common_name].filter(Boolean)) {
+      const d = await wiki(`https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&redirects=1&prop=pageimages&piprop=name&titles=${encodeURIComponent(name)}`);
+      const page = Object.values(d?.query?.pages || {})[0];
+      if (page?.pageimage && /\.(jpe?g|png|webp)$/i.test(page.pageimage)) { title = 'File:' + page.pageimage; break; }
+    }
+    if (!title) return { error: 'No photo on the Wikipedia article' };
   }
   if (!/^File:/i.test(title)) title = 'File:' + title;
   const info = await commonsInfo(title);
@@ -190,7 +195,7 @@ async function findReference(sp, fileTitle) {
 // ---------- data assembly ----------
 async function loadSpecies(db, owner) {
   const [sp, obs, ph] = await db.batch([
-    db.prepare(`SELECT id, seq, common_name, scientific_name, family_id, native_status, season_status, review, endemic, habitats, conservation, photo_group, bay_area, target_priority, notes, custom, definitive_photo_id, ref_url, ref_thumb, ref_credit, ref_license, user_added, (ident != '') has_profile FROM species ORDER BY seq`),
+    db.prepare(`SELECT id, seq, common_name, scientific_name, family_id, native_status, season_status, review, endemic, habitats, conservation, photo_group, bay_area, target_priority, notes, custom, definitive_photo_id, ref_url, ref_thumb, ref_credit, ref_license, ref_license_url, ref_source_url, user_added, (ident != '') has_profile FROM species ORDER BY seq`),
     db.prepare(`SELECT species_id, COUNT(*) n, SUM(confidence = 'confirmed') confirmed, MIN(CASE WHEN confidence = 'confirmed' THEN observed_at END) first_seen, MAX(observed_at) last_seen FROM observations GROUP BY species_id`),
     db.prepare(`SELECT species_id, COUNT(*) n, SUM(id_confirmed = 1) confirmed, MIN(CASE WHEN id_confirmed = 1 THEN COALESCE(taken_at, created_at) END) first_photo, MAX(id) latest_id, MAX(CASE WHEN visibility = 'public' THEN id END) latest_public FROM photos GROUP BY species_id`),
   ]);
@@ -333,13 +338,37 @@ async function route(request, env, url, path) {
     if (r === 'reference' && method === 'POST') {
       need();
       const id = Number(seg[2]); const b = await body();
-      const sp = await db.prepare(`SELECT id, scientific_name FROM species WHERE id = ?`).bind(id).first();
+      const sp = await db.prepare(`SELECT id, scientific_name, common_name FROM species WHERE id = ?`).bind(id).first();
       if (!sp) return fail(404, 'Species not found');
-      if (b.clear) { await db.prepare(`UPDATE species SET ref_url = NULL, ref_thumb = NULL, ref_credit = NULL, ref_license = NULL, ref_license_url = NULL, ref_source_url = NULL, ref_fetched_at = NULL WHERE id = ?`).bind(id).run(); return json({ ok: true }); }
+      if (b.clear) { await db.prepare(`UPDATE photo_reports SET status = 'fixed' WHERE species_id = ? AND status = 'open'`).bind(id).run(); await db.prepare(`UPDATE species SET ref_url = NULL, ref_thumb = NULL, ref_credit = NULL, ref_license = NULL, ref_license_url = NULL, ref_source_url = NULL, ref_fetched_at = NULL WHERE id = ?`).bind(id).run(); return json({ ok: true }); }
       const info = await findReference(sp, b.file);
       if (info.error) return json({ ok: false, reason: info.error });
       await db.prepare(`UPDATE species SET ref_url = ?, ref_thumb = ?, ref_credit = ?, ref_license = ?, ref_license_url = ?, ref_source_url = ?, ref_fetched_at = ? WHERE id = ?`).bind(info.url, info.thumb, info.credit, info.license, info.license_url, info.source, new Date().toISOString(), id).run();
+      if (b.file) await db.prepare(`UPDATE photo_reports SET status = 'fixed' WHERE species_id = ? AND status = 'open'`).bind(id).run();
       return json({ ok: true, ...info });
+    }
+
+    // ----- reports of a wrong reference photo: anyone can send, the editor reviews -----
+    if (r === 'reports') {
+      if (method === 'POST' && !seg[2]) {
+        const b = await body();
+        const sp = await db.prepare(`SELECT id, ref_url FROM species WHERE id = ?`).bind(Number(b.species_id)).first();
+        if (!sp) return fail(404, 'Bird not found');
+        const reason = ['wrong-species', 'plumage', 'not-photo', 'quality', 'other'].includes(b.reason) ? b.reason : 'other';
+        const ip = await hmac(env.ADMIN_PASSWORD || 'wild-index', request.headers.get('cf-connecting-ip') || 'local');
+        const recent = await db.prepare(`SELECT COUNT(*) n FROM photo_reports WHERE ip = ? AND created_at > ?`).bind(ip, new Date(Date.now() - 864e5).toISOString()).first('n');
+        if (recent >= 30) return fail(429, 'Thanks, we have plenty of reports from you today. Please try again tomorrow.');
+        const dup = await db.prepare(`SELECT id FROM photo_reports WHERE ip = ? AND species_id = ? AND status = 'open'`).bind(ip, sp.id).first();
+        if (!dup) await db.prepare(`INSERT INTO photo_reports (created_at, species_id, ref_url, reason, note, ip) VALUES (?,?,?,?,?,?)`).bind(new Date().toISOString(), sp.id, sp.ref_url || '', reason, String(b.note || '').slice(0, 500), ip).run();
+        return json({ ok: true });
+      }
+      need();
+      if (method === 'GET') return json((await db.prepare(`SELECT r.id, r.created_at, r.species_id, r.reason, r.note, r.status, s.common_name, s.scientific_name, s.ref_thumb, s.ref_url, s.ref_credit, s.ref_license FROM photo_reports r JOIN species s ON s.id = r.species_id WHERE r.status = 'open' ORDER BY r.id DESC LIMIT 2000`).all()).results);
+      if (method === 'PATCH' && seg[2] === 'species') {
+        const b = await body();
+        await db.prepare(`UPDATE photo_reports SET status = ? WHERE species_id = ? AND status = 'open'`).bind(b.status === 'fixed' ? 'fixed' : 'dismissed', Number(seg[3])).run();
+        return json({ ok: true });
+      }
     }
 
     // ----- observations -----
@@ -532,7 +561,7 @@ async function route(request, env, url, path) {
     if (r === 'export' && method === 'GET') {
       need();
       const out = { exported_at: new Date().toISOString(), note: 'California Bird Atlas backup. Photograph files are not included; download originals from the Gallery.' };
-      for (const t of ['families', 'species', 'observations', 'photos', 'submissions', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
+      for (const t of ['families', 'species', 'observations', 'photos', 'submissions', 'photo_reports', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
       return new Response(JSON.stringify(out, null, 1), { headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="california-bird-atlas-backup-${out.exported_at.slice(0, 10)}.json"` } });
     }
     return fail(404, 'Not found');

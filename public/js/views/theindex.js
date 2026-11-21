@@ -1,4 +1,5 @@
 import { $, $$, S, esc } from '../util.js';
+import { birdPic } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, CATEGORY, BUILT_IN, currentSeason, myRegion, pickRegion, birdLink, levelOf } from '../wi.js';
 
 let st = null;
@@ -6,10 +7,9 @@ const SHOW = [['here', 'Findable here now'], ['rare', 'Rare finds'], ['out', 'Of
 const SHORT = { W: 'Win', P: 'Spr', S: 'Sum', F: 'Fall' };
 
 function thumb(b) {
-  const sp = S.species.find((s) => s.common_name === b.n);
-  const src = sp?.photo_id ? `/media/${sp.photo_id}/thumb` : BUILT_IN[b.n]?.src;
-  return src
-    ? `<span class="ixc-img"><img loading="lazy" src="${esc(src)}" alt=""></span>`
+  const pic = birdPic(b, 'thumb');
+  return pic
+    ? `<span class="ixc-img${pic.kind === 'ref' ? ' ref' : ''}"><img loading="lazy" src="${esc(pic.src)}" alt="">${pic.kind === 'ref' ? '<span class="ref-tag">Reference</span>' : ''}</span>`
     : `<span class="ixc-img blank" aria-hidden="true"><span class="no">${esc(b.id.replace('WI-', 'No. '))}</span><span class="sc">No photo yet</span></span>`;
 }
 
