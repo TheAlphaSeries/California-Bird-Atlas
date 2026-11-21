@@ -81,15 +81,15 @@ export function renderChrome() {
   const n = draftCount();
   $('#utilities').innerHTML = `
     <a href="/submit" data-link class="cta u-send">Send a photo</a>
-    <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region">Region: <b>${regionName()}</b></button>
+    <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region"><span class="rl">Region: </span><b>${regionName()}</b></button>
     ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
-    <a href="/settings" data-link>${S.owner ? 'Settings' : 'Editor login'}</a>`;
+    ${S.owner ? '<a href="/settings" data-link>Settings</a>' : ''}`;
   $('#u-region').onclick = pickRegion;
   if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;
   const src = S.sources || [];
   $('#colophon').innerHTML = `<span>California Bird Atlas. California's native birds, photographed.</span>
-    <span>${S.species.length} species on the official California list. <a href="/about" data-link>About</a> · <a href="/settings#sources" data-link>Sources and data notes</a></span>`;
+    <span>${S.species.length} species on the official California list. <a href="/about" data-link>About</a> · <a href="/settings#sources" data-link>Sources and data notes</a>${S.owner ? '' : ' · <a href="/settings" data-link>Editor login</a>'}</span>`;
 }
 
 export async function refresh() { await loadAll(); renderChrome(); await render(); }

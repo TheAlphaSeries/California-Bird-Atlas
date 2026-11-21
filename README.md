@@ -62,6 +62,14 @@ Uploaded display copies are re-encoded in the browser, which drops the camera's 
 - Regional levels are editorial estimates, checked against the USGS Breeding Bird Survey, National Park Service
   species lists and Audubon Christmas Bird Count results. See the Rules sheet of the regional table for details.
 
+## The nine birds
+
+Each region gets nine new birds every two weeks: six cards a season (five of two weeks, the last running to the end of
+the season). The draw is in `public/js/rotation.js`: each level's eligible birds are shuffled once per season with a
+generator seeded by season, year and region, then dealt out three at a time, with no repeats until every bird has had a
+turn and a mix of families on every card. Everyone in a region sees the same birds, every year is different, and
+upcoming cards stay hidden. To check the draw, run `node tools/check-rotation.mjs`.
+
 ## Sample birds
 
 Until community photos arrive, **Review → Fill with sample birds** puts about 35 California birds on the wall. Each

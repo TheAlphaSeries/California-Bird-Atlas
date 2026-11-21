@@ -41,7 +41,7 @@ export default async function cover(view) {
         <li><span class="n">1</span><h3>Pick your region</h3><p>Tell us where you go birding. Nothing about your location is collected.</p>
           <div class="how-regions" role="group" aria-label="Your region">${REGIONS.map((r) => `<button type="button" data-r="${r}" aria-pressed="${hasRegion() && myRegion({ regions: REGIONS }) === r}">${REGION_NAMES[r]}</button>`).join('')}</div>
           <button type="button" class="linkish" id="how-which">Not sure which region you're in?</button></li>
-        <li><span class="n">2</span><h3>Get your nine birds</h3><p>Each season your region gets nine birds: three easy, three that take a trip, three that are hard to find.</p>
+        <li><span class="n">2</span><h3>Get your nine birds</h3><p>Every two weeks your region gets nine new birds: three easy, three that take a trip, three that are hard to find.</p>
           <a class="mag-btn solid" href="/this-season" data-link>See this season's birds</a></li>
         <li><span class="n">3</span><h3>Go out and photograph them</h3><p>Send your best shot. We cut the bird out and add it to the Bird Wall with your name. The best are published in the magazine.</p>
           <a class="mag-btn" href="/wall" data-link>See the Bird Wall</a></li>

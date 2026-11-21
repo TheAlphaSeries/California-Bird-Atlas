@@ -297,3 +297,18 @@ body.mag .utilities .cta.u-send { background: var(--mag-accent); border-color: v
 .rv-samples span { color: rgba(255,255,255,.75); line-height: 1.5; }
 .rv-sbtn { display: flex; gap: 10px; flex-wrap: wrap; }
 .region-chip { white-space: nowrap; }
+
+.rot-next { margin: 4px 0 26px; padding: 12px 16px; border-left: 3px solid var(--mag-accent, #f2c200); background: rgba(242,194,0,.07); color: #e6e2da; line-height: 1.5; }
+.rot-next b { color: var(--mag-accent, #f2c200); font-family: Oswald, sans-serif; text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+.rot-cards { margin-top: -6px; }
+.pill.locked { opacity: .45; border-style: dashed; cursor: default; }
+#utilities > * { white-space: nowrap; flex-shrink: 0; }
+@media (min-width: 941px) and (max-width: 1460px) {
+  body.mag .primary { gap: 18px; } body.mag .primary a, body.mag .utilities a, body.mag .utilities button { letter-spacing: .1em; }
+  body.mag .wordmark { letter-spacing: .12em; } body.mag .utilities { gap: 10px; }
+}
+@media (min-width: 941px) and (max-width: 1240px) {
+  body.mag .masthead { gap: 16px; } body.mag .wordmark { font-size: 1.05rem; } body.mag .primary { gap: 14px; }
+}
+@media (min-width: 941px) and (max-width: 1240px) { body.mag .region-chip b { display: inline-block; max-width: 9em; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; } body.mag .primary .tools-sep { display: none; } }
+@media (min-width: 941px) and (max-width: 1240px) { body.mag .region-chip .rl { display: none; } }
