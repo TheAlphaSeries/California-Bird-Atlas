@@ -11,6 +11,7 @@ const routes = [
   [/^\/about\/?$/, () => import('./views/about.js'), 'about'],
   [/^\/wall\/?$/, () => import('./views/wall.js'), 'wall'],
   [/^\/submit\/?$/, () => import('./views/submit.js'), 'submit'],
+  [/^\/add\/?$/, () => import('./views/addbirds.js'), 'add'],
   [/^\/my-wall\/?$/, () => import('./views/mywall.js'), 'mywall'],
   [/^\/review\/?$/, () => import('./views/review.js'), 'review'],
   [/^\/atlas\/?$/, () => import('./views/atlas.js'), 'atlas'],
@@ -23,7 +24,7 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
-const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'mywall', 'review']);
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review']);
 let renderSeq = 0;
 
 // Swap in a new page smoothly: build it off-screen, then cross-fade it in.
@@ -80,7 +81,7 @@ export function renderChrome() {
     : PUBLIC_NAV.map((x) => link(x)).join('') + (S.owner ? '<span class="tools-sep" aria-hidden="true"></span>' + link(['/review', 'review', 'Tools'], 'tool') : '');
   const n = draftCount();
   $('#utilities').innerHTML = `
-    <a href="/submit" data-link class="cta u-send">Send a photo</a>
+    ${S.owner ? '<a href="/add" data-link class="cta u-send">Add birds</a>' : '<a href="/submit" data-link class="cta u-send">Send a photo</a>'}
     <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region"><span class="rl">Region: </span><b>${regionName()}</b></button>
     ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     ${S.owner ? '<a href="/settings" data-link>Settings</a>' : ''}`;

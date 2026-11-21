@@ -33,6 +33,10 @@ Buy a domain (Cloudflare Registrar works), then Worker → **Settings** → **Do
 
 ## Day to day
 
+- **Add your own birds:** signed in, press **Add birds** (top right). Drop in any number of photos; each is cut out
+  automatically, the bird's name is guessed from the file name when it can be, and you can touch up any cut-out.
+  **Publish** puts them on the wall at once, credited to the name you enter (remembered on that device).
+  Sign-in lasts a year per device.
 - **Review submissions:** sign in → **Tools** → **Review**. Open a photo, check the bird and the credit, choose
   **Cut out the bird** (the background is removed automatically; adjust the cut-off or paint with Erase and Restore),
   then **Publish to the wall**. Featured birds show first.

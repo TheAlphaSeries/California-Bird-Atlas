@@ -264,9 +264,9 @@ async function route(request, env, url, path) {
       if (!env.ADMIN_PASSWORD) return fail(400, 'No owner password is set yet. Add a secret named ADMIN_PASSWORD to this Worker in the Cloudflare dashboard.');
       const { password = '' } = await body();
       if (!same(await hmac('pw', String(password)), await hmac('pw', env.ADMIN_PASSWORD))) return fail(401, 'Incorrect password.');
-      const exp = Date.now() + 30 * 864e5;
+      const exp = Date.now() + 365 * 864e5; // stay signed in for a year on this device
       const secure = url.protocol === 'https:' ? ' Secure;' : '';
-      return json({ owner: true }, 200, { 'set-cookie': `atlas_session=${exp}.${await hmac(env.ADMIN_PASSWORD, 'atlas|' + exp)}; Path=/; HttpOnly;${secure} SameSite=Lax; Max-Age=${30 * 86400}` });
+      return json({ owner: true }, 200, { 'set-cookie': `atlas_session=${exp}.${await hmac(env.ADMIN_PASSWORD, 'atlas|' + exp)}; Path=/; HttpOnly;${secure} SameSite=Lax; Max-Age=${365 * 86400}` });
     }
     if (r === 'logout' && method === 'POST') return json({ owner: false }, 200, { 'set-cookie': 'atlas_session=; Path=/; HttpOnly; Max-Age=0' });
 
@@ -436,6 +436,26 @@ async function route(request, env, url, path) {
     }
 
     // ----- submissions (public send, owner review) and the public Bird Wall -----
+    // The editor adds a bird straight to the wall: photo, cut-out and details in one request, published at once.
+    if (r === 'wall' && method === 'POST') {
+      need();
+      const form = await request.formData();
+      const meta = JSON.parse(form.get('meta') || '{}');
+      const display = form.get('display'), thumb = form.get('thumb'), cut = form.get('cutout');
+      if ([display, thumb, cut].some((f) => !f || typeof f === 'string')) return fail(400, 'Missing the photo or its cut-out.');
+      const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(String(meta.bird || '').trim()).first();
+      if (!sp) return fail(400, 'Choose a bird from the California list.');
+      const store = env.PHOTOS ? 'r2' : 'd1', now = new Date().toISOString();
+      const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, region, note, taken_at, camera, width, height, store, status, cut_w, cut_h, approved_at, featured) VALUES (?,?,?,?,?,?,?,?,?,?,?,'approved',?,?,?,?)`)
+        .bind(now, sp.common_name, sp.scientific_name, String(meta.credit_name || 'California Bird Atlas').slice(0, 80), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, clean(meta.cut_w), clean(meta.cut_h), now, meta.featured ? 1 : 0).run();
+      const sid = res.meta.last_row_id;
+      try {
+        await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
+        await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
+        await putBlob(env, `subs/${sid}/cutout`, await cut.arrayBuffer(), 'image/png');
+      } catch (e) { await deleteSubBlobs(env, sid, store); await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(sid).run(); throw e; }
+      return json({ id: sid });
+    }
     if (r === 'wall' && method === 'GET') {
       const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
       return json(rows, 200, { 'cache-control': 'public, max-age=60' });

@@ -11,7 +11,7 @@ export default async function wall(view) {
       <p class="mag-kicker">The Bird Wall</p>
       <h1 class="ix-title">Birds of California,<br>by the people who found them</h1>
       <p class="mag-deck">Every bird here was photographed in the wild by a member of the community, then cut out and added to the wall. Click any bird to see who took it.</p>
-      <p class="wall-ctas"><a class="mag-btn solid" href="/submit" data-link>Send a photo</a><a class="mag-btn" href="/my-wall" data-link>My Wall</a></p>
+      <p class="wall-ctas">${S.owner ? '<a class="mag-btn solid" href="/add" data-link>Add birds</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}<a class="mag-btn" href="/my-wall" data-link>My Wall</a></p>
     </header>
     ${rows.length ? `<div class="ix-bar"><div class="mag-wrap ix-row1">
       <label class="ix-search"><span class="vh">Search</span><input id="wq" type="search" placeholder="Search by bird or photographer"></label>
@@ -20,7 +20,7 @@ export default async function wall(view) {
     <div class="mag-wrap">
       <p class="ix-count" id="wc" aria-live="polite"></p>
       <div class="wall" id="wl"></div>
-      ${rows.length ? '' : `<div class="wall-empty"><p class="wall-empty-h">The wall is waiting for its first birds.</p><p class="mag-deck">Photograph a California bird, send it in, and it could be the first one up.</p>${S.owner ? '<a class="mag-btn solid" href="/review" data-link>Fill with sample birds (in Review)</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}</div>`}
+      ${rows.length ? '' : `<div class="wall-empty"><p class="wall-empty-h">The wall is waiting for its first birds.</p><p class="mag-deck">Photograph a California bird, send it in, and it could be the first one up.</p>${S.owner ? '<a class="mag-btn solid" href="/add" data-link>Add birds</a> <a class="mag-btn" href="/review" data-link>Fill with sample birds</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}</div>`}
     </div>
   </div>`;
   if (!rows.length) return;
