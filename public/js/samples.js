@@ -50,7 +50,7 @@ const OK_LICENSE = /public domain|^pd|cc0|cc[ -]by/i;
 const text = (html) => new DOMParser().parseFromString(String(html || ''), 'text/html').body.textContent.replace(/\s+/g, ' ').trim();
 const getJSON = async (url) => { const r = await fetch(url); if (!r.ok) throw new Error(`Wikimedia answered ${r.status}`); return r.json(); };
 
-async function findPhoto(bird) {
+export async function findPhoto(bird) {
   const q = new URLSearchParams({ action: 'query', titles: bird, redirects: '1', prop: 'pageimages', piprop: 'name', format: 'json', origin: '*' });
   const page = Object.values((await getJSON(`${WP}?${q}`)).query?.pages || {})[0];
   const file = page?.pageimage;
@@ -65,8 +65,16 @@ async function findPhoto(bird) {
 }
 
 // Adds every sample not already on the wall. onProgress(done, total, message).
-export async function fillSamples(onProgress = () => {}) {
-  const have = new Set(await api('/samples'));
+export async function fillSamples(onProgress = () => {}, { key } = {}) {
+  // key: the one-time setup key, used instead of the editor sign-in
+  const call = async (path, opts = {}) => {
+    if (!key) return api(path, opts);
+    const r = await fetch('/api' + path, { method: opts.method || 'GET', body: opts.form, headers: { 'x-setup-key': key } });
+    const d = await r.json().catch(() => null);
+    if (!r.ok) throw new Error(d?.error || 'Request failed (' + r.status + ')');
+    return d;
+  };
+  const have = new Set(await call('/samples'));
   let added = 0; const problems = [];
   for (let i = 0; i < SAMPLES.length; i++) {
     const [bird, region, featured] = SAMPLES[i];
@@ -79,7 +87,7 @@ export async function fillSamples(onProgress = () => {}) {
       const fd = new FormData();
       fd.set('meta', JSON.stringify({ bird, region, featured, credit_name: p.artist, license: p.license, license_url: p.license_url, source_url: p.page, width: der.width, height: der.height, cut_w: cut.width, cut_h: cut.height }));
       fd.set('display', der.display, 'display.jpg'); fd.set('thumb', der.thumb, 'thumb.jpg'); fd.set('cutout', cut.blob, 'cutout.png');
-      const res = await api('/samples', { method: 'POST', form: fd });
+      const res = await call('/samples', { method: 'POST', form: fd });
       if (!res.skipped) added++;
     } catch (err) { problems.push(`${bird}: ${err.message}`); }
   }
