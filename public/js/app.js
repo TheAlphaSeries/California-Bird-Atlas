@@ -28,9 +28,15 @@ const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 
 let renderSeq = 0;
 
 // Swap in a new page smoothly: build it off-screen, then cross-fade it in.
-function swapIn(view, tmp, mag) {
+// Reading pages are printed on paper; photo pages (cover, walls) stay black.
+const PAPER = new Set(['fieldwork', 'index', 'about', 'submit', 'add', 'review', 'gallery']);
+// The vertical Japanese label in the left margin, one per section.
+const TATEGAKI = { fieldwork: '今季の九羽', wall: '野鳥の壁', index: '図鑑', about: '使い方', submit: '投稿', add: '投稿', mywall: '私の壁', review: '編集', gallery: '写真' };
+function swapIn(view, tmp, mag, nav = '') {
   const apply = () => {
     document.body.classList.toggle('mag', mag);
+    document.body.classList.toggle('paper', mag && PAPER.has(nav));
+    const t = document.getElementById('tategaki'); if (t) { t.textContent = (mag && TATEGAKI[nav]) || ''; t.hidden = !t.textContent; }
     view.replaceChildren(tmp);
     if (!location.hash) window.scrollTo(0, 0);
   };
@@ -55,9 +61,10 @@ async function render() {
         const tmp = document.createElement('div'); tmp.className = 'page';
         await mod.default(tmp, ...m.slice(1));
         if (seq !== renderSeq) return; // a newer click won
-        swapIn(view, tmp, true);
+        swapIn(view, tmp, true, nav);
       } else {
-        document.body.classList.remove('mag');
+        document.body.classList.remove('mag', 'paper');
+        const t = document.getElementById('tategaki'); if (t) t.hidden = true;
         await mod.default(view, ...m.slice(1));
         if (!location.hash) window.scrollTo(0, 0);
       }

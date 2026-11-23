@@ -3,7 +3,7 @@ import { BUILT_IN, REGION_NAMES, REGIONS, hasRegion, myRegion, setRegion, pickRe
 
 export const DEFAULT_COVER = {
   line1: 'The Marshes at Dawn', line2: "California's Great Herons", line3: 'A Coastal Sanctuary',
-  season: 'Spring 2027', headline: 'The\nGreat\nBlue',
+  issue: 'No. 1', season: 'Winter 2026–27', headline: 'The\nGreat\nBlue',
   deck: "How a coastal giant thrives in California's changing wetlands",
   aside: 'A closer look at the heron that defines our rivers, marshes, and estuaries.',
   bird: 'Great Blue Heron', photo_id: null, credit: '',
@@ -18,19 +18,22 @@ const coverSrc = (c) => (c.photo_id ? `/media/${c.photo_id}/display` : BUILT_IN[
 export default async function cover(view) {
   document.body.classList.add('mag');
   const c = coverData();
-  view.innerHTML = `<article class="cover" aria-label="This issue's cover">
-    <div class="cover-lines"><span>${esc(c.line1)}</span><span class="bar" aria-hidden="true">|</span><span>${esc(c.line2)}</span><span class="bar" aria-hidden="true">|</span><span>${esc(c.line3)}</span></div>
-    <header class="cover-head">
-      <p class="cover-state">CALIFORNIA</p>
-      <h1 class="cover-title">BIRD ATLAS</h1>
-      <p class="cover-season">${esc(c.season)}</p>
-    </header>
-    <div class="cover-art">
-      <div class="cover-left"><p class="hl">${esc(c.headline)}</p><p class="dk">${esc(c.deck)}</p></div>
-      <img src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
-      <div class="cover-right"><p>${esc(c.aside)}</p></div>
+  const lines = [c.line1, c.line2, c.line3].filter(Boolean);
+  view.innerHTML = `<article class="cv" aria-label="This issue's cover">
+    <div class="cv-text">
+      <p class="cv-top"><span class="cv-no">${esc(c.issue)}</span><span>${esc(c.season)}</span></p>
+      <h1 class="cv-title">California<br>Bird Atlas</h1>
+      <div class="cv-feature">
+        <p class="cv-hl">${esc(c.headline)}</p>
+        <p class="cv-dk">${esc(c.deck)}</p>
+      </div>
+      ${lines.length ? `<ul class="cv-lines" aria-label="Also in this issue">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
     </div>
-    <p class="cover-credit">Cover: ${esc(c.bird)}${c.credit ? ' · ' + esc(c.credit) : ''}</p>
+    <figure class="cv-art">
+      <img src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
+      <p class="cv-jp" lang="ja" aria-hidden="true">カリフォルニア野鳥図鑑</p>
+      <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}${c.credit ? ` <span class="cr">Photograph by ${esc(c.credit)}</span>` : ''}</figcaption>
+    </figure>
     ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
   </article>
   <section class="how" aria-labelledby="how-h">
@@ -63,8 +66,8 @@ async function editCover(c) {
         ${photos.map((p) => `<option value="${p.id}" ${+c.photo_id === p.id ? 'selected' : ''}>${esc(p.common_name)} · #${p.id}${p.visibility === 'public' ? '' : ' (private: make it public first)'}</option>`).join('')}
       </select></label>
       ${f('bird', 'Bird on the cover')}${f('credit', 'Photographer credit')}
-      ${f('season', 'Season line')}${f('line1', 'Cover line 1')}${f('line2', 'Cover line 2')}${f('line3', 'Cover line 3')}
-      ${f('headline', 'Headline (one word per line)', 3)}${f('deck', 'Line under the headline', 2)}${f('aside', 'Note on the right', 3)}
+      ${f('issue', 'Issue number')}${f('season', 'Season line')}${f('line1', 'Cover line 1')}${f('line2', 'Cover line 2')}${f('line3', 'Cover line 3')}
+      ${f('headline', 'Headline (one word per line)', 3)}${f('deck', 'Line under the headline', 2)}${f('aside', 'Photo caption', 3)}
       <p class="note">Use a photo on a black or very dark background, with room on the left for the headline. Only public photos show to visitors.</p>
       <button class="btn solid" type="submit">Save cover</button>
     </form>`, { wide: true });

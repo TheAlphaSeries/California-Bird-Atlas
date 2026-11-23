@@ -17,7 +17,7 @@ export default async function bird(view, id) {
   view.innerHTML = `<div class="mag-wrap mag-page"><article class="bird">
     <figure class="art">${pic ? `<img src="${esc(pic.src)}" alt="${esc(b.n)}${pic.kind === 'ref' ? ' (reference photo)' : ''}">${refCredit(pic)}` : '<div class="ph">Not yet photographed</div>'}</figure>
     <div class="facts">
-      <p class="mag-kicker"><a href="/birds" data-link style="color:inherit;text-decoration:none">All birds</a> · ${esc(b.id)}</p>
+      <p class="plate"><a href="/birds" data-link>All birds</a><span>Plate No. ${+b.id.slice(3)}</span></p>
       <h1 class="mag-h" style="font-size:clamp(40px,5vw,68px)">${esc(b.n)}</h1>
       <p class="mag-sci" style="font-size:18px;margin:0">${esc(b.sci)}</p>
       <dl>

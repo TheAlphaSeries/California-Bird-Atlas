@@ -1,0 +1,155 @@
+/* Journal: a Japanese editorial magazine crossed with a documentary photo magazine.
+   Paper for reading pages, black where photographs need it, Field Yellow as the one signature colour.
+   Shippori Mincho B1 (Latin and Japanese) for headlines; Archivo for captions, data and navigation. */
+:root {
+  --j-paper: #fafaf7; --j-ink: #151515; --j-yellow: #ffcc00; --j-stone: #8a8a84; --j-rule: #dadad3; --j-dim: #4d4d48;
+  --j-mincho: 'Shippori Mincho B1', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --j-sans: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --mag-display: var(--j-mincho); --mag-text: var(--j-mincho); --mag-cond: var(--j-sans); --mag-accent: var(--j-yellow);
+}
+body.mag { --sans: var(--j-sans); font-family: var(--j-sans); }
+
+/* ---------- masthead: a yellow band, a mincho wordmark with its Japanese title ---------- */
+body.mag .masthead { border-top: 5px solid var(--j-yellow); padding-top: 10px; padding-bottom: 10px; }
+.wordmark { display: inline-flex; flex-direction: column; gap: 3px; line-height: 1; }
+.wm-jp { display: block; font: 500 10px/1 var(--j-mincho); letter-spacing: .32em; text-transform: none; opacity: .62; }
+body.mag .wordmark .wm-en { font: 700 21px/1 var(--j-mincho); letter-spacing: .01em; text-transform: none; }
+body.mag .primary a, body.mag .utilities a, body.mag .utilities button { font: 500 14px/1 var(--j-sans); letter-spacing: 0; text-transform: none; }
+body.mag .primary a { padding-bottom: 6px; border-bottom: 2px solid transparent; }
+body.mag .primary a.active, body.mag .primary a:hover { color: var(--mag-ink); border-bottom-color: var(--j-yellow); }
+body.mag .utilities .cta.u-send { color: var(--j-ink); font-weight: 600; }
+.region-chip { border-radius: 2px !important; }
+
+/* ---------- the vertical section label in the left margin ---------- */
+.tategaki { position: fixed; z-index: 6; top: 116px; left: max(14px, calc((100vw - 1240px) / 2 - 44px)); margin: 0;
+  writing-mode: vertical-rl; font: 600 15px/1 var(--j-mincho); letter-spacing: .42em; color: var(--j-stone); pointer-events: none; }
+.tategaki::before { content: ''; display: block; width: 2px; height: 34px; margin: 0 auto 14px; background: var(--j-yellow); }
+@media (max-width: 1340px) { .tategaki { display: none; } }
+
+/* ---------- type: sentence case, quiet labels, mincho headlines ---------- */
+.mag-kicker { display: flex; align-items: center; gap: 10px; font: 600 13px/1.2 var(--j-sans); letter-spacing: .01em; text-transform: none; color: var(--mag-dim); }
+.mag-kicker::before { content: ''; flex: none; width: 22px; height: 2px; background: var(--j-yellow); }
+.mag-h, .ix-title, .mag-section h2, .how h2, .mag-sub, .wall-empty-h { font-family: var(--j-mincho); font-weight: 700; letter-spacing: -.012em; }
+.mag-h { line-height: 1.04; }
+.mag-deck { font: 400 17px/1.8 var(--j-mincho); }
+.mag-btn { font: 600 14px var(--j-sans); letter-spacing: 0; text-transform: none; border-radius: 1px; }
+.mag-btn.solid { color: var(--j-ink); }
+.pill { border-radius: 1px; font: 500 14px var(--j-sans); }
+.pills-lbl, .seg button, .seg.small button, .f > span, .f legend, .clip-field, .score-table th, .lv-grid th,
+.bird dt, .wm-info dt, .ix-stats dt, .level .pts, .ixc-badge, .sq b, .wb-cap .by, .cover-credit, .ixc-img.blank .sc {
+  text-transform: none; letter-spacing: .01em; font-family: var(--j-sans); }
+.pills-lbl, .f > span, .f legend, .bird dt, .wm-info dt, .ix-stats dt, .score-table th, .lv-grid th { font-size: 12px; font-weight: 600; color: var(--mag-faint); }
+.seg button { font-size: 13px; border-radius: 1px; }
+.level h3 { font: 700 24px/1.1 var(--j-mincho); text-transform: none; }
+.level .pts { font-size: 13px; }
+.wb-cap .nm { font: 600 17px/1.25 var(--j-mincho); }
+.wb-cap .by { font-size: 12px; font-weight: 500; margin-top: 4px; }
+.rv-samples b { font: 700 13px var(--j-sans); letter-spacing: 0; text-transform: none; }
+.linkish { text-decoration-thickness: 1px; }
+.mag-sci { font-family: var(--j-mincho); }
+
+/* plate numbers: the bird numbers are a real index, so they read like plates in a field guide */
+.plate { display: flex; align-items: baseline; gap: 14px; margin: 0; font: 600 13px var(--j-sans); color: var(--mag-faint); }
+.plate a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--mag-rule); }
+.plate span { font: 700 15px var(--j-mincho); color: var(--mag-ink); padding-left: 14px; border-left: 2px solid var(--j-yellow); }
+.ixc-no { font: 600 11px var(--j-sans); color: var(--mag-faint); margin-bottom: 3px; }
+
+/* documentary captions: a bold lead-in, the caption, the credit set apart */
+.cv-cap, .ref-cap { font: 400 13px/1.55 var(--j-sans); }
+.cv-cap b, .ref-cap b { font-weight: 700; }
+.cv-cap .cr, .ref-cap .cr { display: block; margin-top: 4px; color: var(--j-stone); font-size: 12px; }
+
+/* ---------- the cover ---------- */
+.cv { position: relative; display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 0; max-width: 1240px; margin: 0 auto; padding: 28px 24px 8px; }
+.cv-text { position: relative; z-index: 2; display: flex; flex-direction: column; padding-right: 8px; }
+.cv-top { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; font: 600 13px var(--j-sans); color: var(--mag-dim); }
+.cv-no { background: var(--j-yellow); color: var(--j-ink); padding: 6px 10px; font: 800 14px/1 var(--j-sans); font-stretch: 85%; }
+.cv-title { margin: 0; font: 800 clamp(58px, 8.6vw, 128px)/.9 var(--j-mincho); letter-spacing: -.025em; margin-right: -26%; }
+.cv-feature { margin-top: auto; padding-top: 40px; max-width: 360px; }
+.cv-hl { margin: 0; font: 900 clamp(40px, 5.2vw, 76px)/.92 var(--j-sans); font-stretch: 72%; text-transform: uppercase; color: var(--j-yellow); white-space: pre-line; letter-spacing: -.01em; }
+.cv-dk { margin: 14px 0 0; font: 500 clamp(17px, 1.6vw, 21px)/1.45 var(--j-mincho); }
+.cv-lines { list-style: none; margin: 32px 0 0; padding: 0; display: grid; gap: 10px; max-width: 360px; }
+.cv-lines li { padding: 10px 0 0; border-top: 1px solid var(--mag-rule); font: 500 15px/1.35 var(--j-sans); color: var(--mag-dim); }
+.cv-art { position: relative; margin: 0; }
+.cv-art img { display: block; width: 100%; height: auto; }
+.cv-jp { position: absolute; top: 4px; right: -2px; margin: 0; writing-mode: vertical-rl; font: 700 clamp(14px, 1.3vw, 18px)/1 var(--j-mincho); letter-spacing: .5em; color: var(--mag-ink); opacity: .9; }
+.cv-cap { margin: 12px 0 0; max-width: 520px; color: var(--mag-dim); }
+.cv .cover-actions { grid-column: 1 / -1; justify-content: flex-start; }
+@media (max-width: 860px) {
+  .cv { grid-template-columns: 1fr; padding-top: 18px; }
+  .cv-title { margin-right: 0; font-size: clamp(52px, 15vw, 88px); }
+  .cv-art { order: -1; margin: 0 -24px 22px; }
+  .cv-feature { padding-top: 26px; }
+  .cv-cap { padding: 0 24px; }
+}
+
+/* ---------- paper: reading pages ---------- */
+body.mag.paper { background: var(--j-paper); color: var(--j-ink); }
+body.mag.paper #view, body.mag.paper .masthead, body.mag.paper .colophon {
+  --mag-bg: var(--j-paper); --mag-ink: var(--j-ink); --mag-dim: var(--j-dim); --mag-faint: var(--j-stone); --mag-rule: var(--j-rule); color: var(--j-ink); }
+body.mag.paper .masthead { background: rgba(250, 250, 247, .96); border-bottom-color: var(--j-rule); }
+body.mag.paper .menu-toggle span { background: var(--j-ink); }
+body.mag.paper .utilities .cta { border-color: var(--j-ink); }
+body.mag.paper .colophon { border-top-color: var(--j-rule); color: var(--j-stone); }
+body.mag.paper .region-chip b { color: var(--j-ink); box-shadow: inset 0 -3px 0 var(--j-yellow); }
+
+/* yellow is a fill on paper, never text: text that was yellow on black becomes ink */
+body.mag.paper #view .linkish, body.mag.paper #view [style*="mag-accent"], body.mag.paper #view .how-steps a:not(.mag-btn), body.mag.paper #view .wm-info dd a, body.mag.paper #view .ref-report {
+  color: var(--j-ink) !important; text-decoration: underline; text-decoration-color: var(--j-yellow); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+body.mag.paper #view .ix-stats dd, body.mag.paper #view .score-table td.n, body.mag.paper #view .how-steps .n,
+body.mag.paper #view .steps-inline li::before, body.mag.paper #view .ix-fam h2 .ct, body.mag.paper #view .ixc-img.blank .no, body.mag.paper #view .rot-next b, body.mag.paper #view .rv-samples b { color: var(--j-ink); }
+body.mag.paper #view .ixc:hover .bn, body.mag.paper #view .level a.bird:hover .bn { color: var(--j-ink); text-decoration: underline; text-decoration-color: var(--j-yellow); text-decoration-thickness: 2px; }
+body.mag.paper #view .rot-next { background: rgba(255, 204, 0, .16); color: var(--j-ink); }
+body.mag.paper #view .lv.l1, body.mag.paper #view .ixc-badge.l1 { color: #2e7a34; } body.mag.paper #view .sq.l1 i { background: #3f9a45; }
+body.mag.paper #view .lv.l2, body.mag.paper #view .ixc-badge.l2 { color: #8a6a00; } body.mag.paper #view .sq.l2 i { background: var(--j-yellow); }
+body.mag.paper #view .lv.l3, body.mag.paper #view .ixc-badge.l3 { color: #b8431b; } body.mag.paper #view .sq.l3 i { background: #d9622e; }
+body.mag.paper #view .lv.none { color: #b5b5ad; } body.mag.paper #view .sq i { background: #e2e2db; }
+body.mag.paper #view .ixc-badge.off, body.mag.paper #view .ixc-badge.cat { color: var(--j-stone); border-color: var(--j-rule); }
+
+/* surfaces */
+body.mag.paper #view .ixc { background: #fff; border-color: var(--j-rule); }
+body.mag.paper #view .ixc:hover { background: #fff; border-color: var(--j-ink); }
+body.mag.paper #view .ixc-img { background: #ecece6; }
+body.mag.paper #view .ixc-img.blank { background: #efefe9; }
+body.mag.paper #view .ix-bar { background: rgba(250, 250, 247, .95); border-color: var(--j-rule); }
+body.mag.paper #view .ix-search input { color: var(--j-ink); border-bottom-color: var(--j-stone); }
+body.mag.paper #view .seg button { border-color: var(--j-rule); color: var(--j-dim); background: #fff; }
+body.mag.paper #view .seg button:hover { border-color: var(--j-ink); color: var(--j-ink); }
+body.mag.paper #view .seg button[aria-pressed="true"] { background: var(--j-ink); border-color: var(--j-ink); color: var(--j-paper); }
+body.mag.paper #view .pill, body.mag.paper #view .how-regions button { border-color: var(--j-rule); background: #fff; color: var(--j-ink); }
+body.mag.paper #view .pill[aria-pressed="true"], body.mag.paper #view .how-regions button[aria-pressed="true"] { background: var(--j-yellow); border-color: var(--j-yellow); }
+body.mag.paper #view .mag-btn { border-color: var(--j-ink); color: var(--j-ink); }
+body.mag.paper #view .mag-btn.solid { border-color: var(--j-yellow); }
+body.mag.paper #view .f input:not([type=checkbox]):not([type=radio]), body.mag.paper #view .f select, body.mag.paper #view .f textarea { background: #fff; color: var(--j-ink); border-color: #cfcfc7; }
+body.mag.paper #view .f input:focus, body.mag.paper #view .f select:focus, body.mag.paper #view .f textarea:focus { border-color: var(--j-ink); box-shadow: 0 0 0 3px rgba(255, 204, 0, .45); }
+body.mag.paper #view .f.checks label, body.mag.paper #view .ad-feat { color: var(--j-ink); }
+body.mag.paper #view .drop { background: #f1f1ec; border-color: #b9b9b0; }
+body.mag.paper #view .drop.over, body.mag.paper #view .drop:hover { border-color: var(--j-ink); }
+body.mag.paper #view .rv-card { background: #fff; border-color: var(--j-rule); }
+body.mag.paper #view .rv-card:hover { border-color: var(--j-ink); }
+body.mag.paper #view .rv-samples { border-color: var(--j-rule); background: #fff; }
+body.mag.paper #view .rv-samples span { color: var(--j-dim); }
+body.mag.paper #view .add-bar { background: rgba(250, 250, 247, .96); border-color: var(--j-rule); color: var(--j-dim); }
+body.mag.paper #view .ad-orig { background: #ecece6; }
+body.mag.paper #view .bird .art .ph { background: #ecece6; color: var(--j-stone); }
+body.mag.paper #view .level a.bird .bt { background: #e6e6df; }
+body.mag.paper #view .steps-inline li { border-color: var(--j-rule); background: #fff; }
+body.mag.paper #view .steps-inline b { color: var(--j-ink); }
+body.mag.paper #view .ref-cap b { color: var(--j-ink); }
+body.mag.paper #view .wall-sample-note { color: var(--j-dim); }
+body.mag.paper #view a:focus-visible, body.mag.paper #view button:focus-visible { outline: 2px solid var(--j-ink); outline-offset: 2px; }
+
+/* a rule of yellow above each level and step, as in the print edition */
+.level, .how-steps li { border-top-width: 4px; }
+
+/* the bird page: a documentary plate with the photo on paper */
+body.mag.paper #view .bird .art img { display: block; width: 100%; height: auto; }
+body.mag.paper #view .bird h1.mag-h { margin-top: 14px; }
+
+/* fixes from review */
+body.mag.paper #view [style*="e6e2da"] { color: var(--j-ink) !important; }
+.rot-next b { font-family: var(--j-sans); font-weight: 700; text-transform: none; letter-spacing: 0; }
+.tategaki::before { display: none; }
+.tategaki { border-top: 2px solid var(--j-yellow); padding-top: 14px; }
+.wall-head .ix-title { font-size: clamp(44px, 6vw, 84px); max-width: 15ch; }
+@media (max-width: 860px) { .cv-jp { right: 30px; top: 10px; } }

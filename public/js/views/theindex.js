@@ -81,7 +81,7 @@ export default async function theIndex(view) {
       <h2><span>${esc(g.fam)}</span><span class="ct">${g.birds.length}</span></h2>
       <div class="ix-grid">${g.birds.map((b) => `<a class="ixc" href="${birdLink(b)}" data-link>
         ${thumb(b)}
-        <span class="ixc-txt"><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>
+        <span class="ixc-txt"><span class="ixc-no">No. ${+b.id.slice(3)}</span><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>
         <span class="ixc-foot">${badge(b, i, st.season)}${b.lv ? strip(b, i) : ''}</span></span>
       </a>`).join('')}</div></section>`).join('') || '<p class="mag-deck" style="padding:40px 0">No birds match. Try another region, season or spelling.</p>';
   };
