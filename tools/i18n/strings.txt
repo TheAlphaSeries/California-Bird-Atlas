@@ -1,0 +1,246 @@
+# Interface translations. One line per piece of text: English || Spanish || Chinese (Traditional) || Tagalog || Vietnamese || Korean
+# The English must match the text on the page exactly (spaces collapsed). Build with: python3 tools/i18n/build.py
+California Bird Atlas || Atlas de Aves de California || 加州鳥類圖鑑 || Atlas ng mga Ibon ng California || Atlas Chim California || 캘리포니아 조류 아틀라스
+Bird photography, made in California || Fotografía de aves, hecha en California || 鳥類攝影，來自加州 || Pagkuha ng larawan ng ibon, gawa sa California || Nhiếp ảnh chim, làm tại California || 캘리포니아에서 만든 조류 사진
+Home || Inicio || 首頁 || Home || Trang chủ || 홈
+This Season || Esta temporada || 本季 || Ngayong Season || Mùa này || 이번 시즌
+Bird Wall || Muro de Aves || 鳥牆 || Bird Wall || Bức tường chim || 새 갤러리
+All Birds || Todas las aves || 所有鳥類 || Lahat ng Ibon || Tất cả các loài chim || 모든 새
+How It Works || Cómo funciona || 如何參與 || Paano Ito Gumagana || Cách hoạt động || 이용 방법
+Send a photo || Enviar una foto || 傳送照片 || Magpadala ng larawan || Gửi ảnh || 사진 보내기
+Search || Buscar || 搜尋 || Maghanap || Tìm kiếm || 검색
+Region: || Región: || 地區： || Rehiyon: || Vùng: || 지역:
+Bay Area || Área de la Bahía || 灣區 || Bay Area || Vùng Vịnh || 베이 에어리어
+North Coast || Costa Norte || 北海岸 || Hilagang Baybayin || Bờ biển phía Bắc || 북부 해안
+Central Valley || Valle Central || 中央谷地 || Gitnang Lambak || Thung lũng Trung tâm || 센트럴 밸리
+Sierra & Northeast || Sierra y Noreste || 內華達山脈與東北部 || Sierra at Hilagang-Silangan || Sierra và Đông Bắc || 시에라·북동부
+Central Coast || Costa Central || 中央海岸 || Gitnang Baybayin || Bờ biển Trung tâm || 중부 해안
+Southern Coast || Costa Sur || 南海岸 || Timog na Baybayin || Bờ biển phía Nam || 남부 해안
+Deserts || Desiertos || 沙漠 || Mga Disyerto || Sa mạc || 사막
+Cover story || Tema de portada || 封面故事 || Pangunahing kuwento || Câu chuyện trang bìa || 커버 스토리
+Pause || Pausa || 暫停 || I-pause || Tạm dừng || 일시정지
+Play || Reproducir || 播放 || I-play || Phát || 재생
+new birds || aves nuevas || 種新鳥 || bagong ibon || loài chim mới || 마리의 새로운 새
+every 2 weeks || cada 2 semanas || 每兩週 || bawat 2 linggo || mỗi 2 tuần || 2주마다
+See your nine birds || Ve tus nueve aves || 查看你的九種鳥 || Tingnan ang iyong siyam na ibon || Xem chín loài chim của bạn || 나의 아홉 마리 새 보기
+How it works || Cómo funciona || 如何參與 || Paano ito gumagana || Cách hoạt động || 이용 방법
+Photograph California's birds, one season at a time. || Fotografía las aves de California, una temporada a la vez. || 一季一季，拍下加州的鳥。 || Kunan ng larawan ang mga ibon ng California, isang season sa bawat pagkakataon. || Chụp ảnh chim California, từng mùa một. || 한 시즌씩, 캘리포니아의 새를 찍어 보세요.
+Pick your region || Elige tu región || 選擇你的地區 || Piliin ang iyong rehiyon || Chọn vùng của bạn || 지역 선택
+Tell us where you go birding. Nothing about your location is collected. || Dinos dónde sueles observar aves. No recopilamos nada sobre tu ubicación. || 告訴我們你在哪裡賞鳥。我們不會收集任何位置資訊。 || Sabihin sa amin kung saan ka nagmamasid ng ibon. Walang kinokolektang impormasyon tungkol sa iyong lokasyon. || Cho chúng tôi biết bạn thường ngắm chim ở đâu. Chúng tôi không thu thập bất kỳ thông tin vị trí nào. || 어디에서 탐조하는지 알려 주세요. 위치 정보는 수집하지 않습니다.
+Not sure which region you're in? || ¿No sabes en qué región estás? || 不確定自己在哪個地區？ || Hindi sigurado kung saang rehiyon ka? || Không chắc mình ở vùng nào? || 어느 지역인지 모르겠나요?
+Get your nine birds || Recibe tus nueve aves || 領取你的九種鳥 || Kunin ang iyong siyam na ibon || Nhận chín loài chim của bạn || 아홉 마리 새 받기
+Every two weeks your region gets nine new birds: three easy, three that take a trip, three that are hard to find. || Cada dos semanas tu región recibe nueve aves nuevas: tres fáciles, tres que requieren un viaje y tres difíciles de encontrar. || 你的地區每兩週會有九種新鳥：三種容易、三種需要專程前往、三種很難找到。 || Bawat dalawang linggo, may siyam na bagong ibon ang iyong rehiyon: tatlong madali, tatlong kailangang puntahan, at tatlong mahirap hanapin. || Cứ hai tuần, vùng của bạn có chín loài chim mới: ba loài dễ, ba loài cần đi một chuyến, ba loài khó tìm. || 2주마다 지역별로 새로운 새 아홉 마리가 정해집니다. 쉬운 새 셋, 찾아가야 하는 새 셋, 찾기 어려운 새 셋입니다.
+See this season's birds || Ve las aves de esta temporada || 查看本季的鳥 || Tingnan ang mga ibon ngayong season || Xem chim mùa này || 이번 시즌 새 보기
+Go out and photograph them || Sal a fotografiarlas || 出門去拍攝牠們 || Lumabas at kunan sila ng larawan || Ra ngoài và chụp ảnh chúng || 밖으로 나가 촬영하세요
+Send your best shot. We cut the bird out and add it to the Bird Wall with your name. The best are published in the magazine. || Envía tu mejor foto. Recortamos el ave y la añadimos al Muro de Aves con tu nombre. Las mejores se publican en la revista. || 傳送你最好的照片。我們會把鳥去背，連同你的名字放上鳥牆。最好的作品會刊登在雜誌上。 || Ipadala ang pinakamahusay mong kuha. Gugupitin namin ang ibon at idadagdag sa Bird Wall kasama ang pangalan mo. Ilalathala sa magasin ang pinakamahuhusay. || Gửi tấm ảnh đẹp nhất của bạn. Chúng tôi tách con chim khỏi nền và đưa lên Bức tường chim kèm tên bạn. Những ảnh đẹp nhất được đăng trên tạp chí. || 가장 좋은 사진을 보내 주세요. 새만 오려 이름과 함께 새 갤러리에 올립니다. 가장 좋은 사진은 잡지에 실립니다.
+See the Bird Wall || Ver el Muro de Aves || 查看鳥牆 || Tingnan ang Bird Wall || Xem Bức tường chim || 새 갤러리 보기
+California Bird Atlas. California's native birds, photographed. || Atlas de Aves de California. Las aves nativas de California, fotografiadas. || 加州鳥類圖鑑。拍下加州的原生鳥類。 || Atlas ng mga Ibon ng California. Ang mga katutubong ibon ng California, nakunan ng larawan. || Atlas Chim California. Các loài chim bản địa của California, qua ống kính. || 캘리포니아 조류 아틀라스. 캘리포니아 토종 새를 사진으로.
+About || Acerca de || 關於 || Tungkol sa amin || Giới thiệu || 소개
+Sources and data notes || Fuentes y notas sobre los datos || 資料來源與說明 || Mga pinagkunan at tala sa datos || Nguồn và ghi chú dữ liệu || 출처 및 데이터 안내
+Editor login || Acceso del editor || 編輯登入 || Login ng editor || Đăng nhập biên tập viên || 편집자 로그인
+Open menu || Abrir menú || 開啟選單 || Buksan ang menu || Mở menu || 메뉴 열기
+Search birds and photographers || Buscar aves y fotógrafos || 搜尋鳥類與攝影者 || Maghanap ng ibon at photographer || Tìm chim và nhiếp ảnh gia || 새와 사진가 검색
+Also in this issue || También en este número || 本期還有 || Nasa isyung ito rin || Cũng trong số này || 이번 호의 다른 기사
+Previous bird || Ave anterior || 上一種鳥 || Nakaraang ibon || Chim trước || 이전 새
+Next bird || Ave siguiente || 下一種鳥 || Susunod na ibon || Chim tiếp theo || 다음 새
+Your region || Tu región || 你的地區 || Iyong rehiyon || Vùng của bạn || 나의 지역
+This season || Esta temporada || 本季 || Ngayong season || Mùa này || 이번 시즌
+See the issue || Ver el número || 查看本期 || Tingnan ang isyu || Xem số báo || 이번 호 보기
+Your nine birds || Tus nueve aves || 你的九種鳥 || Ang iyong siyam na ibon || Chín loài chim của bạn || 나의 아홉 마리 새
+Nine birds || Nueve aves || 九種鳥 || Siyam na ibon || Chín loài chim || 아홉 마리 새
+Not your region? Choose yours || ¿No es tu región? Elige la tuya || 不是你的地區？選擇你的地區 || Hindi mo rehiyon? Piliin ang iyo || Không phải vùng của bạn? Chọn vùng của bạn || 내 지역이 아닌가요? 지역 선택
+Change region || Cambiar de región || 更改地區 || Palitan ang rehiyon || Đổi vùng || 지역 변경
+Make this my region || Hacer de esta mi región || 設為我的地區 || Gawin itong rehiyon ko || Đặt làm vùng của tôi || 내 지역으로 설정
+Print a field card || Imprimir una tarjeta de campo || 列印野外卡 || Mag-print ng field card || In thẻ thực địa || 현장 카드 인쇄
+Add the next dates to my calendar || Añadir las próximas fechas a mi calendario || 把接下來的日期加入行事曆 || Idagdag ang mga susunod na petsa sa kalendaryo ko || Thêm các ngày sắp tới vào lịch của tôi || 다음 날짜를 내 캘린더에 추가
+days until || días para || 天後換成 || araw bago ang || ngày nữa đến || 일 후
+winter birds || las aves de invierno || 冬季鳥 || mga ibon ng taglamig || chim mùa đông || 겨울 새 공개
+spring birds || las aves de primavera || 春季鳥 || mga ibon ng tagsibol || chim mùa xuân || 봄 새 공개
+summer birds || las aves de verano || 夏季鳥 || mga ibon ng tag-init || chim mùa hè || 여름 새 공개
+fall birds || las aves de otoño || 秋季鳥 || mga ibon ng taglagas || chim mùa thu || 가을 새 공개
+new birds || aves nuevas || 新的鳥 || bagong ibon || chim mới || 새로운 새 공개
+Season || Temporada || 季節 || Season || Mùa || 시즌
+Winter || Invierno || 冬季 || Taglamig || Mùa đông || 겨울
+Spring || Primavera || 春季 || Tagsibol || Mùa xuân || 봄
+Summer || Verano || 夏季 || Tag-init || Mùa hè || 여름
+Fall || Otoño || 秋季 || Taglagas || Mùa thu || 가을
+Assignment || Asignación || 任務 || Assignment || Đợt || 과제
+Easy to find || Fáciles de encontrar || 容易找到 || Madaling hanapin || Dễ tìm || 찾기 쉬움
+Takes a trip || Requieren un viaje || 需要專程前往 || Kailangang puntahan || Cần đi một chuyến || 찾아가야 함
+Hard to find || Difíciles de encontrar || 很難找到 || Mahirap hanapin || Khó tìm || 찾기 어려움
+Common and widespread. Expect them on an ordinary outing. || Comunes y extendidas. Espéralas en cualquier salida. || 常見且分布廣泛，一般出門就能看到。 || Karaniwan at laganap. Makikita mo sila sa karaniwang paglabas. || Phổ biến và rộng khắp. Có thể gặp trong một chuyến đi bình thường. || 흔하고 널리 분포합니다. 평범한 외출에서도 볼 수 있어요.
+Go to the right habitat. Usually found when you do. || Ve al hábitat adecuado. Normalmente las encontrarás. || 到合適的棲地去，通常就能找到。 || Pumunta sa tamang tirahan. Karaniwang makikita mo sila roon. || Hãy đến đúng môi trường sống. Thường sẽ tìm thấy. || 알맞은 서식지로 가면 대개 찾을 수 있어요.
+Scarce, local or hard to see. May take several tries. || Escasas, locales o difíciles de ver. Pueden requerir varios intentos. || 稀少、分布局限或難以看見，可能要嘗試好幾次。 || Bihira, lokal, o mahirap makita. Maaaring ilang subok bago mo makita. || Hiếm, chỉ có ở vài nơi hoặc khó thấy. Có thể phải thử nhiều lần. || 드물거나 국지적이거나 보기 어렵습니다. 여러 번 시도해야 할 수도 있어요.
+Find one, photograph it, send it in. || Encuentra una, fotografíala y envíala. || 找到一隻，拍下來，傳給我們。 || Maghanap ng isa, kunan ng larawan, at ipadala. || Tìm một con, chụp ảnh, rồi gửi đi. || 찾고, 찍고, 보내세요.
+See them all || Verlas todas || 查看全部 || Tingnan lahat || Xem tất cả || 모두 보기
+How the nine are drawn || Cómo se eligen las nueve || 九種鳥如何抽出 || Paano pinipili ang siyam || Cách chọn chín loài || 아홉 마리를 고르는 방법
+Your nine birds, by email || Tus nueve aves, por correo || 用電子郵件收到你的九種鳥 || Ang iyong siyam na ibon, sa email || Chín loài chim của bạn, qua email || 아홉 마리 새를 이메일로
+One short email every two weeks with the nine new birds for your region. Nothing else, and you can leave any time. || Un correo breve cada dos semanas con las nueve aves nuevas de tu región. Nada más, y puedes darte de baja cuando quieras. || 每兩週一封簡短的電子郵件，告訴你所在地區的九種新鳥。沒有其他內容，隨時可以取消。 || Isang maikling email bawat dalawang linggo tungkol sa siyam na bagong ibon sa iyong rehiyon. Wala nang iba, at puwede kang umalis anumang oras. || Một email ngắn mỗi hai tuần với chín loài chim mới cho vùng của bạn. Không có gì khác, và bạn có thể hủy bất cứ lúc nào. || 2주마다 지역의 새로운 새 아홉 마리를 짧은 이메일로 보내 드립니다. 다른 내용은 없으며 언제든 그만 받을 수 있어요.
+Email || Correo electrónico || 電子郵件 || Email || Email || 이메일
+Region || Región || 地區 || Rehiyon || Vùng || 지역
+Sign me up || Suscribirme || 我要訂閱 || I-sign up ako || Đăng ký cho tôi || 신청하기
+We keep your email and the region you picked, and use them only for this email. || Guardamos tu correo y la región que elegiste, y solo los usamos para este correo. || 我們會保存你的電子郵件和所選地區，只用於這封郵件。 || Itinatago namin ang iyong email at ang rehiyong pinili mo, at ginagamit lang namin ito para sa email na ito. || Chúng tôi lưu email và vùng bạn chọn, và chỉ dùng cho email này. || 이메일과 선택한 지역은 이 이메일에만 사용합니다.
+Unsubscribe || Darse de baja || 取消訂閱 || Mag-unsubscribe || Hủy đăng ký || 구독 취소
+Scoring || Puntuación || 計分 || Pagmamarka || Tính điểm || 점수
+How points work || Cómo funcionan los puntos || 積分方式 || Paano gumagana ang puntos || Cách tính điểm || 점수 계산 방법
+Choose a region to see its nine birds || Elige una región para ver sus nueve aves || 選擇一個地區，查看它的九種鳥 || Pumili ng rehiyon para makita ang siyam na ibon nito || Chọn một vùng để xem chín loài chim của vùng đó || 지역을 고르면 그 지역의 아홉 마리 새를 볼 수 있어요
+Photographed by readers || Fotografiadas por los lectores || 讀者拍攝 || Kinunan ng mga mambabasa || Do độc giả chụp || 독자들이 찍은 사진
+The Bird Wall || El Muro de Aves || 鳥牆 || Ang Bird Wall || Bức tường chim || 새 갤러리
+Birds of California, by the people who found them. Every one was photographed in the wild, cut out and put up here. Click a bird to see who took it. || Aves de California, por quienes las encontraron. Cada una fue fotografiada en libertad, recortada y colocada aquí. Haz clic en un ave para ver quién la tomó. || 加州的鳥，由發現牠們的人拍攝。每一隻都是在野外拍到、去背後放到這裡。點一隻鳥，看看是誰拍的。 || Mga ibon ng California, mula sa mga taong nakakita sa kanila. Bawat isa ay kinunan sa ligaw, ginupit, at inilagay dito. I-click ang ibon para makita kung sino ang kumuha. || Chim California, do chính những người tìm thấy chúng chụp. Mỗi con đều được chụp ngoài thiên nhiên, tách nền và đưa lên đây. Nhấp vào một con chim để xem ai đã chụp. || 캘리포니아의 새를 찾아낸 사람들이 찍었습니다. 모두 야생에서 촬영해 오려 붙였어요. 새를 누르면 누가 찍었는지 볼 수 있어요.
+My Wall || Mi muro || 我的鳥牆 || Aking Wall || Bức tường của tôi || 나의 갤러리
+Scoreboard || Marcador || 排行榜 || Scoreboard || Bảng điểm || 점수판
+All regions || Todas las regiones || 所有地區 || Lahat ng rehiyon || Tất cả các vùng || 모든 지역
+Order || Orden || 排序 || Ayos || Sắp xếp || 정렬
+Newest first || Más recientes primero || 最新優先 || Pinakabago muna || Mới nhất trước || 최신순
+By family || Por familia || 依科別 || Ayon sa pamilya || Theo họ || 과별
+By region || Por región || 依地區 || Ayon sa rehiyon || Theo vùng || 지역별
+Show names || Mostrar nombres || 顯示名稱 || Ipakita ang mga pangalan || Hiện tên || 이름 표시
+New || Nuevo || 新 || Bago || Mới || 새로 올라옴
+Search by bird or photographer || Buscar por ave o fotógrafo || 依鳥名或攝影者搜尋 || Maghanap ayon sa ibon o photographer || Tìm theo chim hoặc nhiếp ảnh gia || 새 또는 사진가로 검색
+Field guide || Guía de campo || 野外圖鑑 || Field guide || Sách hướng dẫn thực địa || 현장 도감
+Every bird in California || Todas las aves de California || 加州的每一種鳥 || Bawat ibon sa California || Mọi loài chim ở California || 캘리포니아의 모든 새
+Species || Especies || 物種 || Mga species || Loài || 종
+Assigned || Asignables || 可指派 || Maaaring italaga || Có thể giao || 과제 대상
+Rare finds || Hallazgos raros || 罕見發現 || Bihirang tuklas || Phát hiện hiếm || 희귀종
+Findable here now || Se pueden encontrar aquí ahora || 現在在這裡找得到 || Makikita rito ngayon || Có thể tìm thấy ở đây lúc này || 지금 여기서 볼 수 있음
+Off-limits || Fuera de los límites || 不列入 || Bawal || Ngoài phạm vi || 대상 아님
+All birds || Todas las aves || 所有鳥類 || Lahat ng ibon || Tất cả các loài chim || 모든 새
+List || Lista || 清單 || Listahan || Danh sách || 목록
+Photos || Fotos || 照片 || Mga larawan || Ảnh || 사진
+By family || Por familia || 依科別 || Ayon sa pamilya || Theo họ || 과별
+Easiest first || Más fáciles primero || 最容易的優先 || Pinakamadali muna || Dễ nhất trước || 쉬운 순
+Families || Familias || 科別 || Mga pamilya || Các họ || 과
+Collapse all families || Contraer todas las familias || 收合所有科別 || I-collapse ang lahat ng pamilya || Thu gọn tất cả các họ || 모든 과 접기
+Expand all families || Expandir todas las familias || 展開所有科別 || I-expand ang lahat ng pamilya || Mở rộng tất cả các họ || 모든 과 펼치기
+easy to find || fácil de encontrar || 容易找到 || madaling hanapin || dễ tìm || 찾기 쉬움
+takes a trip || requiere un viaje || 需要專程前往 || kailangang puntahan || cần đi một chuyến || 찾아가야 함
+hard to find, in your region this season. The four bars show winter, spring, summer and fall. || difícil de encontrar, en tu región esta temporada. Las cuatro barras muestran invierno, primavera, verano y otoño. || 很難找到，指你所在地區的本季情況。四個色條分別代表冬、春、夏、秋。 || mahirap hanapin, sa iyong rehiyon ngayong season. Ipinapakita ng apat na bar ang taglamig, tagsibol, tag-init at taglagas. || khó tìm, ở vùng của bạn trong mùa này. Bốn thanh thể hiện mùa đông, xuân, hè và thu. || 찾기 어려움(이번 시즌, 나의 지역 기준). 네 개의 막대는 겨울, 봄, 여름, 가을을 뜻합니다.
+Win || Inv || 冬 || Tgl || Đông || 겨울
+Spr || Pri || 春 || Tgs || Xuân || 봄
+Sum || Ver || 夏 || Tgi || Hè || 여름
+Reference || Referencia || 參考 || Sanggunian || Tham khảo || 참고
+Bird families || Familias de aves || 鳥類科別 || Mga pamilya ng ibon || Các họ chim || 새의 과
+Level by season || Nivel por temporada || 各季難度 || Antas ayon sa season || Mức độ theo mùa || 시즌별 난이도
+Reference photo || Foto de referencia || 參考照片 || Larawang sanggunian || Ảnh tham khảo || 참고 사진
+Wrong photo? Tell us || ¿Foto equivocada? Avísanos || 照片不對？告訴我們 || Maling larawan? Sabihin sa amin || Ảnh sai? Báo cho chúng tôi || 사진이 틀렸나요? 알려 주세요
+Where it's easiest || Dónde es más fácil || 哪裡最容易找到 || Kung saan pinakamadali || Nơi dễ tìm nhất || 가장 쉬운 곳
+Easy || Fácil || 容易 || Madali || Dễ || 쉬움
+Hard || Difícil || 困難 || Mahirap || Khó || 어려움
+Not dependable || Poco fiable || 不一定看得到 || Hindi maaasahan || Không chắc chắn || 불확실
+Plate no. || Lámina n.º || 圖版編號 || Plate blg. || Bản số || 도판 번호
+One of the nine right now || Una de las nueve ahora mismo || 目前是九種鳥之一 || Isa sa siyam ngayon || Một trong chín loài lúc này || 지금 아홉 마리 중 하나
+Family || Familia || 科 || Pamilya || Họ || 과
+Status || Estado || 狀態 || Katayuan || Tình trạng || 상태
+Native || Nativa || 原生 || Katutubo || Bản địa || 토종
+Category || Categoría || 類別 || Kategorya || Hạng mục || 분류
+Level by region and season || Nivel por región y temporada || 各地區各季難度 || Antas ayon sa rehiyon at season || Mức độ theo vùng và mùa || 지역·시즌별 난이도
+1 is easy to find, 3 is hard. A dash means not dependable there that season. || 1 es fácil de encontrar y 3 es difícil. Un guion significa que no es fiable allí en esa temporada. || 1 代表容易找到，3 代表困難。破折號代表該季在那裡不一定看得到。 || Ang 1 ay madaling hanapin, ang 3 ay mahirap. Ang gitling ay nangangahulugang hindi maaasahan doon sa season na iyon. || 1 là dễ tìm, 3 là khó. Dấu gạch có nghĩa là không chắc chắn ở đó trong mùa đó. || 1은 찾기 쉬움, 3은 어려움입니다. 줄표는 그 시즌에 그 지역에서 불확실하다는 뜻입니다.
+rare || rara || 罕見 || bihira || hiếm || 희귀
+On the Bird Wall || En el Muro de Aves || 在鳥牆上 || Nasa Bird Wall || Trên Bức tường chim || 새 갤러리에서
+Nobody has sent this bird yet || Nadie ha enviado esta ave todavía || 還沒有人傳送這種鳥 || Wala pang nagpapadala ng ibong ito || Chưa ai gửi loài chim này || 아직 아무도 이 새를 보내지 않았어요
+Be the first. || Sé la primera persona. || 成為第一人。 || Maging una. || Hãy là người đầu tiên. || 첫 번째가 되어 보세요.
+Not yet photographed || Aún sin fotografiar || 尚未拍到 || Wala pang larawan || Chưa có ảnh || 아직 사진 없음
+Look-alike || Parecidas || 相似種 || Kamukha || Loài giống || 닮은 새
+Easy to mix up with || Fácil de confundir con || 容易混淆的鳥 || Madaling mapagkamalan sa || Dễ nhầm với || 헷갈리기 쉬운 새
+or || o || 或 || o || hoặc || 또는
+Open each page to compare where and when they turn up. || Abre cada página para comparar dónde y cuándo aparecen. || 打開各自的頁面，比較牠們出現的地點和時間。 || Buksan ang bawat pahina para ikumpara kung saan at kailan sila lumilitaw. || Mở từng trang để so sánh nơi và thời điểm chúng xuất hiện. || 각 페이지를 열어 언제 어디에 나타나는지 비교해 보세요.
+Put your bird on the wall || Pon tu ave en el muro || 把你的鳥放上鳥牆 || Ilagay ang iyong ibon sa wall || Đưa chim của bạn lên tường || 내 새를 갤러리에 올리기
+We kept your unsent photos and answers from last time. || Guardamos las fotos y respuestas que no enviaste la última vez. || 我們保留了你上次未傳送的照片和回答。 || Itinago namin ang mga hindi naipadalang larawan at sagot mo noong nakaraan. || Chúng tôi đã giữ lại ảnh và câu trả lời chưa gửi của bạn lần trước. || 지난번 보내지 않은 사진과 답변을 보관해 두었어요.
+Start over || Empezar de nuevo || 重新開始 || Magsimula muli || Bắt đầu lại || 처음부터 다시
+About this issue || Sobre este número || 關於本期 || Tungkol sa isyung ito || Về số này || 이번 호 소개
+Choose photos || Elegir fotos || 選擇照片 || Pumili ng mga larawan || Chọn ảnh || 사진 선택
+Which bird is it? || ¿Qué ave es? || 這是哪種鳥？ || Anong ibon ito? || Đây là loài chim nào? || 어떤 새인가요?
+Your photo || Tu foto || 你的照片 || Iyong larawan || Ảnh của bạn || 내 사진
+On the wall || En el muro || 放上鳥牆後 || Sa wall || Trên tường || 갤러리에서
+Remove this photo || Quitar esta foto || 移除這張照片 || Alisin ang larawang ito || Xóa ảnh này || 이 사진 삭제
+Behind the shot || Detrás de la foto || 拍攝幕後 || Sa likod ng kuha || Hậu trường bức ảnh || 촬영 뒷이야기
+(optional, but it's what gets a photo featured) || (opcional, pero es lo que hace que una foto se destaque) || （可選填，但這是作品被精選的關鍵） || (opsyonal, pero ito ang nagpapatampok sa larawan) || (không bắt buộc, nhưng đây là điều giúp ảnh được chọn giới thiệu) || (선택 사항이지만, 사진이 소개되는 데 가장 중요해요)
+A sentence or two each is plenty. Please describe the kind of place, not the exact spot. || Con una o dos frases basta. Describe el tipo de lugar, no el sitio exacto. || 每題一兩句就夠了。請描述地點的類型，不要寫出確切位置。 || Sapat na ang isa o dalawang pangungusap bawat isa. Ilarawan ang uri ng lugar, hindi ang eksaktong puwesto. || Mỗi câu trả lời một hai câu là đủ. Hãy mô tả loại địa điểm, đừng nêu vị trí chính xác. || 질문마다 한두 문장이면 충분해요. 정확한 장소 말고 어떤 곳이었는지만 적어 주세요.
+Set the scene. What kind of place was it, and what was the day like? || Describe la escena. ¿Qué tipo de lugar era y cómo era el día? || 描述一下現場。那是什麼樣的地方？那天天氣如何？ || Ilarawan ang eksena. Anong klaseng lugar ito, at ano ang araw na iyon? || Hãy kể bối cảnh. Đó là nơi như thế nào, và hôm ấy ra sao? || 장면을 그려 주세요. 어떤 곳이었고 그날은 어땠나요?
+What was the bird doing when you took this? || ¿Qué estaba haciendo el ave cuando tomaste la foto? || 拍照時鳥在做什麼？ || Ano ang ginagawa ng ibon nang kunan mo ito? || Con chim đang làm gì khi bạn chụp? || 찍을 때 새는 무엇을 하고 있었나요?
+How did you get the shot? Luck, patience, a plan? || ¿Cómo lograste la foto? ¿Suerte, paciencia, un plan? || 你是怎麼拍到的？運氣、耐心，還是計畫？ || Paano mo nakuha ang larawan? Suwerte, pasensya, o plano? || Bạn đã chụp được thế nào? May mắn, kiên nhẫn hay có kế hoạch? || 어떻게 찍었나요? 운, 인내, 아니면 계획?
+What surprised you, or what nearly went wrong? || ¿Qué te sorprendió o qué estuvo a punto de salir mal? || 有什麼讓你驚訝，或差點出錯的事？ || Ano ang ikinagulat mo, o ano ang muntik nang magkamali? || Điều gì làm bạn bất ngờ, hoặc điều gì suýt hỏng? || 무엇이 놀라웠나요? 혹은 무엇이 잘못될 뻔했나요?
+About you || Sobre ti || 關於你 || Tungkol sa iyo || Về bạn || 보내는 사람
+Your name, as it should be credited || Tu nombre, tal como debe aparecer en el crédito || 你的名字（作為署名） || Ang pangalan mo, gaya ng dapat ilagay sa credit || Tên của bạn, để ghi công || 사진에 표시할 이름
+(optional, never shown; only used if we need to ask about a photo) || (opcional, nunca se muestra; solo lo usamos si necesitamos preguntarte por una foto) || （可選填，不會公開；只在我們需要詢問照片時使用） || (opsyonal, hindi ipinapakita; ginagamit lang kung kailangan naming magtanong tungkol sa larawan) || (không bắt buộc, không hiển thị; chỉ dùng khi chúng tôi cần hỏi về ảnh) || (선택 사항, 공개되지 않음. 사진에 대해 물어볼 때만 사용)
+Region where you took them || Región donde las tomaste || 拍攝的地區 || Rehiyon kung saan mo kinunan || Vùng bạn đã chụp || 촬영한 지역
+Before you send || Antes de enviar || 傳送前 || Bago ka magpadala || Trước khi gửi || 보내기 전에
+I took these photos myself, of wild birds in California. || Tomé estas fotos yo mismo, de aves silvestres en California. || 這些照片是我本人在加州拍攝的野生鳥類。 || Ako mismo ang kumuha ng mga larawang ito, ng mga ligaw na ibon sa California. || Tôi tự chụp những bức ảnh này, về chim hoang dã ở California. || 캘리포니아의 야생 새를 제가 직접 찍었습니다.
+I didn't use bait or playback, flush a bird, or go near a nest. || No usé cebo ni grabaciones, no espanté a ningún ave y no me acerqué a ningún nido. || 我沒有使用誘餌或播放鳥聲，沒有驚飛鳥，也沒有靠近鳥巢。 || Hindi ako gumamit ng pain o playback, hindi ako nagpalipad ng ibon, at hindi ako lumapit sa pugad. || Tôi không dùng mồi hay phát tiếng chim, không làm chim bay đi, và không đến gần tổ. || 미끼나 소리 재생을 쓰지 않았고, 새를 날려 보내거나 둥지에 다가가지 않았습니다.
+California Bird Atlas may publish them, cut out or whole, on this site and in print, with my name as credit. I keep the copyright. || California Bird Atlas puede publicarlas, recortadas o completas, en este sitio y en papel, con mi nombre como crédito. Conservo los derechos de autor. || California Bird Atlas 可以在本網站及印刷品上發表這些照片（去背或完整），並署上我的名字。版權仍歸我所有。 || Maaaring ilathala ng California Bird Atlas ang mga ito, ginupit o buo, sa site na ito at sa print, kasama ang pangalan ko bilang credit. Akin pa rin ang copyright. || California Bird Atlas được đăng những ảnh này, đã tách nền hoặc nguyên bản, trên trang này và bản in, ghi tên tôi. Tôi giữ bản quyền. || California Bird Atlas는 이 사진을 오려 내거나 원본 그대로 이 사이트와 인쇄물에 제 이름과 함께 실을 수 있습니다. 저작권은 제게 있습니다.
+Also keep copies on My Wall on this device. || Guardar también copias en Mi muro en este dispositivo. || 同時在這台裝置的「我的鳥牆」保留副本。 || Itago rin ang mga kopya sa Aking Wall sa device na ito. || Đồng thời lưu bản sao vào Bức tường của tôi trên thiết bị này. || 이 기기의 나의 갤러리에도 사본 저장
+We never publish where a photo was taken. Location data in your photo files is removed in your browser before they're sent. || Nunca publicamos dónde se tomó una foto. Los datos de ubicación de tus archivos se eliminan en tu navegador antes de enviarlos. || 我們絕不公開照片的拍攝地點。照片檔案中的位置資料會在傳送前於你的瀏覽器中移除。 || Hindi namin kailanman inilalathala kung saan kinunan ang larawan. Inaalis sa iyong browser ang location data sa mga file bago ipadala. || Chúng tôi không bao giờ công bố nơi chụp ảnh. Dữ liệu vị trí trong tệp ảnh được xóa ngay trong trình duyệt trước khi gửi. || 사진을 찍은 장소는 절대 공개하지 않습니다. 사진 파일의 위치 정보는 보내기 전에 브라우저에서 삭제됩니다.
+Send || Enviar || 傳送 || Ipadala || Gửi || 보내기
+Send photo || Enviar foto || 傳送照片 || Ipadala ang larawan || Gửi ảnh || 사진 보내기
+Cutting out… || Recortando… || 去背中… || Ginugupit… || Đang tách nền… || 오려 내는 중…
+Sending… || Enviando… || 傳送中… || Ipinapadala… || Đang gửi… || 보내는 중…
+Sent || Enviada || 已傳送 || Naipadala || Đã gửi || 보냄
+Thank you. || Gracias. || 謝謝你。 || Salamat. || Cảm ơn bạn. || 감사합니다.
+Send more || Enviar más || 再傳送 || Magpadala pa || Gửi thêm || 더 보내기
+Copy link || Copiar enlace || 複製連結 || Kopyahin ang link || Sao chép liên kết || 링크 복사
+Check on the photos you've sent || Consulta las fotos que has enviado || 查看你傳送過的照片 || Tingnan ang mga larawang naipadala mo || Xem các ảnh bạn đã gửi || 보낸 사진 확인하기
+The issue || El número || 本期 || Ang isyu || Số báo || 이번 호
+days until it opens || días para que abra || 天後開放 || araw bago magbukas || ngày nữa mở || 일 후 시작
+days left to send a photo || días para enviar una foto || 天內可傳送照片 || araw na lang para magpadala ng larawan || ngày còn lại để gửi ảnh || 일 동안 사진 접수
+Send a photo for this issue || Envía una foto para este número || 為本期傳送照片 || Magpadala ng larawan para sa isyung ito || Gửi ảnh cho số này || 이번 호에 사진 보내기
+Awards || Premios || 獎項 || Mga gantimpala || Giải thưởng || 수상작
+This issue's winners || Ganadores de este número || 本期得獎作品 || Mga nanalo sa isyung ito || Những ảnh đoạt giải số này || 이번 호 수상작
+All issues || Todos los números || 所有期數 || Lahat ng isyu || Tất cả các số || 모든 호
+Region against region || Región contra región || 地區對抗賽 || Rehiyon laban sa rehiyon || Vùng đấu vùng || 지역 대항전
+Each region scores one for every species its photographers have put on the Bird Wall. || Cada región suma un punto por cada especie que sus fotógrafos han puesto en el Muro de Aves. || 各地區的攝影者每放上一個物種到鳥牆，該地區就得一分。 || Bawat rehiyon ay nakakakuha ng isang puntos sa bawat species na nailagay ng mga photographer nito sa Bird Wall. || Mỗi vùng được một điểm cho mỗi loài mà nhiếp ảnh gia của vùng đưa lên Bức tường chim. || 각 지역은 그 지역 사진가들이 새 갤러리에 올린 종마다 1점을 얻습니다.
+species || especies || 種 || species || loài || 종
+Missing birds || Aves que faltan || 尚缺的鳥 || Mga kulang na ibon || Chim còn thiếu || 아직 없는 새
+All missing birds || Todas las aves que faltan || 所有尚缺的鳥 || Lahat ng kulang na ibon || Tất cả chim còn thiếu || 아직 없는 모든 새
+Your photos || Tus fotos || 你的照片 || Iyong mga larawan || Ảnh của bạn || 나의 사진
+What happened to my photos? || ¿Qué pasó con mis fotos? || 我的照片現在怎麼樣了？ || Ano ang nangyari sa mga larawan ko? || Ảnh của tôi thế nào rồi? || 내 사진은 어떻게 되었나요?
+Waiting for review || En espera de revisión || 等待審核 || Naghihintay ng review || Đang chờ duyệt || 검토 대기 중
+On the Bird Wall || En el Muro de Aves || 已在鳥牆上 || Nasa Bird Wall || Đã lên Bức tường chim || 새 갤러리에 올라감
+Not published || No publicada || 未刊出 || Hindi nailathala || Không được đăng || 게시되지 않음
+We look at every photo, usually within a week. || Revisamos cada foto, normalmente en una semana. || 我們會看每一張照片，通常在一週內。 || Tinitingnan namin ang bawat larawan, kadalasan sa loob ng isang linggo. || Chúng tôi xem từng ảnh, thường trong vòng một tuần. || 모든 사진을 보통 일주일 안에 확인합니다.
+See the wall || Ver el muro || 查看鳥牆 || Tingnan ang wall || Xem bức tường || 갤러리 보기
+Back to This Season || Volver a Esta temporada || 返回本季 || Bumalik sa Ngayong Season || Quay lại Mùa này || 이번 시즌으로 돌아가기
+Print this card || Imprimir esta tarjeta || 列印這張卡片 || I-print ang card na ito || In thẻ này || 이 카드 인쇄
+Field card || Tarjeta de campo || 野外卡 || Field card || Thẻ thực địa || 현장 카드
+Dates || Fechas || 日期 || Mga petsa || Ngày || 기간
+Seen || Vista || 看到 || Nakita || Đã thấy || 봄
+Photographed || Fotografiada || 拍到 || Nakunan || Đã chụp || 찍음
+Where, when || Dónde, cuándo || 地點、時間 || Saan, kailan || Ở đâu, khi nào || 장소, 시간
+Field rules. || Reglas de campo. || 野外守則。 || Mga patakaran sa field. || Quy tắc thực địa. || 현장 수칙.
+No bait, no playback, no flushing, keep well back from nests. No photo is worth stressing a bird. || Sin cebo, sin grabaciones, sin espantar aves y lejos de los nidos. Ninguna foto vale el estrés de un ave. || 不用誘餌、不播放鳥聲、不驚飛鳥，遠離鳥巢。沒有任何照片值得讓鳥受驚。 || Walang pain, walang playback, walang pagpapalipad, lumayo sa mga pugad. Walang larawang sulit kung mai-stress ang ibon. || Không mồi, không phát tiếng chim, không làm chim bay, tránh xa tổ. Không bức ảnh nào đáng để làm chim hoảng sợ. || 미끼, 소리 재생, 새 날려 보내기 금지. 둥지에서 멀리 떨어지세요. 새를 괴롭힐 만한 사진은 없습니다.
+Send your photos || Envía tus fotos || 傳送你的照片 || Ipadala ang mga larawan mo || Gửi ảnh của bạn || 사진 보내기
+Your own bird wall || Tu propio muro de aves || 你自己的鳥牆 || Sarili mong bird wall || Bức tường chim của riêng bạn || 나만의 새 갤러리
+Add a bird || Añadir un ave || 新增一隻鳥 || Magdagdag ng ibon || Thêm một con chim || 새 추가
+The public Bird Wall || El Muro de Aves público || 公開鳥牆 || Ang pampublikong Bird Wall || Bức tường chim công khai || 공개 새 갤러리
+Nothing here yet. || Todavía no hay nada. || 這裡還沒有東西。 || Wala pang laman. || Chưa có gì ở đây. || 아직 아무것도 없어요.
+Close || Cerrar || 關閉 || Isara || Đóng || 닫기
+Where do you go birding? || ¿Dónde observas aves? || 你在哪裡賞鳥？ || Saan ka nagmamasid ng ibon? || Bạn thường ngắm chim ở đâu? || 어디서 탐조하나요?
+Pick the part of California you bird in most. It sets your nine birds each season and the levels you see. It is saved on this device only, and you can change it any time. || Elige la parte de California donde más observas aves. Define tus nueve aves y los niveles que ves. Se guarda solo en este dispositivo y puedes cambiarla cuando quieras. || 選擇你最常賞鳥的加州地區。這會決定你的九種鳥和看到的難度。只會保存在這台裝置上，隨時可以更改。 || Piliin ang bahagi ng California kung saan ka madalas magmasid. Ito ang magtatakda ng iyong siyam na ibon at mga antas. Naka-save lang ito sa device na ito, at puwede mong palitan anumang oras. || Chọn khu vực California nơi bạn ngắm chim nhiều nhất. Nó quyết định chín loài chim và mức độ bạn thấy. Chỉ lưu trên thiết bị này, và bạn có thể đổi bất cứ lúc nào. || 가장 자주 탐조하는 캘리포니아 지역을 고르세요. 아홉 마리 새와 난이도가 이에 따라 정해집니다. 이 기기에만 저장되며 언제든 바꿀 수 있어요.
+Photograph || Fotografía || 攝影 || Larawan ni || Ảnh || 사진
+See the full photo || Ver la foto completa || 查看完整照片 || Tingnan ang buong larawan || Xem ảnh đầy đủ || 전체 사진 보기
+See the cut-out || Ver el recorte || 查看去背圖 || Tingnan ang ginupit || Xem ảnh tách nền || 오린 사진 보기
+About this bird || Sobre esta ave || 關於這種鳥 || Tungkol sa ibong ito || Về loài chim này || 이 새에 대하여
+Licence || Licencia || 授權 || Lisensya || Giấy phép || 라이선스
+Taken || Tomada || 拍攝日期 || Kinunan || Ngày chụp || 촬영일
+Camera || Cámara || 相機 || Camera || Máy ảnh || 카메라
+Type at least two letters. || Escribe al menos dos letras. || 請至少輸入兩個字母。 || Mag-type ng hindi bababa sa dalawang titik. || Hãy nhập ít nhất hai chữ cái. || 두 글자 이상 입력하세요.
+Birds || Aves || 鳥類 || Mga ibon || Chim || 새
+Photographers || Fotógrafos || 攝影者 || Mga photographer || Nhiếp ảnh gia || 사진가
+See their birds on the wall || Ver sus aves en el muro || 在鳥牆上查看他們的鳥 || Tingnan ang kanilang mga ibon sa wall || Xem chim của họ trên tường || 갤러리에서 이 사진가의 새 보기
+Nothing found. Check the spelling, or try part of the name. || No se encontró nada. Revisa la ortografía o prueba con parte del nombre. || 找不到結果。請檢查拼字，或只輸入部分名稱。 || Walang nahanap. Suriin ang spelling, o subukan ang bahagi ng pangalan. || Không tìm thấy. Hãy kiểm tra chính tả hoặc thử một phần của tên. || 결과가 없어요. 철자를 확인하거나 이름의 일부만 입력해 보세요.
+Language || Idioma || 語言 || Wika || Ngôn ngữ || 언어
+Some pages and all bird names are in English. || Algunas páginas y todos los nombres de aves están en inglés. || 部分頁面及所有鳥名為英文。 || Nasa Ingles ang ilang pahina at lahat ng pangalan ng ibon. || Một số trang và tất cả tên chim là tiếng Anh. || 일부 페이지와 모든 새 이름은 영어로 표시됩니다.
+Send up to 6 of your California bird photos at once. We review every one and add it to the Bird Wall with your name. The best ones run in the magazine. || Envía hasta 6 fotos de aves de California a la vez. Revisamos cada una y la añadimos al Muro de Aves con tu nombre. Las mejores salen en la revista. || 一次最多可傳送 6 張加州鳥類照片。我們會逐一審核，並連同你的名字放上鳥牆。最好的作品會刊登在雜誌上。 || Magpadala ng hanggang 6 na larawan ng ibon sa California nang sabay-sabay. Sinusuri namin ang bawat isa at idinadagdag sa Bird Wall kasama ang pangalan mo. Ilalabas sa magasin ang pinakamahuhusay. || Gửi tối đa 6 ảnh chim California cùng lúc. Chúng tôi xem từng ảnh và đưa lên Bức tường chim kèm tên bạn. Những ảnh đẹp nhất được đăng trên tạp chí. || 캘리포니아 새 사진을 한 번에 6장까지 보낼 수 있어요. 모든 사진을 검토해 이름과 함께 새 갤러리에 올리며, 가장 좋은 사진은 잡지에 실립니다.
+or drop them here. JPEG, PNG or WebP, up to 6. || o suéltalas aquí. JPEG, PNG o WebP, hasta 6. || 或拖放到這裡。JPEG、PNG 或 WebP，最多 6 張。 || o i-drop dito. JPEG, PNG o WebP, hanggang 6. || hoặc thả vào đây. JPEG, PNG hoặc WebP, tối đa 6 ảnh. || 또는 여기에 끌어다 놓으세요. JPEG, PNG, WebP, 최대 6장.
+Not found || No encontrada || 找不到 || Hindi nahanap || Không tìm thấy || 찾을 수 없음
+No such page || Esta página no existe || 沒有這個頁面 || Walang ganitong pahina || Không có trang này || 없는 페이지입니다
+Return to || Volver a || 返回 || Bumalik sa || Quay lại || 돌아가기:
+the cover || la portada || 封面 || cover || trang bìa || 표지
+Can be assigned || Puede asignarse || 可指派 || Maaaring italaga || Có thể giao || 과제 대상
+Scarce || Escasa || 稀少 || Bihira || Khan hiếm || 드묾
+Rare visitor || Visitante rara || 罕見訪客 || Bihirang bisita || Khách hiếm || 희귀 방문종
+Night bird || Ave nocturna || 夜行鳥 || Ibon sa gabi || Chim đêm || 야행성 새
+Offshore and island || Mar adentro e islas || 外海與島嶼 || Laot at isla || Ngoài khơi và đảo || 먼바다·섬
+Never assigned || Nunca se asigna || 不會被指派 || Hindi kailanman itinatalaga || Không bao giờ giao || 과제 제외
+Introduced || Introducida || 引進種 || Ipinakilala || Du nhập || 도입종
+no points || sin puntos || 不計分 || walang puntos || không có điểm || 점수 없음
+No points || Sin puntos || 不計分 || Walang puntos || Không có điểm || 점수 없음

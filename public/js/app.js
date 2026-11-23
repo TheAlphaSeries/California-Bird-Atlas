@@ -12,6 +12,7 @@ import { loadIssues, currentIssue, stateLine } from './issues.js';
 let ISSUES = []; // loaded once at start for the strip above the menu
 import { openObservation, syncDrafts, draftCount } from './observe.js';
 import { regionName, pickRegion } from './wi.js';
+import { initI18n, translate, langPicker, bindLangPicker } from './i18n.js';
 
 const routes = [
   [/^\/$/, () => import('./views/cover.js'), 'cover'],
@@ -62,6 +63,7 @@ function commit(view, page, nav) {
   b.toggle('paper', !BLACK.has(nav));
   b.toggle('tool', !MAG.has(nav)); // the editor's tool pages: atlas.css components, restyled to match
   const t = document.getElementById('tategaki'); if (t) { t.textContent = MARGIN_LABEL[nav] || ''; t.hidden = !t.textContent; }
+  translate(page); // interface text into the reader's language (no-op in English)
   view.replaceChildren(page);
   if (!location.hash) window.scrollTo(0, 0);
   view.classList.remove('fade-in'); void view.offsetWidth; view.classList.add('fade-in');
@@ -112,6 +114,7 @@ export function renderChrome() {
   $('#strip').innerHTML = iss
     ? `<span><b>No. ${iss.number}</b> ${esc(iss.title)}</span><a href="/issues" data-link>${esc(iss.theme)}: ${esc(stateLine(iss).long.split('. ')[0])}.</a>`
     : `<span><b>${esc(cv.issue || 'No. 1')}</b> ${esc(cv.season || 'Winter 2026–27')}</span><span>Free to read. Made from readers' photographs.</span>`;
+  $('#strip').insertAdjacentHTML('beforeend', langPicker()); bindLangPicker();
   $('#u-region').onclick = pickRegion;
   $('#u-search').onclick = () => import('./search.js').then((m) => m.openSearch());
   if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
@@ -119,6 +122,7 @@ export function renderChrome() {
   const src = S.sources || [];
   $('#colophon').innerHTML = `<span>California Bird Atlas. California's native birds, photographed.</span>
     <span>${S.species.length} species on the official California list. <a href="/about" data-link>About</a> · <a href="/settings#sources" data-link>Sources and data notes</a>${S.owner ? '' : ' · <a href="/settings" data-link>Editor login</a>'}</span>`;
+  ['#primary-nav', '#utilities', '#strip', '#colophon', '.masthead'].forEach((q) => translate(document.querySelector(q)));
 }
 
 export async function refresh() { await loadAll(); renderChrome(); await render(); }
@@ -155,7 +159,7 @@ $('#quick-entry').onclick = () => openObservation();
 
 (async () => {
   try {
-    await loadAll(); loadIssues().then((x) => { ISSUES = x; renderChrome(); }).catch(() => {}); await render(); if (S.owner) syncDrafts();
+    await initI18n(); await loadAll(); loadIssues().then((x) => { ISSUES = x; renderChrome(); }).catch(() => {}); await render(); if (S.owner) syncDrafts();
     const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'wall', 'fieldwork', 'theindex', 'bird', 'about', 'submit'].forEach((v) => import(`./views/${v}.js`)); };
     (window.requestIdleCallback || setTimeout)(warm);
     // Offline support (public/sw.js). Not on localhost, where it would only get in the way of development.

@@ -4,7 +4,7 @@
 // Rule: always try the network first, so a push to GitHub shows up straight away, and keep a copy of every
 // successful answer. Only when the network fails is the copy used. Editor-only data and anything sent
 // (POST, PATCH, DELETE) is never cached. Raise VERSION to throw every cached copy away.
-const VERSION = 'v1';
+const VERSION = 'v2';
 const CACHE = 'cba-' + VERSION;
 // Fetched at install, so the core of the site works offline even before a page has been visited.
 const CORE = ['/', '/this-season', '/css/atlas.css', '/css/magazine.css', '/js/app.js', '/js/util.js', '/js/wi.js', '/js/rotation.js',

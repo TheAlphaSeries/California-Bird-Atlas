@@ -479,7 +479,8 @@ body.mag .masthead { border-top: 0; }
 body.mag .wordmark .wm-en { font: 900 25px/1 var(--j-sans); font-stretch: 68%; text-transform: uppercase; letter-spacing: .005em; }
 .wm-tag { font-size: 11px; }
 @media (max-width: 640px) {
-  .strip span:last-child { display: none; }
+  .strip > :nth-child(2):not(.lang-pick) { display: none; } /* phones: issue number and the language picker only */
+  .strip { padding: 6px 16px; align-items: center; }
 }
 /* heads: heavy, condensed, set tight */
 .mag-h, .ix-title { font: 900 clamp(60px, 10.5vw, 164px)/.84 var(--j-sans); font-stretch: 62%; text-transform: uppercase; letter-spacing: -.012em; margin: 16px 0 18px; }
@@ -1061,3 +1062,18 @@ details.ix-fam > summary:focus-visible { outline: 2px solid var(--j-ink); outlin
 .fw-map { width: 170px; } .fw-map .rmap path { stroke: var(--c); stroke-width: 1; --c: #cfcfc7; } .fw-map .rmap path.home { --c: #8f8f87; }
 .bp-map .rmap path { stroke: var(--c); stroke-width: 1; }
 @media (max-width: 860px) { .fw-head { grid-template-columns: 1fr; } }
+
+/* ---- Languages (public/js/i18n.js) ---- */
+.lang-pick { display: inline-flex; align-items: center; margin-left: auto; }
+.lang-pick select { appearance: none; -webkit-appearance: none; border: 0; border-bottom: 2px solid var(--j-ink); border-radius: 0; background: transparent; color: var(--j-ink);
+  font: 700 12px/1.2 var(--j-sans); padding: 1px 16px 1px 2px; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--j-ink) 50%), linear-gradient(135deg, var(--j-ink) 50%, transparent 50%);
+  background-position: right 6px top 55%, right 2px top 55%; background-size: 4px 4px; background-repeat: no-repeat; }
+.lang-pick select:focus-visible { outline: 2px solid var(--j-ink); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* Chinese and Korean get their own type: the Japanese-cut mincho would draw the wrong glyph shapes. */
+html:lang(zh-Hant) body.mag { --j-sans: 'Archivo', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif; --j-mincho: 'Noto Serif TC', 'Songti TC', 'PMingLiU', serif; }
+html:lang(ko) body.mag { --j-sans: 'Archivo', 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; --j-mincho: 'Noto Serif KR', 'AppleMyungjo', 'Batang', serif; word-break: keep-all; }
+/* Vietnamese stacks accents; the mincho face lacks them, so headings fall back to a serif that has them. */
+html:lang(vi) body.mag { --j-mincho: 'Source Serif 4', Georgia, serif; }
+html:lang(zh-Hant) .mag-h, html:lang(ko) .mag-h { letter-spacing: 0; }

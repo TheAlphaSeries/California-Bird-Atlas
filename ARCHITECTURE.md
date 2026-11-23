@@ -101,3 +101,16 @@ One name per thing, everywhere: an **assignment** is the two-week set of **nine 
 - **No accounts.** Points, ratings and leaderboards are described on the site but not recorded yet.
 - **Spam.** The submission form is limited to 12 photos a day per visitor and nothing more.
 - **The old Gallery page** (`/gallery`) still works but is not in the menu.
+
+## Languages
+
+The public pages can be read in English, Spanish, Chinese (Traditional), Tagalog, Vietnamese and Korean, the
+languages most spoken in California. Views are written in English only. After a page is built, `public/js/i18n.js`
+walks its text and swaps any line it has a translation for (and watches for text added later, like pop-ups).
+- Translations live in `tools/i18n/strings.txt`, one line per piece of text. Rebuild with
+  `python3 tools/i18n/build.py`, which writes `public/data/i18n.json`.
+- Text with numbers, dates or region names in it is handled by `PATTERNS` in i18n.js.
+- Left in English on purpose: bird and family names, photographers' captions and stories, issue titles and
+  blurbs, the About page, the scoring table, and the editor's tool pages. Put `data-noi18n` on anything that must
+  never be translated.
+- The translations were written without a native-speaker review. Have each one checked before a big launch.
