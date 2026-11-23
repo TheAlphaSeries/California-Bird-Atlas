@@ -3,7 +3,6 @@ import { openLightbox } from '../lightbox.js';
 import { wi, BUILT_IN, birdLink } from '../wi.js';
 
 export default async function gallery(view) {
-  document.body.classList.add('mag');
   const [photos, d] = await Promise.all([api('/photos'), wi()]);
   const shown = new Set(photos.map((p) => p.common_name));
   const builtIn = Object.entries(BUILT_IN).filter(([n]) => !shown.has(n)).map(([n, v]) => ({ n, ...v, b: d.byName.get(n) }));

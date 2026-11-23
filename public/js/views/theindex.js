@@ -29,7 +29,6 @@ function badge(b, i, season) {
 }
 
 export default async function theIndex(view) {
-  document.body.classList.add('mag');
   const d = await wi();
   if (!st) st = { q: '', season: currentSeason(), show: 'here' };
   st.region = myRegion(d);

@@ -4,7 +4,6 @@ import { openLightbox } from '../lightbox.js';
 let f = { species: '', fav: '', layout: 'grid', sort: 'new' };
 
 export default async function gallery(view) {
-  document.body.classList.add('dark');
   const photos = await api('/photos');
   const spIds = [...new Set(photos.map((p) => p.species_id))];
   view.innerHTML = `<div class="wrap">

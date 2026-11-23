@@ -11,7 +11,6 @@ const occLabel = (s, y) => `${SEASONS[s]} ${s === 'W' ? `${y}–${String(y + 1).
 const BLURB = { 1: 'Common and widespread. Expect them on an ordinary outing.', 2: 'Go to the right habitat. Usually found when you do.', 3: 'Scarce, local or hard to see. May take several tries.' };
 
 export default async function fieldwork(view, seasonArg) {
-  document.body.classList.add('mag');
   const d = await wi();
   const now = currentSeason();
   let season = SEASON_ORDER.includes(seasonArg) ? seasonArg : now;

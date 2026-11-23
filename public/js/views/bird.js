@@ -3,7 +3,6 @@ import { birdPic, refCredit, bindReports } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, CATEGORY, dbSpecies, levelOf, lvSpan, pointsLabel } from '../wi.js';
 
 export default async function bird(view, id) {
-  document.body.classList.add('mag');
   const d = await wi();
   const b = d.byId.get(id);
   if (!b) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">No such bird</h1><p class="mag-deck"><a href="/birds" data-link style="color:var(--mag-accent)">Back to all birds</a></p></div>'; return; }
@@ -17,7 +16,7 @@ export default async function bird(view, id) {
   view.innerHTML = `<div class="mag-wrap mag-page"><article class="bird">
     <figure class="art">${pic ? `<img src="${esc(pic.src)}" alt="${esc(b.n)}${pic.kind === 'ref' ? ' (reference photo)' : ''}">${refCredit(pic)}` : '<div class="ph">Not yet photographed</div>'}</figure>
     <div class="facts">
-      <p class="plate"><a href="/birds" data-link>All birds</a><span class="pn"><i>Plate no.</i>${+b.id.slice(3)}</span></p>
+      <p class="plate-no"><a href="/birds" data-link>All birds</a><span class="pn"><i>Plate no.</i>${+b.id.slice(3)}</span></p>
       <h1 class="mag-h" style="font-size:clamp(40px,5vw,68px)">${esc(b.n)}</h1>
       <p class="mag-sci" style="font-size:18px;margin:0">${esc(b.sci)}</p>
       <dl>

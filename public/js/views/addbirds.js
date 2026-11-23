@@ -9,7 +9,6 @@ import { birdOptions } from './submit.js';
 const CREDIT_KEY = 'wi.credit';
 
 export default async function addBirds(view) {
-  document.body.classList.add('mag');
   if (!S.owner) {
     view.innerHTML = `<div class="mag-wrap mag-page"><p class="mag-kicker">Bird Wall</p><h1 class="mag-h">Add birds</h1>
       <p class="mag-deck">This is where the editor adds photos straight to the wall. <a href="/settings" data-link style="color:var(--mag-accent)">Sign in</a> first. If you'd like to share a photo, <a href="/submit" data-link style="color:var(--mag-accent)">send it here</a>.</p></div>`;

@@ -17,7 +17,6 @@ export function coverData() {
 const coverSrc = (c) => (c.photo_id ? `/media/${c.photo_id}/display` : BUILT_IN[c.bird]?.src || BUILT_IN['Great Blue Heron'].src);
 
 export default async function cover(view) {
-  document.body.classList.add('mag');
   const c = coverData();
   const lines = [c.line1, c.line2, c.line3].filter(Boolean);
   const builtIn = !c.photo_id && (c.bird === 'Great Blue Heron' || !BUILT_IN[c.bird]);

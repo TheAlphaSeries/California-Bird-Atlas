@@ -36,54 +36,49 @@ const routes = [
 const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review']);
 let renderSeq = 0;
 
-// Swap in a new page smoothly: build it off-screen, then cross-fade it in.
-// Reading pages are printed on paper; photo pages (cover, walls) stay black.
-const PAPER = new Set(['fieldwork', 'index', 'about', 'submit', 'add', 'review', 'gallery']);
+// Every page uses the magazine shell. Photo pages are black; everything else is printed on white paper.
+const BLACK = new Set(['cover', 'wall', 'mywall']);
 // The sideways section label in the left margin, one per section.
 const MARGIN_LABEL = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs' };
-function swapIn(view, tmp, mag, nav = '') {
-  const apply = () => {
-    document.body.classList.toggle('mag', mag);
-    document.body.classList.toggle('paper', mag && PAPER.has(nav));
-    const t = document.getElementById('tategaki'); if (t) { t.textContent = (mag && MARGIN_LABEL[nav]) || ''; t.hidden = !t.textContent; }
-    view.replaceChildren(tmp);
-    if (!location.hash) window.scrollTo(0, 0);
-  };
-  if (document.startViewTransition && !document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) { const t = document.startViewTransition(apply); for (const p of [t.ready, t.finished, t.updateCallbackDone]) p?.catch(() => {}); }
-  else { apply(); view.classList.remove('fade-in'); void view.offsetWidth; view.classList.add('fade-in'); }
+
+// Put a finished page on screen. The page is built off-screen first, so the old page stays whole until this
+// moment; then the menu, the page colours and the content all change together and the new page fades in.
+// (No cross-fade: blending two pages made the old one ghost through the new one.)
+function commit(view, page, nav) {
+  renderChrome();
+  $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
+  const b = document.body.classList;
+  b.add('mag'); b.remove('dark');
+  b.toggle('paper', !BLACK.has(nav));
+  b.toggle('tool', !MAG.has(nav)); // the editor's tool pages: atlas.css components, restyled to match
+  const t = document.getElementById('tategaki'); if (t) { t.textContent = MARGIN_LABEL[nav] || ''; t.hidden = !t.textContent; }
+  view.replaceChildren(page);
+  if (!location.hash) window.scrollTo(0, 0);
+  view.classList.remove('fade-in'); void view.offsetWidth; view.classList.add('fade-in');
 }
 
 async function render() {
   const seq = ++renderSeq;
   const path = location.pathname;
   const view = $('#view');
-  document.body.classList.remove('menu-open', 'dark');
-  renderChrome();
+  document.body.classList.remove('menu-open');
+  const page = document.createElement('div'); page.className = 'page';
   for (const [re, load, nav] of routes) {
     const m = re.exec(path);
     if (!m) continue;
-    $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
-    const mag = MAG.has(nav);
     try {
       const mod = await load();
-      if (mag) {
-        const tmp = document.createElement('div'); tmp.className = 'page';
-        await mod.default(tmp, ...m.slice(1));
-        if (seq !== renderSeq) return; // a newer click won
-        swapIn(view, tmp, true, nav);
-      } else {
-        document.body.classList.remove('mag', 'paper');
-        const t = document.getElementById('tategaki'); if (t) t.hidden = true;
-        await mod.default(view, ...m.slice(1));
-        if (!location.hash) window.scrollTo(0, 0);
-      }
+      await mod.default(page, ...m.slice(1));
     } catch (e) {
       console.error(e);
-      view.innerHTML = `<div class="wrap"><p class="empty">This page could not be opened: ${esc(e.message)}</p></div>`;
+      page.innerHTML = `<div class="mag-wrap mag-page"><p class="mag-deck">This page could not be opened: ${esc(e.message)}</p></div>`;
     }
+    if (seq !== renderSeq) return; // a newer click won
+    commit(view, page, nav);
     return;
   }
-  view.innerHTML = `<div class="wrap page-head"><span class="label">Not found</span><h1>No such page</h1><p class="deck">Return to <a href="/" data-link>the cover</a>.</p></div>`;
+  page.innerHTML = `<div class="mag-wrap mag-page"><p class="mag-kicker">Not found</p><h1 class="mag-h">No such page</h1><p class="mag-deck">Return to <a class="linkish" href="/" data-link>the cover</a>.</p></div>`;
+  commit(view, page, '');
 }
 
 const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];

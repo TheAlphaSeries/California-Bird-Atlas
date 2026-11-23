@@ -10,7 +10,6 @@ import { loadAll } from '../util.js';
 let tab = 'pending';
 
 export default async function review(view) {
-  document.body.classList.add('mag');
   if (!S.owner) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">Review</h1><p class="mag-deck">Sign in with Editor login to review submissions.</p></div>'; return; }
   const [rows, d, reports] = await Promise.all([api('/submissions'), wi(), api('/reports')]);
   warmClipper();

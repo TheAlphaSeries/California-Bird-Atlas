@@ -14,7 +14,6 @@ const CREDITS = [
 ];
 
 export default async function about(view) {
-  document.body.classList.add('mag');
   const done = S.species.filter((s) => s.status === 'photographed').length, total = S.species.length;
   view.innerHTML = `<div class="mag-wrap mag-page ab">
     <p class="mag-kicker">Our mission</p>

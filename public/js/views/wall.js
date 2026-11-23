@@ -3,14 +3,13 @@ import { wi, REGION_NAMES, birdLink } from '../wi.js';
 
 // The Bird Wall: everyone's birds, cut out and set on black. Click a bird for the credits.
 export default async function wall(view) {
-  document.body.classList.add('mag');
   let [rows, d] = await Promise.all([api(S.owner ? '/wall?fresh=' + Date.now() : '/wall'), wi()]);
   // Until the first real birds go up, show the built-in sample birds (openly licensed Wikimedia Commons photos).
   const samples = !rows.length;
   if (samples) rows = (await fetch('/data/wall-samples.json').then((r) => r.json()).catch(() => [])).map((x, i) => ({ ...x, id: 'sample-' + i, credit_name: x.credit, cut_w: x.w, cut_h: x.h, sample: 1, static: true }));
   let region = '', q = '';
   view.innerHTML = `<div class="wall-page">
-    <header class="mag-wrap wall-head">
+    <header class="mag-wrap wall-head one-line">
       <p class="mag-kicker">Reader photos</p>
       <h1 class="ix-title">The Bird Wall</h1>
       <p class="mag-deck">Birds of California, by the people who found them. Every one was photographed in the wild, cut out and put up here. Click a bird to see who took it.</p>

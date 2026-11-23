@@ -160,11 +160,7 @@ body.mag .modal.mag-modal .sheet, body.mag .modal.mag-modal .sheet h2 { color: v
 /* smooth page changes */
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-#view.fade-in { animation: fadeIn .2s ease-out; }
-::view-transition-old(root) { animation: fadeIn .16s ease-in reverse both; }
-::view-transition-new(root) { animation: fadeIn .22s ease-out both; }
-.masthead { view-transition-name: masthead; }
-::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; }
+#view.fade-in { animation: fadeIn .18s ease-out; }
 @media (prefers-reduced-motion: reduce) {
   #view.fade-in, .modal.mag-modal, .modal.mag-modal .sheet { animation: none; }
 }
@@ -388,9 +384,9 @@ body.mag .utilities .cta.u-send { color: var(--j-ink); font-weight: 600; }
 .linkish { text-decoration-thickness: 1px; }
 .mag-sci { font-family: var(--j-mincho); }
 /* plate numbers: the bird numbers are a real index, so they read like plates in a field guide */
-.plate { display: flex; align-items: baseline; gap: 14px; margin: 0; font: 600 13px var(--j-sans); color: var(--mag-faint); }
-.plate a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--mag-rule); }
-.plate span { font: 700 15px var(--j-mincho); color: var(--mag-ink); padding-left: 14px; border-left: 2px solid var(--j-yellow); }
+.plate-no { display: flex; align-items: baseline; gap: 14px; margin: 0; font: 600 13px var(--j-sans); color: var(--mag-faint); }
+.plate-no a { color: inherit; text-decoration: none; border-bottom: 1px solid var(--mag-rule); }
+.plate-no span { font: 700 15px var(--j-mincho); color: var(--mag-ink); padding-left: 14px; border-left: 2px solid var(--j-yellow); }
 /* documentary captions: a bold lead-in, the caption, the credit set apart */
 .cv-cap, .ref-cap { font: 400 13px/1.55 var(--j-sans); }
 .cv-cap b, .ref-cap b { font-weight: 700; }
@@ -558,8 +554,8 @@ body.mag.paper #view .ixc:hover { transform: translate(-2px, -2px); box-shadow: 
 .ixc .bn { font-weight: 700; }
 .ixc-badge { font-weight: 800; border-width: 2px; }
 /* ---------- bird page ---------- */
-.plate .pn { display: inline-flex; align-items: baseline; gap: 8px; padding: 0 0 0 14px; border-left: 6px solid var(--j-yellow); font: 900 54px/.9 var(--j-sans); font-stretch: 62%; }
-.plate .pn i { font: 700 12px/1 var(--j-sans); font-stretch: 100%; color: var(--mag-faint); }
+.plate-no .pn { display: inline-flex; align-items: baseline; gap: 8px; padding: 0 0 0 14px; border-left: 6px solid var(--j-yellow); font: 900 54px/.9 var(--j-sans); font-stretch: 62%; }
+.plate-no .pn i { font: 700 12px/1 var(--j-sans); font-stretch: 100%; color: var(--mag-faint); }
 .bird dt { margin-top: 22px; padding-top: 10px; border-top: 2px solid var(--mag-ink); color: var(--mag-ink) !important; font-weight: 800 !important; }
 body.mag.paper #view .bird .art img { border: 2px solid var(--j-ink); box-shadow: 10px 10px 0 var(--j-yellow); }
 /* ---------- Bird Wall ---------- */
@@ -749,3 +745,50 @@ body.mag:not(.paper) .ix-search input { background: #111; color: #fff; border-co
 .mag-wrap.mag-page { padding-left: 24px; padding-right: 24px; }
 .wall-head .ix-title { font-size: clamp(48px, 6.6vw, 98px); white-space: nowrap; }
 .wall-head { padding-top: 28px; }
+
+/* ================= the editor's tool pages (body.tool), restyled to match the magazine =================
+   These pages are built from atlas.css components. Rather than restyle each one, the old design's
+   variables are pointed at the magazine's palette and type, then the main components are overridden. */
+body.mag.paper {
+  --paper: var(--j-paper); --ivory: #efefe9; --forest: var(--j-ink); --charcoal: var(--j-ink); --black: var(--j-ink);
+  --olive: #6b6b65; --ochre: #8a6a00; --gray: var(--j-stone); --rule: var(--j-rule);
+  --display: var(--j-sans); --serif: var(--j-mincho); --mono: var(--j-sans);
+}
+body.tool #view { font: 400 16px/1.6 var(--j-sans); color: var(--j-ink); }
+body.tool #view h1 { font: 900 clamp(48px, 7.4vw, 112px)/.86 var(--j-sans); font-stretch: 62%; text-transform: uppercase; letter-spacing: -.012em; margin: 14px 0 16px; }
+body.tool #view h2 { font: 900 clamp(26px, 3vw, 40px)/.95 var(--j-sans); font-stretch: 66%; text-transform: uppercase; letter-spacing: 0; }
+body.tool #view h3 { font: 700 22px/1.2 var(--j-mincho); }
+body.tool #view .page-head .label, body.tool #view .section-head .label, body.tool #view > .page > .wrap > .label, .modal:not(.mag-modal) .label { display: inline-block; padding: 6px 10px 5px; background: var(--j-yellow); color: var(--j-ink); font: 700 13px/1.2 var(--j-sans); letter-spacing: 0; text-transform: none; transform: rotate(-1.5deg); }
+body.tool #view .mono, body.tool #view .caption { font-family: var(--j-sans); text-transform: none; letter-spacing: 0; font-size: 13px; }
+body.tool #view .deck, body.tool #view .sci { font-family: var(--j-mincho); }
+body.tool #view .page-head { padding-top: 40px; }
+body.tool #view .section-head { border-top: 6px solid var(--j-ink); }
+body.tool #view .section-head .more { font: 700 14px var(--j-sans); letter-spacing: 0; text-transform: none; }
+body.tool #view .rule.double, body.tool #view .settings section { border-top: 2px solid var(--j-ink); }
+body.tool #view .loading, body.tool #view .empty { font: 500 18px var(--j-mincho); }
+body.mag .btn { font: 700 14px/1 var(--j-sans); letter-spacing: 0; text-transform: none; padding: 14px 18px; border: 2px solid var(--j-ink); border-radius: 1px; color: var(--j-ink); background: #fff; }
+body.mag .btn.small { padding: 9px 12px; font-size: 13px; }
+body.mag .btn.solid { background: var(--j-yellow); color: var(--j-ink); box-shadow: 4px 4px 0 var(--j-ink); }
+body.mag .btn:hover, body.mag .btn.solid:hover { background: var(--j-ink); border-color: var(--j-ink); color: #fff; }
+body.mag .btn.quiet { border-color: #b9b9b0; }
+body.mag .field > span { font: 600 12px var(--j-sans); letter-spacing: 0; text-transform: none; color: var(--j-stone); }
+body.tool #view input:not([type=checkbox]):not([type=radio]):not([type=range]), body.tool #view select, body.tool #view textarea,
+body.mag .modal:not(.mag-modal) input:not([type=checkbox]):not([type=radio]), body.mag .modal:not(.mag-modal) select, body.mag .modal:not(.mag-modal) textarea {
+  background: #fff; border: 2px solid var(--j-ink); border-radius: 1px; font: 400 15px var(--j-sans); color: var(--j-ink); }
+body.tool #view table th { font: 600 12px var(--j-sans); letter-spacing: 0; text-transform: none; color: var(--j-stone); }
+body.mag .modal:not(.mag-modal) .sheet { background: var(--j-paper); border-top: 6px solid var(--j-yellow); font-family: var(--j-sans); }
+body.mag .modal:not(.mag-modal) h2 { font: 900 clamp(30px, 4vw, 46px)/.95 var(--j-sans); font-stretch: 66%; text-transform: uppercase; }
+body.mag .modal:not(.mag-modal) .x { font: 600 13px var(--j-sans); letter-spacing: 0; text-transform: none; }
+body.mag .quick-entry { background: var(--j-yellow); color: var(--j-ink); font: 800 14px var(--j-sans); letter-spacing: 0; text-transform: none; border: 2px solid var(--j-ink); box-shadow: 4px 4px 0 var(--j-ink); }
+body.mag #toast { font-family: var(--j-sans); background: var(--j-ink); border-left: 6px solid var(--j-yellow); }
+
+/* My Wall shares the wall header but its title is longer */
+.wall-head .ix-title { white-space: normal; }
+.wall-head.one-line .ix-title { white-space: nowrap; }
+.wall-head:not(.one-line) .ix-title { font-size: clamp(40px, 5vw, 76px); }
+body.mag.paper #view a { text-decoration-color: var(--j-yellow); text-decoration-thickness: 2px; }
+body.tool #view .label { font-family: var(--j-sans); letter-spacing: 0; text-transform: none; font-size: 12px; font-weight: 700; }
+body.tool #view .plate h3, body.tool #view .plate .name { font: 700 19px/1.2 var(--j-mincho); }
+/* The old tool design used small tracked capitals everywhere; the magazine uses sentence case. */
+body.tool #view *:not(h1):not(h2) { text-transform: none !important; letter-spacing: 0 !important; }
+body.tool #view button, body.tool #view [role="tab"], body.tool #view nav a { font-family: var(--j-sans); font-size: 14px; font-weight: 600; }

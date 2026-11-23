@@ -6,7 +6,6 @@ import { addToMyWall } from './mywall.js';
 export const birdOptions = (d) => `<datalist id="bird-names">${d.birds.filter((b) => b.cat !== 'introduced').map((b) => `<option value="${esc(b.n)}"></option>`).join('')}</datalist>`;
 
 export default async function submit(view) {
-  document.body.classList.add('mag');
   const d = await wi();
   const pre = (() => { try { return JSON.parse(sessionStorage.getItem('wi.submit') || 'null'); } catch { return null; } })();
   sessionStorage.removeItem('wi.submit');

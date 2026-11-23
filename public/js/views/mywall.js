@@ -25,7 +25,6 @@ const putMyBird = (rec) => tx('readwrite', (s) => s.put(rec));
 const delMyBird = (id) => tx('readwrite', (s) => s.delete(id));
 
 export default async function myWall(view) {
-  document.body.classList.add('mag');
   const d = await wi();
   let rows = [];
   try { rows = (await allMyBirds()).sort((a, b) => b.created.localeCompare(a.created)); }
