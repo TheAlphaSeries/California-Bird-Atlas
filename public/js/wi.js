@@ -24,8 +24,8 @@ import { S, esc, modal } from './util.js';
 export const SEASONS = { W: 'Winter', P: 'Spring', S: 'Summer', F: 'Fall' };
 export const SEASON_ORDER = ['W', 'P', 'S', 'F'];
 export const CATEGORY = {
-  assign: 'On the cards', scarce: 'Scarce', rare: 'Rare visitor', night: 'Night bird',
-  offshore: 'Offshore and island', sensitive: 'Gallery only', introduced: 'Introduced',
+  assign: 'Can be assigned', scarce: 'Scarce', rare: 'Rare visitor', night: 'Night bird',
+  offshore: 'Offshore and island', sensitive: 'Never assigned', introduced: 'Introduced',
 };
 // Photos that ship with the site, shown until uploaded photographs replace them.
 export const BUILT_IN = { 'Great Blue Heron': { src: '/img/great-blue-heron.jpg', caption: 'Found all year in every region of California.' } };
@@ -78,9 +78,19 @@ export function pickRegion() {
   let cur = null; try { cur = localStorage.getItem(REGION_KEY); } catch { /* storage off */ }
   const m = modal(`<p class="mag-kicker">Your region</p><h2>Where do you go birding?</h2>
     <p class="rp-note">Pick the part of California you bird in most. It sets your nine birds each season and the levels you see. It is saved on this device only, and you can change it any time.</p>
-    <div class="region-pick">${REGIONS.map((r) => `<button type="button" data-r="${r}" aria-pressed="${r === cur}"><b>${REGION_NAMES[r]}</b><span>${REGION_HINT[r]}</span></button>`).join('')}</div>`, { wide: true });
-  m.el.classList.add('mag-modal');
-  m.el.querySelectorAll('[data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); m.close(); window.dispatchEvent(new Event('route')); }));
+    <div class="rp-layout"><div class="rp-map" id="rp-map" aria-hidden="true"></div>
+    <div class="region-pick">${REGIONS.map((r) => `<button type="button" data-r="${r}" aria-pressed="${r === cur}"><b>${REGION_NAMES[r]}</b><span>${REGION_HINT[r]}</span></button>`).join('')}</div></div>`, { wide: true });
+  m.el.classList.add('mag-modal', 'region-modal');
+  const choose = (r) => { setRegion(r); m.close(); window.dispatchEvent(new Event('route')); };
+  const light = (r, on) => m.el.querySelectorAll(`[data-r="${r}"], [data-mr="${r}"]`).forEach((x) => x.classList.toggle('hot', on));
+  m.el.querySelectorAll('[data-r]').forEach((b) => { b.onclick = () => choose(b.dataset.r); b.onmouseenter = b.onfocus = () => light(b.dataset.r, true); b.onmouseleave = b.onblur = () => light(b.dataset.r, false); });
+  // The map is a second way to click the same seven buttons (drawn by tools/make-region-map.mjs).
+  fetch('/data/region-map.json').then((res) => res.json()).then((g) => {
+    const box = m.el.querySelector('#rp-map'); if (!box) return;
+    box.innerHTML = `<svg viewBox="-6 -6 ${g.w + 12} ${g.h + 12}" role="presentation">${REGIONS.map((r) => `<path data-mr="${r}" class="${r === cur ? 'on' : ''}" d="${g.paths[r]}"><title>${REGION_NAMES[r]}</title></path>`).join('')}
+      ${REGIONS.map((r) => `<text x="${g.labels[r][0]}" y="${g.labels[r][1]}">${r === 'SN' ? 'Sierra' : REGION_NAMES[r].replace(' Coast', '').replace('Central Valley', 'Valley')}</text>`).join('')}</svg>`;
+    box.querySelectorAll('[data-mr]').forEach((p) => { p.onclick = () => choose(p.dataset.mr); p.onmouseenter = () => light(p.dataset.mr, true); p.onmouseleave = () => light(p.dataset.mr, false); });
+  }).catch(() => {});
 }
 
 // level of bird b in region index i and season s: 1..3, 'r' (rare/brief), or null

@@ -3,6 +3,8 @@
 import { esc } from './util.js';
 
 const SIZE = 320, MEAN = [0.485, 0.456, 0.406], STD = [0.229, 0.224, 0.225];
+// Defaults for the cut: a slightly high cut-off and a narrow soft edge leave less of the background as a halo.
+const CUT = 0.56, SOFT = 0.14;
 const WORK = 1600; // longest side of the working image
 let sessionP = null;
 
@@ -93,8 +95,8 @@ export function openClipper(src, { title = 'Cut out the bird' } = {}) {
       <div class="clip-side">
         <p class="mag-kicker">Bird Wall</p><h2>${esc(title)}</h2>
         <p class="clip-help">The background is removed automatically. If it took too much or too little, adjust the cut-off, then paint with the brush to erase leftovers or bring back missing feathers.</p>
-        <label class="clip-field"><span>Cut-off <output id="ct-v"></output></span><input type="range" id="ct" min="0.05" max="0.95" step="0.01" value="0.5"></label>
-        <label class="clip-field"><span>Edge softness <output id="cs-v"></output></span><input type="range" id="cs" min="0" max="0.6" step="0.01" value="0.2"></label>
+        <label class="clip-field"><span>Cut-off <output id="ct-v"></output></span><input type="range" id="ct" min="0.05" max="0.95" step="0.01" value="${CUT}"></label>
+        <label class="clip-field"><span>Edge softness <output id="cs-v"></output></span><input type="range" id="cs" min="0" max="0.6" step="0.01" value="${SOFT}"></label>
         <div class="clip-field"><span>Brush</span><div class="seg" role="group" aria-label="Brush">
           <button type="button" data-mode="off" aria-pressed="true">Off</button><button type="button" data-mode="erase" aria-pressed="false">Erase</button><button type="button" data-mode="restore" aria-pressed="false">Restore</button></div></div>
         <label class="clip-field"><span>Brush size <output id="bs-v"></output></span><input type="range" id="bs" min="4" max="160" step="2" value="40"></label>
@@ -141,7 +143,7 @@ export function openClipper(src, { title = 'Cut out the bird' } = {}) {
     q('#bs').addEventListener('input', outVal);
     q('#ghost').addEventListener('change', () => img && draw());
     q('#c-cancel').onclick = () => close(null);
-    q('#c-reset').onclick = () => { if (!img) return; q('#ct').value = 0.5; q('#cs').value = 0.2; paint = { keep: layer(), erase: layer() }; outVal(); rebuild(); };
+    q('#c-reset').onclick = () => { if (!img) return; q('#ct').value = CUT; q('#cs').value = SOFT; paint = { keep: layer(), erase: layer() }; outVal(); rebuild(); };
     q('#c-done').onclick = async () => {
       q('#c-done').disabled = true; status.textContent = 'Saving…'; status.hidden = false;
       try { close(await finish(compose(img, mask))); }
@@ -165,5 +167,5 @@ export function openClipper(src, { title = 'Cut out the bird' } = {}) {
 export async function autoCut(src, { crop = true } = {}) {
   const img = await loadImage(src);
   const sal = await saliency(img);
-  return finish(compose(img, maskFrom(sal, img.width, img.height, 0.5, 0.2)), crop);
+  return finish(compose(img, maskFrom(sal, img.width, img.height, CUT, SOFT)), crop);
 }

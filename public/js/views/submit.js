@@ -1,4 +1,5 @@
 import { $, api, esc, toast } from '../util.js';
+import { autoCut, warmClipper } from '../clip.js';
 import { readExif, derivatives } from '../exif.js';
 import { wi, REGIONS, REGION_NAMES, myRegion } from '../wi.js';
 import { addToMyWall } from './mywall.js';
@@ -15,78 +16,105 @@ const STORY = [
 
 export const birdOptions = (d) => `<datalist id="bird-names">${d.birds.filter((b) => b.cat !== 'introduced').map((b) => `<option value="${esc(b.n)}"></option>`).join('')}</datalist>`;
 
+const MAX = 6; // photos per send; the daily limit per visitor is 12
+
 export default async function submit(view) {
   const d = await wi();
   const issue = currentIssue(await loadIssues().catch(() => []));
   const pre = (() => { try { return JSON.parse(sessionStorage.getItem('wi.submit') || 'null'); } catch { return null; } })();
   sessionStorage.removeItem('wi.submit');
-  let file = null;
+  const items = []; // one per photo: { file, url, bird, story, cut, el, state }
+  let queue = Promise.resolve();
   view.innerHTML = `<div class="mag-wrap mag-page sub-page">
     <p class="mag-kicker">Send a photo</p>
     <h1 class="mag-h">Put your bird on the wall</h1>
-    <p class="mag-deck">Send one of your California bird photos. We review every one, cut the bird out of its background and add it to the Bird Wall with your name. The best ones run in the magazine.</p>
+    <p class="mag-deck">Send up to ${MAX} of your California bird photos at once. We review every one and add it to the Bird Wall with your name. The best ones run in the magazine.</p>
     ${issue ? `<p class="sub-issue"><b>Issue No. ${issue.number}: ${esc(issue.theme || issue.title)}.</b> ${esc(stateLine(issue).long)} <a class="linkish" href="/issues/${issue.number}" data-link>About this issue</a></p>` : ''}
-    <form class="sub-form" id="sf" novalidate>
-      <div class="sub-photo">
-        <label class="drop" id="drop"><input type="file" id="file" accept="image/jpeg,image/png,image/webp" required>
-          <span class="drop-in"><b>Choose a photo</b><span>or drop it here. JPEG, PNG or WebP.</span></span>
-          <img id="prev" alt="" hidden></label>
-      </div>
-      <div class="sub-fields">
-        <label class="f"><span>Which bird is it?</span><input name="bird" list="bird-names" autocomplete="off" required placeholder="Start typing, e.g. Anna's Hummingbird" value="${esc(pre?.bird || '')}">${birdOptions(d)}</label>
-        <label class="f"><span>Your name, as it should be credited</span><input name="credit_name" required maxlength="80" autocomplete="name"></label>
-        <label class="f"><span>Email <i>(optional, never shown; only used if we need to ask about your photo)</i></span><input name="contact" type="email" maxlength="120" autocomplete="email"></label>
-        <label class="f"><span>Region where you took it</span><select name="region">${REGIONS.map((r) => `<option value="${r}" ${r === myRegion({ regions: REGIONS }) ? 'selected' : ''}>${REGION_NAMES[r]}</option>`).join('')}</select></label>
-        <fieldset class="f story"><legend>Behind the shot <i>(optional, but it's what gets a photo featured)</i></legend>
-          <p class="story-hint">A sentence or two each is plenty. Please describe the kind of place, not the exact spot.</p>
-          ${STORY.map(([k, q, eg]) => `<label><span>${esc(q)}</span><textarea name="story_${k}" rows="2" maxlength="700" placeholder="For example: ${esc(eg)}"></textarea></label>`).join('')}
-        </fieldset>
-        <label class="f"><span>Anything else we should know? <i>(optional, not published)</i></span><textarea name="note" rows="2" maxlength="600"></textarea></label>
+    <form id="sf" novalidate>
+      <label class="drop sub-drop" id="drop"><input type="file" id="file" accept="image/jpeg,image/png,image/webp" multiple>
+        <span class="drop-in"><b>Choose photos</b><span>or drop them here. JPEG, PNG or WebP, up to ${MAX}.</span></span></label>
+      ${birdOptions(d)}
+      <div class="sp-list" id="sp-list"></div>
+      <div class="sub-you" id="sub-you" hidden>
+        <h2>About you</h2>
+        <div class="sub-you-grid">
+          <label class="f"><span>Your name, as it should be credited</span><input name="credit_name" required maxlength="80" autocomplete="name"></label>
+          <label class="f"><span>Email <i>(optional, never shown; only used if we need to ask about a photo)</i></span><input name="contact" type="email" maxlength="120" autocomplete="email"></label>
+          <label class="f"><span>Region where you took them</span><select name="region">${REGIONS.map((r) => `<option value="${r}" ${r === myRegion({ regions: REGIONS }) ? 'selected' : ''}>${REGION_NAMES[r]}</option>`).join('')}</select></label>
+        </div>
         <fieldset class="f checks"><legend>Before you send</legend>
-          <label><input type="checkbox" name="mine" required> I took this photo myself, of a wild bird in California.</label>
-          <label><input type="checkbox" name="ethics" required> I didn't use bait or playback, flush the bird, or go near a nest.</label>
-          <label><input type="checkbox" name="consent" required> California Bird Atlas may publish it, cut out or whole, on this site and in print, with my name as credit. I keep the copyright.</label>
-          <label><input type="checkbox" name="keep" checked> Also keep a copy on My Wall on this device.</label>
+          <label><input type="checkbox" name="mine" required> I took these photos myself, of wild birds in California.</label>
+          <label><input type="checkbox" name="ethics" required> I didn't use bait or playback, flush a bird, or go near a nest.</label>
+          <label><input type="checkbox" name="consent" required> California Bird Atlas may publish them, cut out or whole, on this site and in print, with my name as credit. I keep the copyright.</label>
+          <label><input type="checkbox" name="keep" checked> Also keep copies on My Wall on this device.</label>
         </fieldset>
-        <p class="sub-privacy">We never publish where a photo was taken. Location data in your photo file is removed in your browser before it's sent.</p>
-        <button class="mag-btn solid" type="submit" id="sb">Send photo</button>
+        <p class="sub-privacy">We never publish where a photo was taken. Location data in your photo files is removed in your browser before they're sent.</p>
+        <button class="mag-btn solid" type="submit" id="sb">Send</button>
       </div>
     </form>
   </div>`;
-  const form = $('#sf', view), prev = $('#prev', view), drop = $('#drop', view);
-  const take = (f) => {
-    if (!f || !/^image\//.test(f.type)) { toast('Choose a JPEG, PNG or WebP photo.', true); return; }
-    file = f; prev.src = URL.createObjectURL(f); prev.hidden = false; drop.classList.add('has');
+  const form = $('#sf', view), list = $('#sp-list', view), drop = $('#drop', view), btn = $('#sb', view);
+  const birdOf = (name) => d.byName.get(String(name || '').trim()) || [...d.byName.values()].find((b) => b.n.toLowerCase() === String(name || '').trim().toLowerCase());
+  const live = () => items.filter((x) => x.state !== 'removed' && x.state !== 'sent');
+  const sync = () => { $('#sub-you', view).hidden = !live().length; btn.textContent = live().length > 1 ? `Send ${live().length} photos` : 'Send photo'; };
+  const paintCut = (it) => { it.el.querySelector('.sp-cut').innerHTML = it.cut ? `<img src="${it.cutUrl}" alt="How it will look on the wall">` : `<span>${it.cutFailed ? 'No preview. We\'ll cut it out for you.' : 'Cutting out…'}</span>`; };
+  const add = (file, bird = '') => {
+    if (!/^image\/(jpeg|png|webp)/.test(file.type)) { toast(`"${file.name}" isn't a JPEG, PNG or WebP photo.`, true); return; }
+    if (live().length >= MAX) { toast(`You can send ${MAX} at a time. Send these, then add more.`, true); return; }
+    const it = { file, url: URL.createObjectURL(file), state: 'ready', cut: null };
+    it.el = document.createElement('div'); it.el.className = 'sp-item';
+    it.el.innerHTML = `<div class="sp-imgs"><figure><img src="${it.url}" alt="Your photo"><figcaption>Your photo</figcaption></figure><figure><div class="sp-cut"></div><figcaption>On the wall</figcaption></figure></div>
+      <div class="sp-fields">
+        <label class="f"><span>Which bird is it?</span><input class="sp-bird" list="bird-names" autocomplete="off" placeholder="Start typing, e.g. Anna's Hummingbird" value="${esc(bird)}"></label>
+        <details class="sp-story" ${items.length ? '' : 'open'}><summary>Behind the shot <i>(optional, but it's what gets a photo featured)</i></summary>
+          <p class="story-hint">A sentence or two each is plenty. Please describe the kind of place, not the exact spot.</p>
+          ${STORY.map(([k, q, eg]) => `<label><span>${esc(q)}</span><textarea data-k="${k}" rows="2" maxlength="700" placeholder="For example: ${esc(eg)}"></textarea></label>`).join('')}
+        </details>
+        <p class="sp-foot"><button type="button" class="linkish sp-del">Remove this photo</button><span class="sp-state" role="status"></span></p>
+      </div>`;
+    list.appendChild(it.el); items.push(it); paintCut(it); sync();
+    it.el.querySelector('.sp-del').onclick = () => { it.state = 'removed'; it.el.remove(); sync(); };
+    // Cut-outs are made one at a time so a phone is not asked to do several at once.
+    queue = queue.then(async () => { if (it.state === 'removed') return; try { it.cut = await autoCut(file); it.cutUrl = URL.createObjectURL(it.cut.blob); } catch { it.cutFailed = true; } if (it.state !== 'removed') paintCut(it); });
   };
-  $('#file', view).onchange = (e) => take(e.target.files[0]);
+  const take = (files) => { warmClipper(); [...files].forEach((f) => add(f)); };
+  $('#file', view).onchange = (e) => { take(e.target.files); e.target.value = ''; };
   drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
-  drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); take(e.dataTransfer.files[0]); });
+  drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); take(e.dataTransfer.files); });
   if (pre?.blobKey) {
     const { getMyBird } = await import('./mywall.js');
     const mine = await getMyBird(pre.blobKey);
-    if (mine) take(new File([mine.photo], 'my-wall.jpg', { type: mine.photo.type || 'image/jpeg' }));
+    if (mine) { warmClipper(); add(new File([mine.photo], 'my-wall.jpg', { type: mine.photo.type || 'image/jpeg' }), pre.bird || ''); }
   }
   form.onsubmit = async (e) => {
     e.preventDefault();
-    const v = Object.fromEntries(new FormData(form));
-    const bird = d.byName.get(String(v.bird || '').trim()) || [...d.byName.values()].find((b) => b.n.toLowerCase() === String(v.bird || '').trim().toLowerCase());
-    if (!file) return toast('Choose a photo first.', true);
-    if (!bird) return toast('Pick the bird from the list. Start typing its name.', true);
+    const v = Object.fromEntries(new FormData(form)), todo = live();
+    if (!todo.length) return toast('Choose a photo first.', true);
+    for (const it of todo) { it.b = birdOf(it.el.querySelector('.sp-bird').value); if (!it.b) { it.el.querySelector('.sp-bird').focus(); return toast('Pick each bird from the list. Start typing its name.', true); } }
     if (!v.credit_name?.trim()) return toast('Enter the name to credit.', true);
     if (!v.mine || !v.ethics || !v.consent) return toast('Please tick the three boxes under "Before you send".', true);
-    const btn = $('#sb', view); btn.disabled = true; btn.textContent = 'Sending…';
-    try {
-      const [ex, dv] = [await readExif(file), await derivatives(file)];
-      const fd = new FormData();
-      fd.set('meta', JSON.stringify({ bird: bird.n, credit_name: v.credit_name.trim(), contact: v.contact || '', region: v.region, note: v.note || '', story: Object.fromEntries(STORY.map(([k]) => [k, v['story_' + k] || ''])), consent: true, taken_at: ex.taken_at || null, camera: ex.camera || '', width: dv.width, height: dv.height }));
-      fd.set('display', dv.display, 'display.jpg'); fd.set('thumb', dv.thumb, 'thumb.jpg');
-      await api('/submissions', { method: 'POST', form: fd });
-      if (v.keep && !pre?.blobKey) await addToMyWall({ bird: bird.n, sci: bird.sci, photo: dv.display, taken_at: ex.taken_at || null }).catch(() => {});
+    btn.disabled = true; let sent = 0; const names = [];
+    for (const it of todo) {
+      const stEl = it.el.querySelector('.sp-state'); stEl.textContent = 'Sending…';
+      try {
+        const [ex, dv] = [await readExif(it.file), await derivatives(it.file)];
+        const story = Object.fromEntries([...it.el.querySelectorAll('textarea[data-k]')].map((t) => [t.dataset.k, t.value]));
+        const fd = new FormData();
+        fd.set('meta', JSON.stringify({ bird: it.b.n, credit_name: v.credit_name.trim(), contact: v.contact || '', region: v.region, story, consent: true, taken_at: ex.taken_at || null, camera: ex.camera || '', width: dv.width, height: dv.height, cut_w: it.cut?.width, cut_h: it.cut?.height }));
+        fd.set('display', dv.display, 'display.jpg'); fd.set('thumb', dv.thumb, 'thumb.jpg');
+        if (it.cut) fd.set('cutout', it.cut.blob, 'cutout.png');
+        await api('/submissions', { method: 'POST', form: fd });
+        if (v.keep && !pre?.blobKey) await addToMyWall({ bird: it.b.n, sci: it.b.sci, photo: dv.display, taken_at: ex.taken_at || null }).catch(() => {});
+        it.state = 'sent'; sent++; names.push(it.b.n); stEl.textContent = 'Sent'; it.el.classList.add('done');
+      } catch (err) { stEl.textContent = err.message; toast(err.message, true); break; }
+    }
+    btn.disabled = false; sync();
+    if (sent && !live().length) {
       view.querySelector('.sub-page').innerHTML = `<p class="mag-kicker">Sent</p><h1 class="mag-h">Thank you.</h1>
-        <p class="mag-deck" style="font-size:19px;color:#e6e2da">Your ${esc(bird.n)} is in the review queue. Approved photos are cut out and added to the Bird Wall with your name, usually within a week.</p>
-        <p class="wall-ctas"><a class="mag-btn solid" href="/submit" data-link>Send another</a><a class="mag-btn" href="/wall" data-link>See the Bird Wall</a>${v.keep ? '<a class="mag-btn" href="/my-wall" data-link>My Wall</a>' : ''}</p>`;
+        <p class="mag-deck" style="font-size:19px">${sent === 1 ? `Your ${esc(names[0])} is` : `Your ${sent} photos are`} in the review queue. Approved photos go on the Bird Wall with your name, usually within a week.</p>
+        <p class="wall-ctas"><a class="mag-btn solid" href="/submit" data-link>Send more</a><a class="mag-btn" href="/wall" data-link>See the Bird Wall</a>${v.keep ? '<a class="mag-btn" href="/my-wall" data-link>My Wall</a>' : ''}</p>`;
       window.scrollTo(0, 0);
-    } catch (err) { toast(err.message, true); btn.disabled = false; btn.textContent = 'Send photo'; }
+    }
   };
 }

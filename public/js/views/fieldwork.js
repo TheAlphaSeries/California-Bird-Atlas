@@ -2,7 +2,7 @@ import { $, $$, esc } from '../util.js';
 import { birdPic } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, levelOf } from '../wi.js';
 import { seasonCards, latestOccurrence, windowSpan, WINDOWS } from '../rotation.js';
-import { subscribeForm, bindSubscribe } from '../issues.js';
+import { subscribeForm, bindSubscribe, loadIssues, currentIssue, stateLine } from '../issues.js';
 
 const DAY = 864e5;
 const fmt = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -13,6 +13,7 @@ const BLURB = { 1: 'Common and widespread. Expect them on an ordinary outing.', 
 
 export default async function fieldwork(view, seasonArg) {
   const d = await wi();
+  const issue = currentIssue(await loadIssues().catch(() => []));
   const now = currentSeason();
   let season = SEASON_ORDER.includes(seasonArg) ? seasonArg : now;
   let region = myRegion(d);
@@ -38,6 +39,7 @@ export default async function fieldwork(view, seasonArg) {
         <span class="nb-art">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : `<span class="nb-ph"><b>${+b.id.slice(3)}</b><i>${esc(b.fam)}</i></span>`}</span>
         <span class="nb-nm">${esc(b.n)}</span><span class="nb-sc mag-sci">${esc(b.sci)}</span></a>`; };
     view.innerHTML = `<div class="mag-wrap mag-page fw">
+      ${issue ? `<a class="fw-issue" href="/issues/${issue.number}" data-link><b>Issue No. ${issue.number}</b><span><strong>${esc(issue.theme || issue.title)}.</strong> ${esc(stateLine(issue).long)}</span><i>See the issue</i></a>` : ''}
       <header class="fw-head">
         <div>
           <p class="mag-kicker">${esc(occLabel(season, occ.year))}, assignment ${shownIdx + 1} of ${WINDOWS}</p>
@@ -72,16 +74,16 @@ export default async function fieldwork(view, seasonArg) {
         <table class="score-table">
           <thead><tr><th>Photo of</th><th>Points</th><th>Notes</th></tr></thead>
           <tbody>
-            <tr><td>A bird on your card</td><td class="n">${sc.base.assign.join(' / ')}</td><td>Level 1, 2 or 3.</td></tr>
+            <tr><td>One of your nine birds</td><td class="n">${sc.base.assign.join(' / ')}</td><td>Level 1, 2 or 3.</td></tr>
             <tr><td>A frequent visitor</td><td class="n">${sc.base.frequent.join(' / ')}</td><td>Any other bird with a level in your region this season. First photo of each bird per season.</td></tr>
             <tr><td>A night bird</td><td class="n">${sc.base.night}</td><td>Nighthawks, poorwill, whip-poor-will.</td></tr>
             <tr><td>An offshore or island bird</td><td class="n">${sc.base.offshore}</td><td>Seabirds seen from a boat, and Island Scrub-Jay.</td></tr>
             <tr><td>A scarce bird</td><td class="n">${sc.base.scarce}</td><td>Native but too rare to assign. First photo of each per year.</td></tr>
             <tr><td>A rare visitor</td><td class="n">${sc.base.rare}</td><td>On the state review list. +${sc.bonus.documented} if you send it to the California Bird Records Committee.</td></tr>
-            <tr><td>A sensitive bird</td><td class="n">0</td><td>Owls and nest, roost or colony birds can go in the Gallery but never score.</td></tr>
+            <tr><td>A sensitive bird</td><td class="n">0</td><td>Owls and nest, roost or colony birds are never assigned and never score.</td></tr>
             <tr><td>Star rating</td><td class="n">×${sc.stars.join(' ×')}</td><td>Every scored photo is rated 1 to 5 stars. Points × the rating, rounded up.</td></tr>
             <tr><td>A better photo later</td><td class="n">${sc.reupload.share * 100}%</td><td>Up to ${sc.reupload.max} re-uploads per bird per season earn ${sc.reupload.share * 100}% of the extra points.</td></tr>
-            <tr><td>Bonuses</td><td class="n">+${sc.bonus.level} / +${sc.bonus.card}</td><td>All three birds in a level of one card / all nine birds of one card, by the end of the season.</td></tr>
+            <tr><td>Bonuses</td><td class="n">+${sc.bonus.level} / +${sc.bonus.card}</td><td>All three birds in a level of one assignment / all nine birds of one assignment, by the end of the season.</td></tr>
             <tr><td>Featured</td><td class="n">+${sc.bonus.issue} / +${sc.bonus.annual}</td><td>In a seasonal issue / in the year-end edition.</td></tr>
             <tr><td>Posting</td><td class="n">+${sc.activity.post}</td><td>Each post, up to ${sc.activity.weekly_cap} a week. +${sc.activity.streak} a week for a streak of weekly posts, up to +${sc.activity.streak_cap}.</td></tr>
           </tbody>

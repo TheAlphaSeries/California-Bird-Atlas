@@ -10,7 +10,7 @@ export default async function wall(view) {
   let region = '', q = new URLSearchParams(location.search).get('by') || '';
   view.innerHTML = `<div class="wall-page">
     <header class="mag-wrap wall-head one-line">
-      <p class="mag-kicker">Reader photos</p>
+      <p class="mag-kicker">Photographed by readers</p>
       <h1 class="ix-title">The Bird Wall</h1>
       <p class="mag-deck">Birds of California, by the people who found them. Every one was photographed in the wild, cut out and put up here. Click a bird to see who took it.</p>
       ${samples && rows.length ? '<p class="wall-sample-note">Sample birds for now: openly licensed photos from Wikimedia Commons, credited to their photographers. They step aside as soon as the first community photos go up.</p>' : ''}

@@ -581,6 +581,11 @@ async function route(request, env, url, path) {
           .bind(new Date().toISOString(), sp.common_name, sp.scientific_name, name, String(meta.contact || '').slice(0, 120), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, ip).run();
         const sid = res.meta.last_row_id;
         { const st = storyFrom(meta); await db.prepare(`UPDATE submissions SET issue_id = ?, story = ?, caption = ? WHERE id = ?`).bind(await issueFor(db), st.story, st.caption, sid).run(); }
+        // The sender's browser may include its automatic cut-out, which saves the editor a step (it can be redone in Review).
+        const cut = form.get('cutout');
+        if (cut && typeof cut !== 'string' && cut.size <= 4 * 1024 * 1024 && Number(meta.cut_w) > 0) {
+          try { await putBlob(env, `subs/${sid}/cutout`, await cut.arrayBuffer(), 'image/png'); await db.prepare(`UPDATE submissions SET cut_w = ?, cut_h = ? WHERE id = ?`).bind(Number(meta.cut_w), Number(meta.cut_h), sid).run(); } catch { /* the photo itself is what matters */ }
+        }
         try {
           await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
           await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');

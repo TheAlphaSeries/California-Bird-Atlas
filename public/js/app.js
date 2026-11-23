@@ -45,7 +45,7 @@ let renderSeq = 0;
 // Every page uses the magazine shell. Photo pages are black; everything else is printed on white paper.
 const BLACK = new Set(['cover', 'wall', 'mywall']);
 // The sideways section label in the left margin, one per section.
-const MARGIN_LABEL = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs', issue: 'The issue', board: 'Scoreboard' };
+const MARGIN_LABEL = { fieldwork: 'This season', wall: 'Bird Wall', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs', issue: 'The issue', board: 'Scoreboard' };
 
 // Put a finished page on screen. The page is built off-screen first, so the old page stays whole until this
 // moment; then the menu, the page colours and the content all change together and the new page fades in.
@@ -55,6 +55,8 @@ function commit(view, page, nav) {
   $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === nav));
   const b = document.body.classList;
   b.add('mag'); b.remove('dark');
+  document.body.dataset.page = nav; // lets the stylesheet treat one page differently (the cover's big footer)
+  if (nav === 'issue') $$('.primary a').forEach((a) => a.classList.toggle('active', a.dataset.nav === 'fieldwork')); // the issue lives under This Season
   b.toggle('paper', !BLACK.has(nav));
   b.toggle('tool', !MAG.has(nav)); // the editor's tool pages: atlas.css components, restyled to match
   const t = document.getElementById('tategaki'); if (t) { t.textContent = MARGIN_LABEL[nav] || ''; t.hidden = !t.textContent; }
@@ -87,7 +89,7 @@ async function render() {
   commit(view, page, '');
 }
 
-const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/issues', 'issue', 'The Issue'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
+const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
 const TOOLS_NAV = [['/review', 'review', 'Review'], ['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
 const TOOL_PATHS = [/^\/review/, /^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
 export function renderChrome() {
@@ -99,6 +101,7 @@ export function renderChrome() {
   const n = draftCount();
   $('#utilities').innerHTML = `
     ${S.owner ? '<a href="/add" data-link class="cta u-send">Add birds</a>' : '<a href="/submit" data-link class="cta u-send">Send a photo</a>'}
+    <button type="button" id="u-search" class="u-search" aria-label="Search birds and photographers">Search</button>
     <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region"><span class="rl">Region: </span><b>${regionName()}</b></button>
     ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     ${S.owner ? '<a href="/settings" data-link>Settings</a>' : ''}`;
@@ -108,6 +111,7 @@ export function renderChrome() {
     ? `<span><b>No. ${iss.number}</b> ${esc(iss.title)}</span><a href="/issues" data-link>${esc(iss.theme)}: ${esc(stateLine(iss).long.split('. ')[0])}.</a>`
     : `<span><b>${esc(cv.issue || 'No. 1')}</b> ${esc(cv.season || 'Winter 2026–27')}</span><span>Free to read. Made from readers' photographs.</span>`;
   $('#u-region').onclick = pickRegion;
+  $('#u-search').onclick = () => import('./search.js').then((m) => m.openSearch());
   if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;
   const src = S.sources || [];
