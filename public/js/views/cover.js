@@ -31,8 +31,8 @@ export default async function cover(view) {
     </div>
     <figure class="cv-art">
       <img src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
-      <p class="cv-jp" lang="ja" aria-hidden="true">カリフォルニア野鳥図鑑</p>
-      <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}${c.credit ? ` <span class="cr">Photograph by ${esc(c.credit)}</span>` : ''}</figcaption>
+      <p class="cv-side" aria-hidden="true">Birds of California, photographed by the people who found them</p>
+      <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}${c.credit ? ` <span class="cr">Photo ● ${esc(c.credit)}</span>` : ''}</figcaption>
     </figure>
     ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
   </article>

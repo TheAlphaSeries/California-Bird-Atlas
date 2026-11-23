@@ -1,4 +1,6 @@
-/* Journal: a Japanese editorial magazine crossed with a documentary photo magazine.
+/* Journal: styled after Japanese bird and outdoor magazines (BIRDER's colour tabs, numbered recurring features
+   and role-labelled credits; GO OUT's clean covers and dense, ordered pages), with Nat Geo's yellow and
+   Audubon's documentary captions. English only.
    Paper for reading pages, black where photographs need it, Field Yellow as the one signature colour.
    Shippori Mincho B1 (Latin and Japanese) for headlines; Archivo for captions, data and navigation. */
 :root {
@@ -12,7 +14,7 @@ body.mag { --sans: var(--j-sans); font-family: var(--j-sans); }
 /* ---------- masthead: a yellow band, a mincho wordmark with its Japanese title ---------- */
 body.mag .masthead { border-top: 5px solid var(--j-yellow); padding-top: 10px; padding-bottom: 10px; }
 .wordmark { display: inline-flex; flex-direction: column; gap: 3px; line-height: 1; }
-.wm-jp { display: block; font: 500 10px/1 var(--j-mincho); letter-spacing: .32em; text-transform: none; opacity: .62; }
+.wm-tag { display: block; font: 500 11px/1 var(--j-sans); letter-spacing: .01em; text-transform: none; opacity: .62; }
 body.mag .wordmark .wm-en { font: 700 21px/1 var(--j-mincho); letter-spacing: .01em; text-transform: none; }
 body.mag .primary a, body.mag .utilities a, body.mag .utilities button { font: 500 14px/1 var(--j-sans); letter-spacing: 0; text-transform: none; }
 body.mag .primary a { padding-bottom: 6px; border-bottom: 2px solid transparent; }
@@ -22,7 +24,7 @@ body.mag .utilities .cta.u-send { color: var(--j-ink); font-weight: 600; }
 
 /* ---------- the vertical section label in the left margin ---------- */
 .tategaki { position: fixed; z-index: 6; top: 116px; left: max(14px, calc((100vw - 1240px) / 2 - 44px)); margin: 0;
-  writing-mode: vertical-rl; font: 600 15px/1 var(--j-mincho); letter-spacing: .42em; color: var(--j-stone); pointer-events: none; }
+  writing-mode: vertical-rl; font: 600 13px/1 var(--j-sans); letter-spacing: .04em; color: var(--j-stone); pointer-events: none; }
 .tategaki::before { content: ''; display: block; width: 2px; height: 34px; margin: 0 auto 14px; background: var(--j-yellow); }
 @media (max-width: 1340px) { .tategaki { display: none; } }
 
@@ -72,7 +74,7 @@ body.mag .utilities .cta.u-send { color: var(--j-ink); font-weight: 600; }
 .cv-lines li { padding: 10px 0 0; border-top: 1px solid var(--mag-rule); font: 500 15px/1.35 var(--j-sans); color: var(--mag-dim); }
 .cv-art { position: relative; margin: 0; }
 .cv-art img { display: block; width: 100%; height: auto; }
-.cv-jp { position: absolute; top: 4px; right: -2px; margin: 0; writing-mode: vertical-rl; font: 700 clamp(14px, 1.3vw, 18px)/1 var(--j-mincho); letter-spacing: .5em; color: var(--mag-ink); opacity: .9; }
+.cv-side { position: absolute; top: 0; right: -4px; margin: 0; writing-mode: vertical-rl; font: 500 13px/1 var(--j-sans); letter-spacing: .04em; color: var(--mag-dim); }
 .cv-cap { margin: 12px 0 0; max-width: 520px; color: var(--mag-dim); }
 .cv .cover-actions { grid-column: 1 / -1; justify-content: flex-start; }
 @media (max-width: 860px) {
@@ -152,4 +154,12 @@ body.mag.paper #view [style*="e6e2da"] { color: var(--j-ink) !important; }
 .tategaki::before { display: none; }
 .tategaki { border-top: 2px solid var(--j-yellow); padding-top: 14px; }
 .wall-head .ix-title { font-size: clamp(44px, 6vw, 84px); max-width: 15ch; }
-@media (max-width: 860px) { .cv-jp { right: 30px; top: 10px; } }
+@media (max-width: 860px) { .cv-side { display: none; } }
+
+/* BIRDER-style section tabs: a solid yellow tab with the section name */
+.mag-kicker { display: inline-flex; width: fit-content; gap: 0; padding: 5px 9px 4px; background: var(--j-yellow); color: var(--j-ink) !important; font: 700 12px/1.2 var(--j-sans); }
+.mag-kicker::before { display: none; }
+/* role-labelled credits: "Photo ● Name" */
+.wb-cap .by { color: var(--mag-faint); }
+.cv-cap .cr, .ref-cap .cr { display: block; }
+.ref-cap > span > b { display: block; }

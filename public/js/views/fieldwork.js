@@ -32,7 +32,7 @@ export default async function fieldwork(view, seasonArg) {
     const seasonEnd = windowSpan(season, occ.year, WINDOWS - 1).end - DAY;
     const frequent = d.birds.filter((b) => b.cat === 'assign' && levelOf(b, ri, season) && ![...card['1'], ...card['2'], ...card['3']].includes(b.id)).length;
     view.innerHTML = `<div class="mag-wrap mag-page">
-      <p class="mag-kicker">${occ.live ? 'This season' : 'Last'} · ${esc(occLabel(season, occ.year))} · ${esc(range(span))}</p>
+      <p class="mag-kicker">${esc(occLabel(season, occ.year))}, assignment ${shownIdx + 1} of ${WINDOWS}</p>
       <h1 class="mag-h">${isNow ? 'Your nine birds' : `Nine birds, ${esc(range(span))}`}</h1>
       <p class="mag-deck" style="font-size:19px;color:#e6e2da">For birders in the <b style="color:var(--mag-accent);font-weight:600">${esc(d.region_names[region])}</b>${isNow ? ' right now' : ''}. <button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button></p>
       ${occ.live ? `<p class="rot-next"><b>${nextLabel} in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</b> · ${fmt(curSpan.end)}. A new set of nine every two weeks, all season long.</p>` : ''}

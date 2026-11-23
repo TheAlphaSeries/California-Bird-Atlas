@@ -15,7 +15,7 @@ export function birdPic(b, size = 'display') {
 export function refCredit(pic) {
   if (pic?.kind !== 'ref') return '';
   const lic = pic.license_url ? `<a href="${esc(pic.license_url)}" target="_blank" rel="noopener">${esc(pic.license)}</a>` : esc(pic.license || '');
-  return `<figcaption class="ref-cap"><span><b>Reference photo</b> · ${esc(pic.credit || 'Unknown photographer')}${lic ? `, ${lic}` : ''}, via ${pic.source ? `<a href="${esc(pic.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>` : 'Wikimedia Commons'}</span>
+  return `<figcaption class="ref-cap"><span><b>Reference photo</b> <span class="cr">Photo ● ${esc(pic.credit || 'Unknown photographer')}${lic ? `, ${lic}` : ''}, via ${pic.source ? `<a href="${esc(pic.source)}" target="_blank" rel="noopener">Wikimedia Commons</a>` : 'Wikimedia Commons'}</span></span>
     <button type="button" class="linkish ref-report" data-sp="${pic.sp.id}">Wrong photo? Tell us</button></figcaption>`;
 }
 

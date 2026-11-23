@@ -11,7 +11,7 @@ export default async function wall(view) {
   let region = '', q = '';
   view.innerHTML = `<div class="wall-page">
     <header class="mag-wrap wall-head">
-      <p class="mag-kicker">The Bird Wall</p>
+      <p class="mag-kicker">Reader photos</p>
       <h1 class="ix-title">Birds of California,<br>by the people who found them</h1>
       <p class="mag-deck">Every bird here was photographed in the wild by a member of the community, then cut out and added to the wall. Click any bird to see who took it.</p>
       ${samples && rows.length ? '<p class="wall-sample-note">Sample birds for now: openly licensed photos from Wikimedia Commons, credited to their photographers. They step aside as soon as the first community photos go up.</p>' : ''}
@@ -37,7 +37,7 @@ export default async function wall(view) {
       const wide = r.cut_w && r.cut_h && r.cut_w / r.cut_h > 1.35;
       return `<button type="button" class="wb${wide ? ' wide' : ''}${r.featured ? ' big' : ''}" data-i="${rows.indexOf(r)}" style="--d:${(i % 12) * 40}ms" aria-label="${esc(r.bird)}, photographed by ${esc(r.credit_name)}">
         <img loading="lazy" src="${r.static ? r.src : `/media/sub/${r.id}/cutout`}" alt="" width="${r.cut_w || ''}" height="${r.cut_h || ''}">
-        <span class="wb-cap"><span class="nm">${esc(r.bird)}</span><span class="by">${esc(r.credit_name)}</span></span>
+        <span class="wb-cap"><span class="nm">${esc(r.bird)}</span><span class="by">Photo ● ${esc(r.credit_name)}</span></span>
       </button>`;
     }).join('') || '<p class="mag-deck">No birds match.</p>';
     $$('.wb', list).forEach((b) => (b.onclick = () => openBird(rows[+b.dataset.i], d)));

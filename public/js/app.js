@@ -30,8 +30,8 @@ let renderSeq = 0;
 // Swap in a new page smoothly: build it off-screen, then cross-fade it in.
 // Reading pages are printed on paper; photo pages (cover, walls) stay black.
 const PAPER = new Set(['fieldwork', 'index', 'about', 'submit', 'add', 'review', 'gallery']);
-// The vertical Japanese label in the left margin, one per section.
-const TATEGAKI = { fieldwork: '今季の九羽', wall: '野鳥の壁', index: '図鑑', about: '使い方', submit: '投稿', add: '投稿', mywall: '私の壁', review: '編集', gallery: '写真' };
+// The sideways section label in the left margin, one per section.
+const TATEGAKI = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs' };
 function swapIn(view, tmp, mag, nav = '') {
   const apply = () => {
     document.body.classList.toggle('mag', mag);
