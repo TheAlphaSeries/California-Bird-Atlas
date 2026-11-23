@@ -2,6 +2,7 @@ import { $, $$, esc } from '../util.js';
 import { birdPic } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, levelOf } from '../wi.js';
 import { seasonCards, latestOccurrence, windowSpan, WINDOWS } from '../rotation.js';
+import { subscribeForm, bindSubscribe } from '../issues.js';
 
 const DAY = 864e5;
 const fmt = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -29,6 +30,9 @@ export default async function fieldwork(view, seasonArg) {
     const daysLeft = Math.round((curSpan.end - occ.today) / DAY);
     const nextLabel = occ.window < WINDOWS - 1 ? 'New birds' : `${SEASONS[SEASON_ORDER[(SEASON_ORDER.indexOf(season) + 1) % 4]]} birds`;
     const seasonEnd = windowSpan(season, occ.year, WINDOWS - 1).end - DAY;
+    // Arriving: birds you can find here this season that you could not last season.
+    const prev = SEASON_ORDER[(SEASON_ORDER.indexOf(season) + 3) % 4];
+    const arriving = d.birds.filter((b) => b.cat === 'assign' && typeof levelOf(b, ri, season) === 'number' && typeof levelOf(b, ri, prev) !== 'number');
     const frequent = d.birds.filter((b) => b.cat === 'assign' && levelOf(b, ri, season) && ![...card['1'], ...card['2'], ...card['3']].includes(b.id)).length;
     const tile = (b) => { const pic = birdPic(b, 'thumb'); return `<a class="nb" href="${birdLink(b)}" data-link>
         <span class="nb-art">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : `<span class="nb-ph"><b>${+b.id.slice(3)}</b><i>${esc(b.fam)}</i></span>`}</span>
@@ -57,6 +61,11 @@ export default async function fieldwork(view, seasonArg) {
         <a class="mag-btn solid" href="/submit" data-link>Send a photo</a>
       </div>
 
+      ${arriving.length ? `<section class="mag-section fw-arr"><p class="mag-kicker">Arriving this ${SEASONS[season].toLowerCase()}</p>
+        <h2>${arriving.length} birds that weren't here in ${SEASONS[prev].toLowerCase()}</h2>
+        <p class="fw-arr-list">${arriving.map((b) => `<a href="${birdLink(b)}" data-link>${esc(b.n)}</a>`).join('')}</p></section>` : ''}
+      <section class="mag-section">${subscribeForm()}</section>
+
       <section class="mag-section" aria-labelledby="sc-h">
         <p class="mag-kicker">Scoring</p>
         <h2 id="sc-h">How points work</h2>
@@ -81,6 +90,7 @@ export default async function fieldwork(view, seasonArg) {
       </section>
     </div>`;
     $('#chg', view).onclick = pickRegion;
+    bindSubscribe(view);
     $$('[data-s]', view).forEach((b) => (b.onclick = () => { season = b.dataset.s; pick = null; draw(); }));
     $$('[data-c]', view).forEach((b) => (b.onclick = () => { pick = +b.dataset.c; draw(); }));
   };

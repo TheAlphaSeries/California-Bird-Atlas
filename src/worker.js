@@ -14,6 +14,10 @@
 //                    sample   1 = an openly licensed Wikimedia photo added by "Fill with sample birds"
 //                    cut_w/h  size of the cut-out; a bird only shows on the wall once it has one
 //                  Readers' photos arrive pending; the editor's own (POST /api/wall) arrive approved.
+//                    issue_id the issue it was sent for; caption = the Behind the Shot story shown to readers
+//                    (drafted from the sender's answers in `story`, edited in Review); award = e.g. 'Best Level 3 find'
+//   issues         one per season: number, title, theme, blurb and the submission window (opens_at, closes_at, UTC).
+//   subscribers    email + chosen region for the two-week email. Private: only the editor can read them.
 //   photo_reports  readers' "wrong reference photo" reports, open until the editor keeps or replaces the photo.
 //   blobs          image files, in chunks, until R2 is switched on (see putBlob). Keys:
 //                    photos/<photo id>/thumb|display|original      subs/<submission id>/thumb|display|cutout
@@ -31,10 +35,11 @@
 //   bootstrap                  everything the pages need at start: species, families, settings
 //   species, reference, reports, observations, photos
 //   wall (GET public list, POST editor adds a bird), samples, submissions (POST public; the rest editor only)
+//   issues (GET public; POST/PATCH editor), subscribe, unsubscribe, subscribers (editor)
 //   fields, views, settings, export
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '4';
+const SCHEMA_VERSION = '5';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -67,6 +72,9 @@ const SCHEMA = [
      status TEXT DEFAULT 'pending', cut_w INTEGER, cut_h INTEGER, approved_at TEXT, featured INTEGER DEFAULT 0, ip TEXT,
      license TEXT DEFAULT '', license_url TEXT DEFAULT '', source_url TEXT DEFAULT '', sample INTEGER DEFAULT 0)`,
   `CREATE INDEX IF NOT EXISTS sub_status ON submissions(status)`,
+  `CREATE TABLE IF NOT EXISTS issues (id INTEGER PRIMARY KEY AUTOINCREMENT, number INTEGER UNIQUE NOT NULL, title TEXT NOT NULL, theme TEXT DEFAULT '', blurb TEXT DEFAULT '',
+     opens_at TEXT NOT NULL, closes_at TEXT NOT NULL, created_at TEXT)`,
+  `CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, region TEXT DEFAULT '', created_at TEXT, ip TEXT)`,
   `CREATE TABLE IF NOT EXISTS photo_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, species_id INTEGER NOT NULL, ref_url TEXT, reason TEXT, note TEXT DEFAULT '', ip TEXT, status TEXT DEFAULT 'open')`,
   `CREATE INDEX IF NOT EXISTS rep_status ON photo_reports(status, species_id)`,
   `CREATE INDEX IF NOT EXISTS obs_species ON observations(species_id)`,
@@ -91,8 +99,14 @@ async function init(env) {
   if (v === SCHEMA_VERSION) return;
   await db.batch(SCHEMA.map((s) => db.prepare(s)));
   // Columns added after the first release; each fails harmlessly if it is already there.
-  for (const col of [`license TEXT DEFAULT ''`, `license_url TEXT DEFAULT ''`, `source_url TEXT DEFAULT ''`, `sample INTEGER DEFAULT 0`]) {
+  for (const col of [`license TEXT DEFAULT ''`, `license_url TEXT DEFAULT ''`, `source_url TEXT DEFAULT ''`, `sample INTEGER DEFAULT 0`,
+    `issue_id INTEGER`, `story TEXT DEFAULT '{}'`, `caption TEXT DEFAULT ''`, `award TEXT DEFAULT ''`]) {
     try { await db.prepare(`ALTER TABLE submissions ADD COLUMN ${col}`).run(); } catch { /* exists */ }
+  }
+  // The first issue, so the site has an open call from day one. The editor can change everything about it.
+  if (!(await db.prepare(`SELECT COUNT(*) n FROM issues`).first('n'))) {
+    await db.prepare(`INSERT INTO issues (number, title, theme, blurb, opens_at, closes_at, created_at) VALUES (1, ?, ?, ?, ?, ?, ?)`)
+      .bind('Winter 2026–27', 'Winter visitors', 'Every winter, millions of birds come to California from the Arctic, the mountains and the interior. This issue is about the ones that only show up when it gets cold. Send us your best.', '2026-12-01T08:00:00Z', '2027-03-01T08:00:00Z', new Date().toISOString()).run();
   }
   const n = await db.prepare(`SELECT COUNT(*) n FROM species`).first('n');
   if (!n) {
@@ -189,6 +203,22 @@ async function deleteBlobs(env, id, store) {
     const key = `photos/${id}/${v}`;
     if (store === 'r2' && env.PHOTOS) await env.PHOTOS.delete(key); else await env.DB.prepare(`DELETE FROM blobs WHERE key = ?`).bind(key).run();
   }
+}
+
+// ---------- issues and Behind the Shot ----------
+// The issue a new photo belongs to: the one whose window is open, otherwise the next one to open.
+async function issueFor(db) {
+  const now = new Date().toISOString();
+  const open = await db.prepare(`SELECT id FROM issues WHERE opens_at <= ? AND closes_at > ? ORDER BY number DESC LIMIT 1`).bind(now, now).first('id');
+  return open || (await db.prepare(`SELECT id FROM issues WHERE opens_at > ? ORDER BY opens_at LIMIT 1`).bind(now).first('id')) || null;
+}
+// The questions on the submission form, in the order their answers are joined into a first-draft caption.
+const STORY_KEYS = ['day', 'doing', 'how', 'surprise'];
+function storyFrom(meta) {
+  const story = {};
+  for (const k of STORY_KEYS) { const v = String(meta?.story?.[k] || '').trim().slice(0, 700); if (v) story[k] = v; }
+  const caption = STORY_KEYS.map((k) => story[k]).filter(Boolean).map((t) => (/[.!?]$/.test(t) ? t : t + '.')).join(' ');
+  return { story: JSON.stringify(story), caption };
 }
 
 // ---------- reference photographs (Wikimedia Commons) ----------
@@ -485,6 +515,7 @@ async function route(request, env, url, path) {
       const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, region, note, taken_at, camera, width, height, store, status, cut_w, cut_h, approved_at, featured) VALUES (?,?,?,?,?,?,?,?,?,?,?,'approved',?,?,?,?)`)
         .bind(now, sp.common_name, sp.scientific_name, String(meta.credit_name || 'California Bird Atlas').slice(0, 80), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, clean(meta.cut_w), clean(meta.cut_h), now, meta.featured ? 1 : 0).run();
       const sid = res.meta.last_row_id;
+      await db.prepare(`UPDATE submissions SET issue_id = ?, caption = ? WHERE id = ?`).bind(await issueFor(db), String(meta.caption || '').slice(0, 2000), sid).run();
       try {
         await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
         await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
@@ -493,7 +524,7 @@ async function route(request, env, url, path) {
       return json({ id: sid });
     }
     if (r === 'wall' && method === 'GET') {
-      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
+      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
       return json(rows, 200, { 'cache-control': 'public, max-age=60' });
     }
     // Sample birds: openly licensed photos the editor's browser fetched and cut out, shown until real photos arrive.
@@ -549,6 +580,7 @@ async function route(request, env, url, path) {
         const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, store, ip) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)`)
           .bind(new Date().toISOString(), sp.common_name, sp.scientific_name, name, String(meta.contact || '').slice(0, 120), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, ip).run();
         const sid = res.meta.last_row_id;
+        { const st = storyFrom(meta); await db.prepare(`UPDATE submissions SET issue_id = ?, story = ?, caption = ? WHERE id = ?`).bind(await issueFor(db), st.story, st.caption, sid).run(); }
         try {
           await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
           await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
@@ -557,7 +589,7 @@ async function route(request, env, url, path) {
       }
       need();
       if (method === 'GET') {
-        const rows = (await db.prepare(`SELECT id, created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, status, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample FROM submissions ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, id DESC LIMIT 3000`).all()).results;
+        const rows = (await db.prepare(`SELECT id, created_at, bird, sci, credit_name, contact, region, note, taken_at, camera, width, height, status, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award, story FROM submissions ORDER BY CASE status WHEN 'pending' THEN 0 WHEN 'approved' THEN 1 ELSE 2 END, id DESC LIMIT 3000`).all()).results;
         return json(rows);
       }
       if (method === 'POST' && seg[3] === 'cutout' && id) {
@@ -572,7 +604,7 @@ async function route(request, env, url, path) {
       }
       if (method === 'PATCH' && id) {
         const b = await body(); const sets = [], vals = [];
-        for (const k of ['credit_name', 'region', 'note', 'featured', 'status']) if (k in b) { sets.push(`${k} = ?`); vals.push(b[k]); }
+        for (const k of ['credit_name', 'region', 'note', 'featured', 'status', 'caption', 'award', 'issue_id']) if (k in b) { sets.push(`${k} = ?`); vals.push(b[k]); }
         if ('bird' in b) {
           const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(String(b.bird)).first();
           if (!sp) return fail(400, 'Choose a bird from the California list.');
@@ -591,6 +623,38 @@ async function route(request, env, url, path) {
         return json({ ok: true });
       }
     }
+
+    // ----- issues: anyone can read them, the editor creates and edits them -----
+    if (r === 'issues') {
+      if (method === 'GET') return json((await db.prepare(`SELECT id, number, title, theme, blurb, opens_at, closes_at FROM issues ORDER BY number DESC`).all()).results, 200, { 'cache-control': 'public, max-age=60' });
+      need();
+      const b = await body();
+      const f = { number: Number(b.number), title: String(b.title || '').slice(0, 80), theme: String(b.theme || '').slice(0, 120), blurb: String(b.blurb || '').slice(0, 1200), opens_at: String(b.opens_at || ''), closes_at: String(b.closes_at || '') };
+      if (!f.number || !f.title || isNaN(Date.parse(f.opens_at)) || isNaN(Date.parse(f.closes_at)) || f.closes_at <= f.opens_at) return fail(400, 'An issue needs a number, a title, and a closing date after its opening date.');
+      try {
+        if (method === 'POST') await db.prepare(`INSERT INTO issues (number, title, theme, blurb, opens_at, closes_at, created_at) VALUES (?,?,?,?,?,?,?)`).bind(f.number, f.title, f.theme, f.blurb, f.opens_at, f.closes_at, new Date().toISOString()).run();
+        else if (method === 'PATCH' && seg[2]) await db.prepare(`UPDATE issues SET number = ?, title = ?, theme = ?, blurb = ?, opens_at = ?, closes_at = ? WHERE id = ?`).bind(f.number, f.title, f.theme, f.blurb, f.opens_at, f.closes_at, Number(seg[2])).run();
+      } catch (e) { return fail(400, /UNIQUE/.test(String(e.message)) ? 'There is already an issue with that number.' : e.message); }
+      return json({ ok: true });
+    }
+
+    // ----- the two-week email list: anyone can join or leave, only the editor can read it -----
+    if (r === 'subscribe' && method === 'POST') {
+      const b = await body();
+      const email = String(b.email || '').trim().toLowerCase();
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) || email.length > 160) return fail(400, 'Enter a valid email address.');
+      const ip = await hmac(env.ADMIN_PASSWORD || 'wild-index', request.headers.get('cf-connecting-ip') || 'local');
+      const recent = await db.prepare(`SELECT COUNT(*) n FROM subscribers WHERE ip = ? AND created_at > ?`).bind(ip, new Date(Date.now() - 864e5).toISOString()).first('n');
+      if (recent >= 5) return fail(429, 'Too many sign-ups from here today. Please try again tomorrow.');
+      await db.prepare(`INSERT INTO subscribers (email, region, created_at, ip) VALUES (?,?,?,?) ON CONFLICT(email) DO UPDATE SET region = excluded.region`).bind(email, String(b.region || '').slice(0, 8), new Date().toISOString(), ip).run();
+      return json({ ok: true });
+    }
+    if (r === 'unsubscribe' && method === 'POST') {
+      const b = await body();
+      await db.prepare(`DELETE FROM subscribers WHERE email = ?`).bind(String(b.email || '').trim().toLowerCase()).run();
+      return json({ ok: true }); // the same answer whether or not the address was on the list
+    }
+    if (r === 'subscribers' && method === 'GET') { need(); return json((await db.prepare(`SELECT email, region, created_at FROM subscribers ORDER BY region, email`).all()).results); }
 
     // ----- custom fields, saved views, settings, export -----
     if (r === 'fields') {
@@ -617,7 +681,7 @@ async function route(request, env, url, path) {
     if (r === 'export' && method === 'GET') {
       need();
       const out = { exported_at: new Date().toISOString(), note: 'California Bird Atlas backup. Photograph files are not included; download originals from the Gallery.' };
-      for (const t of ['families', 'species', 'observations', 'photos', 'submissions', 'photo_reports', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
+      for (const t of ['families', 'species', 'observations', 'photos', 'submissions', 'photo_reports', 'issues', 'subscribers', 'custom_fields', 'saved_views', 'sources', 'settings']) out[t] = (await db.prepare(`SELECT * FROM ${t}`).all()).results;
       return new Response(JSON.stringify(out, null, 1), { headers: { 'content-type': 'application/json', 'content-disposition': `attachment; filename="california-bird-atlas-backup-${out.exported_at.slice(0, 10)}.json"` } });
     }
     return fail(404, 'Not found');

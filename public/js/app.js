@@ -8,6 +8,8 @@
 // - To add a page: write views/<name>.js, add a line to `routes`, add its nav key to MAG (and PAPER if white),
 //   and add it to PUBLIC_NAV if it belongs in the menu.
 import { S, $, $$, api, loadAll, toast, modal, esc } from './util.js';
+import { loadIssues, currentIssue, stateLine } from './issues.js';
+let ISSUES = []; // loaded once at start for the strip above the menu
 import { openObservation, syncDrafts, draftCount } from './observe.js';
 import { regionName, pickRegion } from './wi.js';
 
@@ -21,6 +23,10 @@ const routes = [
   [/^\/wall\/?$/, () => import('./views/wall.js'), 'wall'],
   [/^\/submit\/?$/, () => import('./views/submit.js'), 'submit'],
   [/^\/add\/?$/, () => import('./views/addbirds.js'), 'add'],
+  [/^\/issues\/?$/, () => import('./views/issue.js'), 'issue'],
+  [/^\/issues\/(\d+)\/?$/, () => import('./views/issue.js'), 'issue'],
+  [/^\/board\/?$/, () => import('./views/board.js'), 'board'],
+  [/^\/unsubscribe\/?$/, () => import('./views/unsubscribe.js'), 'unsubscribe'],
   [/^\/my-wall\/?$/, () => import('./views/mywall.js'), 'mywall'],
   [/^\/review\/?$/, () => import('./views/review.js'), 'review'],
   [/^\/atlas\/?$/, () => import('./views/atlas.js'), 'atlas'],
@@ -33,13 +39,13 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
-const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review']);
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review', 'issue', 'board', 'unsubscribe']);
 let renderSeq = 0;
 
 // Every page uses the magazine shell. Photo pages are black; everything else is printed on white paper.
 const BLACK = new Set(['cover', 'wall', 'mywall']);
 // The sideways section label in the left margin, one per section.
-const MARGIN_LABEL = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs' };
+const MARGIN_LABEL = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs', issue: 'The issue', board: 'Scoreboard' };
 
 // Put a finished page on screen. The page is built off-screen first, so the old page stays whole until this
 // moment; then the menu, the page colours and the content all change together and the new page fades in.
@@ -81,7 +87,7 @@ async function render() {
   commit(view, page, '');
 }
 
-const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
+const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/issues', 'issue', 'The Issue'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
 const TOOLS_NAV = [['/review', 'review', 'Review'], ['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
 const TOOL_PATHS = [/^\/review/, /^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
 export function renderChrome() {
@@ -97,7 +103,10 @@ export function renderChrome() {
     ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     ${S.owner ? '<a href="/settings" data-link>Settings</a>' : ''}`;
   let cv = {}; try { cv = JSON.parse(S.settings?.cover || '{}'); } catch { cv = {}; }
-  $('#strip').innerHTML = `<span><b>${esc(cv.issue || 'No. 1')}</b> ${esc(cv.season || 'Winter 2026–27')}</span><span>Free to read. Made from readers' photographs.</span>`;
+  const iss = currentIssue(ISSUES);
+  $('#strip').innerHTML = iss
+    ? `<span><b>No. ${iss.number}</b> ${esc(iss.title)}</span><a href="/issues" data-link>${esc(iss.theme)}: ${esc(stateLine(iss).long.split('. ')[0])}.</a>`
+    : `<span><b>${esc(cv.issue || 'No. 1')}</b> ${esc(cv.season || 'Winter 2026–27')}</span><span>Free to read. Made from readers' photographs.</span>`;
   $('#u-region').onclick = pickRegion;
   if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;
@@ -140,7 +149,7 @@ $('#quick-entry').onclick = () => openObservation();
 
 (async () => {
   try {
-    await loadAll(); renderChrome(); await render(); if (S.owner) syncDrafts();
+    await loadAll(); loadIssues().then((x) => { ISSUES = x; renderChrome(); }).catch(() => {}); await render(); if (S.owner) syncDrafts();
     const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'wall', 'fieldwork', 'theindex', 'bird', 'about', 'submit'].forEach((v) => import(`./views/${v}.js`)); };
     (window.requestIdleCallback || setTimeout)(warm);
   }

@@ -7,17 +7,17 @@ export default async function wall(view) {
   // Until the first real birds go up, show the built-in sample birds (openly licensed Wikimedia Commons photos).
   const samples = !rows.length;
   if (samples) rows = (await fetch('/data/wall-samples.json').then((r) => r.json()).catch(() => [])).map((x, i) => ({ ...x, id: 'sample-' + i, credit_name: x.credit, cut_w: x.w, cut_h: x.h, sample: 1, static: true }));
-  let region = '', q = '';
+  let region = '', q = new URLSearchParams(location.search).get('by') || '';
   view.innerHTML = `<div class="wall-page">
     <header class="mag-wrap wall-head one-line">
       <p class="mag-kicker">Reader photos</p>
       <h1 class="ix-title">The Bird Wall</h1>
       <p class="mag-deck">Birds of California, by the people who found them. Every one was photographed in the wild, cut out and put up here. Click a bird to see who took it.</p>
       ${samples && rows.length ? '<p class="wall-sample-note">Sample birds for now: openly licensed photos from Wikimedia Commons, credited to their photographers. They step aside as soon as the first community photos go up.</p>' : ''}
-      <p class="wall-ctas">${S.owner ? '<a class="mag-btn solid" href="/add" data-link>Add birds</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}<a class="mag-btn" href="/my-wall" data-link>My Wall</a></p>
+      <p class="wall-ctas">${S.owner ? '<a class="mag-btn solid" href="/add" data-link>Add birds</a>' : '<a class="mag-btn solid" href="/submit" data-link>Send a photo</a>'}<a class="mag-btn" href="/my-wall" data-link>My Wall</a><a class="mag-btn" href="/board" data-link>Scoreboard</a></p>
     </header>
     ${rows.length ? `<div class="ix-bar"><div class="mag-wrap ix-row1">
-      <label class="ix-search"><span class="vh">Search</span><input id="wq" type="search" placeholder="Search by bird or photographer"></label>
+      <label class="ix-search"><span class="vh">Search</span><input id="wq" type="search" placeholder="Search by bird or photographer" value="${esc(q)}"></label>
       <div class="seg small" role="group" aria-label="Region"><button type="button" data-r="" aria-pressed="true">All regions</button>${Object.entries(REGION_NAMES).map(([k, n]) => `<button type="button" data-r="${k}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>
     </div></div>` : ''}
     <div class="mag-wrap">
@@ -54,7 +54,7 @@ export function openBird(r, d) {
     <div class="wm-grid">
       <div class="wm-art"><img id="wm-img" src="${r.static ? r.src : `/media/sub/${r.id}/cutout`}" alt="${esc(r.bird)}"></div>
       <div class="wm-info">
-        <p class="mag-kicker">On the wall</p>
+        <p class="mag-kicker">${r.award ? esc(r.award) : 'On the wall'}</p>
         <h2>${esc(r.bird)}</h2>
         <p class="mag-sci" style="margin:0 0 20px">${esc(r.sci || '')}</p>
         <dl>
@@ -64,7 +64,8 @@ export function openBird(r, d) {
           ${r.taken_at ? `<dt>Taken</dt><dd>${esc(fmtDate(r.taken_at))}</dd>` : ''}
           ${r.camera ? `<dt>Camera</dt><dd>${esc(r.camera)}</dd>` : ''}
         </dl>
-        <p class="wm-links">${r.static ? `<a class="linkish" href="${esc(r.source_url)}" target="_blank" rel="noopener">See the full photo</a>` : '<button type="button" class="linkish" id="wm-full">See the full photo</button>'}${b ? ` · <a class="linkish" href="${birdLink(b)}" data-link>About this bird</a>` : ''}</p>
+        ${r.caption ? `<p class="wm-story"><b>Behind the shot.</b> ${esc(r.caption)}</p>` : ''}
+        <p class="wm-links">${r.static ? '' : `<a class="linkish" href="/wall?by=${encodeURIComponent(r.credit_name)}" data-link>More by ${esc(r.credit_name)}</a> · `}${r.static ? `<a class="linkish" href="${esc(r.source_url)}" target="_blank" rel="noopener">See the full photo</a>` : '<button type="button" class="linkish" id="wm-full">See the full photo</button>'}${b ? ` · <a class="linkish" href="${birdLink(b)}" data-link>About this bird</a>` : ''}</p>
         ${r.sample ? `<p class="wm-note">Sample photo from <a class="linkish" href="${esc(r.source_url)}" target="_blank" rel="noopener">Wikimedia Commons</a>, cut out by California Bird Atlas. Shown under its licence until community photos fill the wall.</p>` : `<p class="wm-note">© ${esc(r.credit_name)}. Shown with permission. Please don't reuse without asking.</p>`}
       </div>
     </div></div>`;

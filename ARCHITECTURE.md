@@ -63,6 +63,24 @@ Every bird on the wall is a row in `submissions`, whatever its source:
 
 A bird shows on the wall when it is `approved` and has a cut-out. Each has three image files: `thumb`, `display` (2,560 px at most) and `cutout`. While the table has no approved birds, the wall shows the static samples in `wall-samples.json` instead.
 
+## Issues, stories and awards
+
+- An **issue** (`issues` table) is a season's edition: number, title, theme, a call for photos, and a submission window. `public/js/issues.js` works out whether it is open, upcoming or closed.
+- Every new photo is tagged with the issue whose window is open, or the next one to open (`issueFor` in the worker).
+- The submission form asks four **Behind the Shot** questions. The answers are kept in `submissions.story` and joined into a first-draft `caption`, which the editor can rewrite in Review. Readers only ever see `caption`.
+- An **award** is a line of text on a submission (for example "Best behavior"), set in Review. Award winners lead the issue's page.
+- `/issues` shows the current issue; `/issues/<number>` shows any issue.
+
+## The two-week email
+
+- Readers join with an email address and a region (`subscribers` table; only the editor can read it). `/unsubscribe` deletes an address.
+- `public/js/email.js` writes the email for a region from the current assignment. Review shows it with the region's addresses, ready to copy into an email app and send by BCC.
+- **Nothing is sent automatically.** That needs a mail service (such as Resend), a domain the site owns, and a scheduled trigger on the Worker. The generator is already separate from the page, so adding sending later is a small step.
+
+## Scoreboard and missing birds
+
+`/board` counts everything from the public wall list: species per region, and which scoring birds have no photo yet. Sample birds and non-scoring birds are ignored. No accounts are involved.
+
 ## Privacy rules built into the code
 
 - The region is chosen by the reader and kept in their browser. Nothing about location is collected.

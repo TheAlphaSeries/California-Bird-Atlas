@@ -5,19 +5,34 @@ import { birdOptions } from './submit.js';
 import { fillSamples, clearSamples, SAMPLES } from '../samples.js';
 import { pickReference } from '../refpick.js';
 import { loadAll } from '../util.js';
+import { loadIssues, currentIssue, stateLine } from '../issues.js';
+import { nineBirdsEmail } from '../email.js';
+
+const AWARDS = ['Best Level 3 find', 'Best behavior', 'Bird in its habitat', 'Best portrait', 'Young photographer', 'Phone or digiscope', "Editor's pick"];
+let ISS = [];
 
 // Owner only: review submitted photos, cut the bird out and publish it to the Bird Wall.
 let tab = 'pending';
 
 export default async function review(view) {
   if (!S.owner) { view.innerHTML = '<div class="mag-wrap mag-page"><h1 class="mag-h">Review</h1><p class="mag-deck">Sign in with Editor login to review submissions.</p></div>'; return; }
-  const [rows, d, reports] = await Promise.all([api('/submissions'), wi(), api('/reports')]);
+  const [rows, d, reports, issues, subs] = await Promise.all([api('/submissions'), wi(), api('/reports'), loadIssues(), api('/subscribers')]);
+  ISS = issues;
+  const cur = currentIssue(issues);
   warmClipper();
   const count = (s) => (s === 'reports' ? new Set(reports.map((r) => r.species_id)).size : rows.filter((r) => r.status === s).length);
   const withRef = S.species.filter((x) => x.ref_url).length;
   view.innerHTML = `<div class="mag-wrap mag-page">
     <p class="mag-kicker">Editor</p><h1 class="mag-h">Review submissions</h1>
     <p class="mag-deck">Open a photo, check the bird and the credit, cut the bird out, then publish it to the Bird Wall.</p>
+    <div class="rv-samples">
+      <div><b>Issues</b><span>${cur ? `No. ${cur.number}, ${esc(cur.title)}: "${esc(cur.theme)}". ${esc(stateLine(cur).long)} ${rows.filter((r) => r.issue_id === cur.id).length} photo(s) sent for it.` : 'No issue yet.'}</span></div>
+      <div class="rv-sbtn">${cur ? `<button type="button" class="mag-btn" id="is-edit">Edit this issue</button>` : ''}<button type="button" class="mag-btn solid" id="is-new">New issue</button></div>
+    </div>
+    <div class="rv-samples">
+      <div><b>Two-week email</b><span>${subs.length} subscriber${subs.length === 1 ? '' : 's'}. The email for each region writes itself from the current assignment; copy it into your email app and send it with that region's subscribers in BCC.</span></div>
+      <div class="rv-sbtn"><button type="button" class="mag-btn solid" id="em-open">Write this fortnight's email</button></div>
+    </div>
     <div class="rv-samples">
       <div><b>Sample birds</b><span id="smp-s">${rows.some((r) => r.sample) ? `${rows.filter((r) => r.sample).length} sample birds are on the wall. They're openly licensed photos from Wikimedia Commons, credited to their photographers. Remove them when your own photos are up.` : `The wall is empty until photos arrive. Fill it with ${SAMPLES.length} openly licensed photos of California birds from Wikimedia Commons, cut out automatically and credited to their photographers.`}</span></div>
       <div class="rv-sbtn"><button type="button" class="mag-btn solid" id="smp-add">${rows.some((r) => r.sample) ? 'Add any missing' : 'Fill with sample birds'}</button>${rows.some((r) => r.sample) ? '<button type="button" class="mag-btn" id="smp-del">Remove sample birds</button>' : ''}</div>
@@ -56,6 +71,9 @@ export default async function review(view) {
       window.dispatchEvent(new Event('route'));
     } catch (err) { toast(err.message, true); b.disabled = false; }
   };
+  $('#is-new', view).onclick = () => editIssue({ number: (issues[0]?.number || 0) + 1, title: '', theme: '', blurb: '', opens_at: '', closes_at: '' });
+  const ie = $('#is-edit', view); if (ie) ie.onclick = () => editIssue(cur);
+  $('#em-open', view).onclick = () => openEmail(d, cur, subs);
   let stop = false;
   const run = $('#ref-run', view);
   if (run) run.onclick = async () => {
@@ -94,6 +112,9 @@ function openSub(r, d) {
         <label class="f"><span>Bird</span><input name="bird" list="bird-names" value="${esc(r.bird)}">${birdOptions(d)}</label>
         <label class="f"><span>Credit</span><input name="credit_name" value="${esc(r.credit_name)}"></label>
         <label class="f"><span>Region</span><select name="region">${Object.entries(REGION_NAMES).map(([k, n]) => `<option value="${k}" ${k === r.region ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+        <label class="f"><span>Behind the shot (the caption readers see)</span><textarea name="caption" rows="5" maxlength="2000">${esc(r.caption || '')}</textarea></label>
+        <label class="f"><span>Issue</span><select name="issue_id"><option value="">None</option>${ISS.map((i) => `<option value="${i.id}" ${i.id === r.issue_id ? 'selected' : ''}>No. ${i.number}: ${esc(i.theme || i.title)}</option>`).join('')}</select></label>
+        <label class="f"><span>Award (optional)</span><input name="award" list="award-names" value="${esc(r.award || '')}" placeholder="None"><datalist id="award-names">${AWARDS.map((a) => `<option value="${esc(a)}"></option>`).join('')}</datalist></label>
         <label class="f checks"><span>Featured</span><label><input type="checkbox" name="featured" ${r.featured ? 'checked' : ''}> Show larger, at the top of the wall</label></label>
       </form>
       <dl>${r.contact ? `<dt>Email (private)</dt><dd><a href="mailto:${esc(r.contact)}">${esc(r.contact)}</a></dd>` : ''}
@@ -112,7 +133,7 @@ function openSub(r, d) {
   const close = () => el.remove();
   const refresh = () => { close(); window.dispatchEvent(new Event('route')); };
   q('.x').onclick = close;
-  const fields = () => { const v = Object.fromEntries(new FormData(q('#rf'))); return { bird: v.bird, credit_name: v.credit_name, region: v.region, featured: v.featured ? 1 : 0 }; };
+  const fields = () => { const v = Object.fromEntries(new FormData(q('#rf'))); return { bird: v.bird, credit_name: v.credit_name, region: v.region, featured: v.featured ? 1 : 0, caption: v.caption || '', award: (v.award || '').trim(), issue_id: v.issue_id ? +v.issue_id : null }; };
   const patch = async (extra = {}) => api(`/submissions/${r.id}`, { method: 'PATCH', body: { ...fields(), ...extra } });
   q('#r-cut').onclick = async () => {
     el.style.display = 'none';
@@ -138,4 +159,59 @@ function openSub(r, d) {
     if (!confirm('Delete this submission and its photos for good?')) return;
     try { await api(`/submissions/${r.id}`, { method: 'DELETE' }); toast('Deleted.'); refresh(); } catch (err) { toast(err.message, true); }
   };
+}
+
+// Create or edit an issue. Dates are entered as California calendar days and stored as UTC instants.
+function editIssue(it) {
+  const day = (iso, back = 0) => (iso ? new Date(Date.parse(iso) - back).toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' }) : '');
+  const el = document.createElement('div'); el.className = 'modal mag-modal';
+  el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Issue"><button class="x" type="button">Close</button>
+    <p class="mag-kicker">${it.id ? 'Edit issue' : 'New issue'}</p><h2>Issue No. ${it.number}</h2>
+    <form id="if">
+      <div class="add-defaults"><label class="f"><span>Number</span><input name="number" type="number" min="1" required value="${it.number}"></label>
+        <label class="f"><span>Title (the season)</span><input name="title" required placeholder="Spring 2027" value="${esc(it.title)}"></label></div>
+      <label class="f"><span>Theme</span><input name="theme" placeholder="Courtship" value="${esc(it.theme)}"></label>
+      <label class="f"><span>The call for photos (a few sentences)</span><textarea name="blurb" rows="4" maxlength="1200">${esc(it.blurb)}</textarea></label>
+      <div class="add-defaults"><label class="f"><span>Opens (first day)</span><input name="opens" type="date" required value="${day(it.opens_at)}"></label>
+        <label class="f"><span>Closes (last day)</span><input name="closes" type="date" required value="${day(it.closes_at, 1)}"></label></div>
+      <div class="wm-actions"><button type="submit" class="mag-btn solid">Save issue</button></div>
+    </form></div>`;
+  document.body.appendChild(el);
+  el.querySelector('.x').onclick = () => el.remove();
+  el.querySelector('#if').onsubmit = async (e) => {
+    e.preventDefault();
+    const v = Object.fromEntries(new FormData(e.target));
+    // Midnight in California is 08:00 UTC in winter; an hour's difference in summer does not matter for a window of months.
+    const at = (d, plus = 0) => new Date(Date.parse(d + 'T08:00:00Z') + plus * 864e5).toISOString();
+    const body = { number: +v.number, title: v.title, theme: v.theme, blurb: v.blurb, opens_at: at(v.opens), closes_at: at(v.closes, 1) };
+    try { await api(it.id ? `/issues/${it.id}` : '/issues', { method: it.id ? 'PATCH' : 'POST', body }); toast('Issue saved.'); el.remove(); window.dispatchEvent(new Event('route')); }
+    catch (err) { toast(err.message, true); }
+  };
+}
+
+// The two-week email, one region at a time, ready to copy.
+function openEmail(d, issue, subs) {
+  const el = document.createElement('div'); el.className = 'modal mag-modal wall-modal';
+  el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Two-week email"><button class="x" type="button">Close</button>
+    <p class="mag-kicker">Two-week email</p><h2>Your nine new birds</h2>
+    <div class="seg" role="group" aria-label="Region">${d.regions.map((r, i) => `<button type="button" data-r="${r}" aria-pressed="${i === 0}">${esc(REGION_NAMES[r])} (${subs.filter((s) => s.region === r).length})</button>`).join('')}</div>
+    <div class="em-grid"><div><label class="f"><span>Subject</span><input id="em-sub" readonly></label>
+        <label class="f"><span>Send to (paste into BCC)</span><textarea id="em-to" rows="3" readonly></textarea></label>
+        <div class="wm-actions"><button type="button" class="mag-btn solid" data-copy="html">Copy formatted email</button><button type="button" class="mag-btn" data-copy="text">Copy as plain text</button><button type="button" class="mag-btn" data-copy="to">Copy addresses</button></div>
+        <p class="wm-note">Paste the formatted email into a new message in Gmail or Apple Mail. Put the addresses in BCC so subscribers never see each other.</p></div>
+      <div class="em-prev" id="em-prev"></div></div></div>`;
+  document.body.appendChild(el);
+  const q = (s) => el.querySelector(s);
+  q('.x').onclick = () => el.remove();
+  let mail = null, to = '';
+  const show = (r) => { mail = nineBirdsEmail(d, r, issue); to = subs.filter((s) => s.region === r).map((s) => s.email).join(', '); q('#em-sub').value = mail.subject; q('#em-to').value = to || 'No subscribers in this region yet.'; q('#em-prev').innerHTML = mail.html; };
+  el.querySelectorAll('[data-r]').forEach((b) => (b.onclick = () => { el.querySelectorAll('[data-r]').forEach((x) => x.setAttribute('aria-pressed', x === b)); show(b.dataset.r); }));
+  el.querySelectorAll('[data-copy]').forEach((b) => (b.onclick = async () => {
+    try {
+      if (b.dataset.copy === 'html' && window.ClipboardItem) await navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([mail.html], { type: 'text/html' }), 'text/plain': new Blob([mail.text], { type: 'text/plain' }) })]);
+      else await navigator.clipboard.writeText(b.dataset.copy === 'to' ? to : mail.text);
+      toast('Copied.');
+    } catch { toast('Could not copy. Select the text and copy it by hand.', true); }
+  }));
+  show(d.regions[0]);
 }
