@@ -140,8 +140,8 @@ export default async function submit(view) {
         fd.set('display', dv.display, 'display.jpg'); fd.set('thumb', dv.thumb, 'thumb.jpg');
         if (it.cut) fd.set('cutout', it.cut.blob, 'cutout.png');
         const res = await api('/submissions', { method: 'POST', form: fd });
-        if (res?.key) { const list = sentLinks(); list.push({ s: `${res.id}.${res.key}`, bird: it.b.n, at: new Date().toISOString() }); try { localStorage.setItem(SENT_KEY, JSON.stringify(list.slice(-60))); } catch { /* storage off */ } it.statusPair = `${res.id}.${res.key}`; }
-        if (v.keep && !pre?.blobKey) await addToMyWall({ bird: it.b.n, sci: it.b.sci, photo: dv.display, taken_at: ex.taken_at || null }).catch(() => {});
+        if (res?.key) { const list = sentLinks(); list.push({ s: `${res.id}.${res.key}`, bird: it.b.n, at: new Date().toISOString(), region: v.region || '', taken_at: ex.taken_at || null }); try { localStorage.setItem(SENT_KEY, JSON.stringify(list.slice(-60))); } catch { /* storage off */ } it.statusPair = `${res.id}.${res.key}`; }
+        if (v.keep && !pre?.blobKey) await addToMyWall({ bird: it.b.n, sci: it.b.sci, photo: dv.display, taken_at: ex.taken_at || null, region: v.region || '' }).catch(() => {});
         it.state = 'sent'; sent++; names.push(it.b.n); stEl.textContent = 'Sent'; it.el.classList.add('done');
       } catch (err) { stEl.textContent = err.message; toast(err.message, true); break; }
     }

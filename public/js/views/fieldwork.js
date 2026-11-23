@@ -6,6 +6,7 @@ import { subscribeForm, bindSubscribe, loadIssues, currentIssue, stateLine } fro
 import { loadMap, mapSvg } from '../regionmap.js';
 import { setRegion } from '../wi.js';
 import { calendarFile } from '../calendar.js';
+import { lightFor, clock } from '../sun.js';
 
 const DAY = 864e5;
 const fmt = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -52,7 +53,12 @@ export default async function fieldwork(view, seasonArg) {
           <p class="fw-tools"><a class="mag-btn" href="/field-card?r=${region}&s=${season}&a=${shownIdx}" data-link>Print a field card</a>${occ.live ? '<button type="button" class="mag-btn" id="cal">Add the next dates to my calendar</button>' : ''}</p>
         </div>
         <div class="fw-side"><div class="fw-map" id="fw-map" aria-label="Choose a region to see its nine birds"></div>
-        ${occ.live ? `<p class="fw-count"><b>${daysLeft}</b><span>day${daysLeft === 1 ? '' : 's'} until<br>${nextLabel.toLowerCase()}</span></p>` : ''}</div>
+        ${occ.live ? `<p class="fw-count"><b>${daysLeft}</b><span>day${daysLeft === 1 ? '' : 's'} until<br>${nextLabel.toLowerCase()}</span></p>` : ''}
+        ${(() => { const L = lightFor(region); return `<section class="fw-light" aria-labelledby="fw-light-h">
+          <p class="fw-light-h" id="fw-light-h">${L.tomorrow ? 'Light tomorrow' : 'Light today'}</p>
+          <dl><dt>Sunrise</dt><dd>${clock(L.rise)}</dd><dt>Golden hour</dt><dd>${clock(L.amStart)} – ${clock(L.amEnd)}</dd>
+          <dt>Golden hour</dt><dd>${clock(L.pmStart)} – ${clock(L.pmEnd)}</dd><dt>Sunset</dt><dd>${clock(L.set)}</dd></dl>
+          <p class="fw-light-note">Times for ${esc(L.place)}. Elsewhere in the region they're within a few minutes.</p></section>`; })()}</div>
       </header>
       <div class="fw-ctl">
         <span class="fw-lbl" id="fw-s">Season</span>
@@ -60,6 +66,7 @@ export default async function fieldwork(view, seasonArg) {
         <span class="fw-lbl" id="fw-a">Assignment</span>
         <div class="seg" role="group" aria-labelledby="fw-a">${cards.slice(0, occ.window + 1).map((_, i) => `<button type="button" data-c="${i}" aria-pressed="${i === shownIdx}">${i + 1}<small>${range(windowSpan(season, occ.year, i))}</small></button>`).join('')}${occ.live && occ.window < WINDOWS - 1 ? `<span class="fw-more">${WINDOWS - 1 - occ.window} more to come</span>` : ''}</div>
       </div>
+      <h2 class="vh">The nine birds, by level</h2>
       <div class="fw-levels">${[1, 2, 3].map((L) => `<section class="fw-level" aria-label="Level ${L}">
         <div class="fw-lv"><span class="lvn">${L}</span><h3>${['Easy to find', 'Takes a trip', 'Hard to find'][L - 1]}</h3><p class="pts">${sc.base.assign[L - 1]} points each</p><p class="bl">${BLURB[L]}</p></div>
         <div class="fw-birds">${card[String(L)].map((id) => tile(d.byId.get(id))).join('') || '<p class="bl">To be announced.</p>'}</div>

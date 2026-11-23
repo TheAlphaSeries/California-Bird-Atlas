@@ -1,5 +1,7 @@
 import { $, $$, esc, toast, go, download, fmtDate } from '../util.js';
-import { wi, birdLink } from '../wi.js';
+import { wi, birdLink, REGIONS, REGION_NAMES, myRegion } from '../wi.js';
+import { stampsSection } from '../stamps.js';
+import { loadMap } from '../regionmap.js';
 import { openClipper, warmClipper } from '../clip.js';
 
 // My Wall: a private bird wall kept only in this browser (IndexedDB). Nothing here is uploaded.
@@ -29,6 +31,7 @@ export default async function myWall(view) {
   let rows = [];
   try { rows = (await allMyBirds()).sort((a, b) => b.created.localeCompare(a.created)); }
   catch (e) { view.innerHTML = `<div class="mag-wrap mag-page"><h1 class="mag-h">My Wall</h1><p class="mag-deck">${esc(e.message)} My Wall needs the browser to allow site storage (private browsing often blocks it).</p></div>`; return; }
+  const g = await loadMap().catch(() => null);
   const urls = [];
   const url = (blob) => { const u = URL.createObjectURL(blob); urls.push(u); return u; };
   view.innerHTML = `<div class="wall-page">
@@ -39,6 +42,7 @@ export default async function myWall(view) {
       <p class="wall-ctas"><label class="mag-btn solid" for="mw-file">Add a bird</label><input type="file" id="mw-file" accept="image/jpeg,image/png,image/webp" class="vh"><a class="mag-btn" href="/wall" data-link>The public Bird Wall</a></p>
       <p class="sub-privacy">Clearing your browser's site data deletes My Wall. Download the birds you want to keep.</p>
     </header>
+    ${g ? `<div class="mag-wrap">${stampsSection(g, rows)}</div>` : ''}
     <div class="mag-wrap"><p class="ix-count">${rows.length} bird${rows.length === 1 ? '' : 's'}, ${new Set(rows.map((r) => r.bird)).size} species</p>
       <div class="wall" id="mwl">${rows.map((r, i) => `<button type="button" class="wb" data-i="${i}" aria-label="${esc(r.bird)}">
         <img src="${url(r.cutout || r.photo)}" alt="" class="${r.cutout ? '' : 'uncut'}">
@@ -53,7 +57,7 @@ export default async function myWall(view) {
     if (!name) return;
     const cut = await openClipper(f, { title: `Cut out your ${name.n}` });
     try {
-      await addToMyWall({ bird: name.n, sci: name.sci, photo: f, cutout: cut?.blob || null, w: cut?.width, h: cut?.height });
+      await addToMyWall({ bird: name.n, sci: name.sci, region: name.region, photo: f, cutout: cut?.blob || null, w: cut?.width, h: cut?.height });
       toast(`${name.n} added to My Wall.`); window.dispatchEvent(new Event('route'));
     } catch (err) { toast(err.message, true); }
   };
@@ -68,6 +72,7 @@ function askBird(d) {
       <p class="mag-kicker">My Wall</p><h2>Which bird is it?</h2>
       <form><label class="f"><span>Bird</span><input name="bird" list="mw-names" autocomplete="off" required placeholder="Start typing, e.g. Western Bluebird">
       <datalist id="mw-names">${d.birds.map((b) => `<option value="${esc(b.n)}"></option>`).join('')}</datalist></label>
+      <label class="f"><span>Region where you took it</span><select name="region">${REGIONS.map((r) => `<option value="${r}"${r === myRegion(d) ? ' selected' : ''}>${esc(REGION_NAMES[r])}</option>`).join('')}</select></label>
       <p style="margin-top:18px"><button class="mag-btn solid" type="submit">Next: cut it out</button></p></form></div>`;
     document.body.appendChild(el);
     const done = (v) => { el.remove(); resolve(v); };
@@ -78,7 +83,7 @@ function askBird(d) {
       const v = input.value.trim().toLowerCase();
       const b = d.birds.find((x) => x.n.toLowerCase() === v);
       if (!b) { toast('Pick the bird from the list.', true); return; }
-      done(b);
+      done({ ...b, region: el.querySelector('select[name=region]').value });
     };
   });
 }

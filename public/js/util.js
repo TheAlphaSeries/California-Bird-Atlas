@@ -66,14 +66,23 @@ export function plate(sp, { status = true, tag = '' } = {}) {
 
 export function go(path) { history.pushState({}, '', path); window.dispatchEvent(new Event('route')); }
 
+// Keep Tab and Shift+Tab inside a dialog (Apple and Google both ask that focus stay in a modal until it closes).
+export function trapFocus(el, e) {
+  if (e.key !== 'Tab') return;
+  const f = [...el.querySelectorAll('button, a[href], input, select, textarea, [tabindex="0"]')].filter((n) => !n.disabled && n.offsetParent !== null);
+  if (!f.length) return;
+  if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+  else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+}
 export function modal(html, { wide = false } = {}) {
+  const back = document.activeElement;
   const root = $('#modal-root');
   const el = document.createElement('div');
   el.className = 'modal';
   el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" ${wide ? 'style="width:min(900px,100%)"' : ''}><button class="x" type="button">Close</button>${html}</div>`;
   root.appendChild(el);
-  const close = () => { el.remove(); document.removeEventListener('keydown', onKey); };
-  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  const close = () => { el.remove(); document.removeEventListener('keydown', onKey); back?.focus?.(); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); else trapFocus(el, e); };
   document.addEventListener('keydown', onKey);
   $('.x', el).onclick = close;
   el.addEventListener('mousedown', (e) => { if (e.target === el) close(); });

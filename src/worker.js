@@ -18,6 +18,8 @@
 //                    (drafted from the sender's answers in `story`, edited in Review); award = e.g. 'Best Level 3 find'
 //   issues         one per season: number, title, theme, blurb and the submission window (opens_at, closes_at, UTC).
 //   subscribers    email + chosen region for the two-week email. Private: only the editor can read them.
+//   hearts         readers' hearts on wall photos: one row per photo per device (voter = a keyed hash of a random
+//                  id the browser keeps; ip = a keyed hash, used only to slow down floods). Counts drive Readers' Choice.
 //   photo_reports  readers' "wrong reference photo" reports, open until the editor keeps or replaces the photo.
 //   blobs          image files, in chunks, until R2 is switched on (see putBlob). Keys:
 //                    photos/<photo id>/thumb|display|original      subs/<submission id>/thumb|display|cutout
@@ -36,12 +38,12 @@
 //   session, login, logout     editor sign-in
 //   bootstrap                  everything the pages need at start: species, families, settings
 //   species, reference, reports, observations, photos
-//   wall (GET public list, POST editor adds a bird), samples, submissions (POST public; the rest editor only), status (a sender's own photos)
+//   wall (GET public list, POST editor adds a bird), hearts (POST toggles a reader's heart), samples, submissions (POST public; the rest editor only), status (a sender's own photos)
 //   issues (GET public; POST/PATCH editor), subscribe, unsubscribe, subscribers (editor)
 //   fields, views, settings, export
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '5';
+const SCHEMA_VERSION = '6';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -77,6 +79,8 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS issues (id INTEGER PRIMARY KEY AUTOINCREMENT, number INTEGER UNIQUE NOT NULL, title TEXT NOT NULL, theme TEXT DEFAULT '', blurb TEXT DEFAULT '',
      opens_at TEXT NOT NULL, closes_at TEXT NOT NULL, created_at TEXT)`,
   `CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE NOT NULL, region TEXT DEFAULT '', created_at TEXT, ip TEXT)`,
+  `CREATE TABLE IF NOT EXISTS hearts (sub_id INTEGER NOT NULL, voter TEXT NOT NULL, ip TEXT, created_at TEXT, PRIMARY KEY (sub_id, voter))`,
+  `CREATE INDEX IF NOT EXISTS hearts_ip ON hearts(ip, created_at)`,
   `CREATE TABLE IF NOT EXISTS photo_reports (id INTEGER PRIMARY KEY AUTOINCREMENT, created_at TEXT, species_id INTEGER NOT NULL, ref_url TEXT, reason TEXT, note TEXT DEFAULT '', ip TEXT, status TEXT DEFAULT 'open')`,
   `CREATE INDEX IF NOT EXISTS rep_status ON photo_reports(status, species_id)`,
   `CREATE INDEX IF NOT EXISTS obs_species ON observations(species_id)`,
@@ -578,8 +582,26 @@ async function route(request, env, url, path) {
       return json({ id: sid });
     }
     if (r === 'wall' && method === 'GET') {
-      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
+      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award, (SELECT COUNT(*) FROM hearts h WHERE h.sub_id = submissions.id) hearts FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
       return json(rows, 200, { 'cache-control': 'public, max-age=60' });
+    }
+    // A reader's heart on a wall photo: POST toggles it. One per photo per device; at most 300 a day from one connection.
+    if (r === 'hearts' && method === 'POST') {
+      const id = Number(seg[2]), b = await body();
+      const device = String(b.device || '');
+      if (!/^[A-Za-z0-9-]{8,64}$/.test(device)) return fail(400, 'Missing device id.');
+      const sub = await db.prepare(`SELECT id FROM submissions WHERE id = ? AND status = 'approved'`).bind(id).first();
+      if (!sub) return fail(404, 'Not found');
+      const key = env.ADMIN_PASSWORD || 'wild-index';
+      const voter = await hmac(key, 'heart|' + device), ip = await hmac(key, request.headers.get('cf-connecting-ip') || 'local');
+      const had = await db.prepare(`SELECT 1 FROM hearts WHERE sub_id = ? AND voter = ?`).bind(id, voter).first();
+      if (had) await db.prepare(`DELETE FROM hearts WHERE sub_id = ? AND voter = ?`).bind(id, voter).run();
+      else {
+        const recent = await db.prepare(`SELECT COUNT(*) n FROM hearts WHERE ip = ? AND created_at > ?`).bind(ip, new Date(Date.now() - 864e5).toISOString()).first('n');
+        if (recent >= 300) return fail(429, 'That is a lot of hearts for one day. Try again tomorrow.');
+        await db.prepare(`INSERT INTO hearts (sub_id, voter, ip, created_at) VALUES (?,?,?,?)`).bind(id, voter, ip, new Date().toISOString()).run();
+      }
+      return json({ on: !had, hearts: await db.prepare(`SELECT COUNT(*) n FROM hearts WHERE sub_id = ?`).bind(id).first('n') });
     }
     // Sample birds: openly licensed photos the editor's browser fetched and cut out, shown until real photos arrive.
     if (r === 'samples') {
@@ -588,7 +610,7 @@ async function route(request, env, url, path) {
       if (method === 'DELETE') {
         const rows = (await db.prepare(`SELECT id, store FROM submissions WHERE sample = 1`).all()).results;
         for (const x of rows) await deleteSubBlobs(env, x.id, x.store);
-        await db.prepare(`DELETE FROM submissions WHERE sample = 1`).run();
+        await db.batch([db.prepare(`DELETE FROM hearts WHERE sub_id IN (SELECT id FROM submissions WHERE sample = 1)`), db.prepare(`DELETE FROM submissions WHERE sample = 1`)]);
         return json({ removed: rows.length });
       }
       if (method === 'POST') {
@@ -689,7 +711,7 @@ async function route(request, env, url, path) {
         const sub = await db.prepare(`SELECT store FROM submissions WHERE id = ?`).bind(id).first();
         if (!sub) return fail(404, 'Not found');
         await deleteSubBlobs(env, id, sub.store);
-        await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(id).run();
+        await db.batch([db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(id), db.prepare(`DELETE FROM hearts WHERE sub_id = ?`).bind(id)]);
         return json({ ok: true });
       }
     }

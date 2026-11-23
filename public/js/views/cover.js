@@ -1,6 +1,27 @@
 import { S, $, api, esc, modal, toast } from '../util.js';
 import { wi, BUILT_IN, REGION_NAMES, REGIONS, hasRegion, myRegion, setRegion, pickRegion, currentSeason } from '../wi.js';
 import { seasonCards, latestOccurrence } from '../rotation.js';
+import { heartButton, bindHearts } from '../hearts.js';
+import { openFull } from '../viewer.js';
+
+// Photo of the week: changes every Monday (California time) by itself. It picks from photos put up in the last
+// four weeks that came with a story, falling back to any photo with a story, then any photo; the most-hearted
+// come first, and the week number steps through them so the same photo doesn't sit there for months.
+function weekOf(now = new Date()) {
+  const ca = new Date(now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }));
+  const day = Math.floor(Date.UTC(ca.getFullYear(), ca.getMonth(), ca.getDate()) / 864e5);
+  const monday = day - ((new Date(day * 864e5).getUTCDay() + 6) % 7);
+  return { n: Math.floor(monday / 7), start: new Date(monday * 864e5), end: new Date((monday + 6) * 864e5) };
+}
+export function photoOfTheWeek(rows, now = new Date()) {
+  const w = weekOf(now), real = rows.filter((r) => !r.static);
+  const recent = real.filter((r) => r.caption && r.approved_at && now - Date.parse(r.approved_at) < 28 * 864e5);
+  const pool = (recent.length ? recent : real.filter((r) => r.caption).length ? real.filter((r) => r.caption) : rows)
+    .slice().sort((a, b) => (b.hearts || 0) - (a.hearts || 0) || String(a.id).localeCompare(String(b.id)));
+  if (!pool.length) return null;
+  const top = pool.slice(0, Math.max(1, Math.min(pool.length, 5)));
+  return { r: top[w.n % top.length], week: w };
+}
 
 export const DEFAULT_COVER = {
   line1: 'The Marshes at Dawn', line2: "California's Great Herons", line3: 'A Coastal Sanctuary',
@@ -28,6 +49,7 @@ export default async function cover(view) {
   // Slides: this edition's cover first, then featured birds from the Bird Wall.
   let wallRows = await api('/wall').catch(() => []);
   if (!wallRows.length) wallRows = (await fetch('/data/wall-samples.json').then((r) => r.json()).catch(() => [])).map((x) => ({ ...x, credit_name: x.credit, static: true }));
+  const potw = photoOfTheWeek(wallRows);
   const picks = [...wallRows.filter((r) => r.featured), ...wallRows.filter((r) => !r.featured)].slice(0, 5);
   const slides = [{ edition: true }, ...picks.map((r) => ({
     bird: r.bird, src: r.static ? r.src : `/media/sub/${r.id}/cutout`, region: REGION_NAMES[r.region] || '',
@@ -61,6 +83,16 @@ export default async function cover(view) {
     <p class="cv2-sticker" aria-hidden="true"><b>9</b>new birds<br>every 2 weeks</p>
     ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
   </article>
+  ${potw ? (() => { const r = potw.r, fmt = (x) => x.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    return `<section class="potw" aria-labelledby="potw-h">
+    <button type="button" class="potw-art" id="potw-full" aria-label="${esc(r.bird)}: see it full screen"><img loading="lazy" src="${r.static ? esc(r.src) : `/media/sub/${r.id}/display`}" alt=""></button>
+    <div class="potw-text">
+      <p class="mag-kicker">Photo of the week, ${fmt(potw.week.start)} – ${fmt(potw.week.end)}</p>
+      <h2 id="potw-h">${esc(r.bird)}</h2>
+      ${r.caption ? `<p class="potw-story">${esc(r.caption)}</p>` : `<p class="potw-story">${r.static ? 'A sample bird from Wikimedia Commons, standing in until readers send their own. Next week this spot goes to a reader’s photo and the story behind it.' : 'Photographed by a reader and put up on the Bird Wall.'}</p>`}
+      <p class="potw-by">Photo ● ${esc(r.credit_name)}${r.region ? `, ${esc(REGION_NAMES[r.region] || '')}` : ''}${r.license ? `, ${esc(r.license)}` : ''}</p>
+      <p class="potw-acts">${heartButton(r)}<a class="mag-btn" href="/wall" data-link>See the Bird Wall</a></p>
+    </div></section>`; })() : ''}
   <a class="cv2-band" href="/this-season" data-link>
     <span class="lead">Assigned now in the ${esc(d.region_names[region])}</span>
     <span class="names">${nine.map((n) => `<span>${esc(n)}</span>`).join('')}</span>
@@ -83,6 +115,7 @@ export default async function cover(view) {
   </section>`;
   view.querySelectorAll('.how-regions [data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); window.dispatchEvent(new Event('route')); }));
   $('#how-which', view).onclick = pickRegion;
+  if (potw) { $('#potw-full', view).onclick = () => openFull(potw.r.static ? potw.r.src : `/media/sub/${potw.r.id}/display`, potw.r.bird); bindHearts(view, wallRows); }
   if (S.owner) $('#edit-cover', view).onclick = () => editCover(c);
   if (slides.length < 2) return;
   // Rotate the cover bird. Stops for good when the reader pauses it, and never auto-plays with reduced motion.

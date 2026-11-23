@@ -114,3 +114,34 @@ walks its text and swaps any line it has a translation for (and watches for text
   blurbs, the About page, the scoring table, and the editor's tool pages. Put `data-noi18n` on anything that must
   never be translated.
 - The translations were written without a native-speaker review. Have each one checked before a big launch.
+
+## Reader features (round 3)
+
+- **Hearts** (`public/js/hearts.js`, worker route `hearts`, table `hearts`): one heart per photo per browser,
+  toggled with POST /api/hearts/<id>. No accounts; the browser keeps a random id. At most 300 hearts a day from one
+  connection. `/api/wall` returns each photo's count.
+- **Readers' Choice**: on each issue page, the photo with the most hearts (at least `MIN_HEARTS`, 3). Final when
+  the issue closes.
+- **Photo of the week** (`photoOfTheWeek` in views/cover.js): under the cover bird. Changes every Monday,
+  California time, by itself. Picks from recent photos with a story, most-hearted first.
+- **Stamps** (`public/js/stamps.js`): on My Wall. Worked out from My Wall birds and photos sent from this browser,
+  both of which now record the region. Nothing new is stored.
+- **Light today** (`public/js/sun.js`): sunrise, sunset and golden hour on This Season, calculated in the browser
+  from NOAA's formulas for one town per region. Daylight saving is handled by formatting in America/Los_Angeles.
+  Nothing to maintain.
+- **Full screen and swipe** (`public/js/viewer.js`): full-screen photos without stretching; swipe between birds
+  on bird pages and in the wall's photo panel (arrow keys too).
+- **Bird pages**: "Play the year" steps the map through the seasons; "Compare side by side" for look-alikes.
+- **Photographer card**: inside the wall's photo panel (photos, species, hearts, regions, more of their birds).
+
+## Accessibility
+
+Built to Apple's Human Interface Guidelines and Google's Material/Android guidance, checked with axe-core
+(WCAG 2.2 AA):
+- every tap target is at least 44 × 44 px, 48 px on touch screens;
+- a two-tone focus ring that shows on black and on paper; a "Skip to the page" link;
+- dialogs keep focus inside and hand it back when they close;
+- text contrast at least 4.5 : 1; colour never carries meaning alone (levels also have numbers or words);
+- motion stops when the reader's device asks for reduced motion; the cover never auto-plays then;
+- zoom is never blocked; `<html lang>` follows the chosen language.
+To re-check after changes, run axe on each public page at phone and desktop widths.

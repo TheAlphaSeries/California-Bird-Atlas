@@ -2,6 +2,7 @@ import { api, esc } from '../util.js';
 import { wi, REGION_NAMES } from '../wi.js';
 import { loadIssues, currentIssue, issueState, stateLine, subscribeForm, bindSubscribe } from '../issues.js';
 import { openBird } from './wall.js';
+import { heartButton, bindHearts, readersChoice, MIN_HEARTS } from '../hearts.js';
 
 // An issue's page: its theme, the submission window, award winners, and every published photo sent for it
 // with its Behind the Shot story. /issues shows the current issue; /issues/<number> shows one by number.
@@ -12,12 +13,14 @@ export default async function issue(view, number) {
   const st = issueState(it), line = stateLine(it);
   const rows = wall.filter((r) => r.issue_id === it.id);
   const winners = rows.filter((r) => r.award);
+  const rc = readersChoice(rows); // decided by readers' hearts; final once the issue closes
   const story = (r) => `<article class="is-story">
       <button type="button" class="is-art" data-id="${r.id}" aria-label="${esc(r.bird)}: see credits"><img loading="lazy" src="/media/sub/${r.id}/cutout" alt=""></button>
       <div>${r.award ? `<p class="is-award">${esc(r.award)}</p>` : ''}
         <h3>${esc(r.bird)}</h3>
         ${r.caption ? `<p class="is-cap">${esc(r.caption)}</p>` : ''}
-        <p class="is-by">Photo ● ${esc(r.credit_name)}${r.region ? `, ${esc(REGION_NAMES[r.region] || r.region)}` : ''}</p></div>
+        <p class="is-by">Photo ● ${esc(r.credit_name)}${r.region ? `, ${esc(REGION_NAMES[r.region] || r.region)}` : ''}</p>
+        ${heartButton(r, 'small')}</div>
     </article>`;
   view.innerHTML = `<div class="mag-wrap mag-page is">
     <header class="is-head">
@@ -32,6 +35,10 @@ export default async function issue(view, number) {
         ${st.state !== 'closed' ? '<a class="mag-btn" href="/submit" data-link>Send a photo for this issue</a>' : ''}
       </div>
     </header>
+    ${rows.length ? `<section class="mag-section is-rc"><p class="mag-kicker">Readers' Choice</p>
+      ${rc ? `<h2>${st.state === 'closed' ? "Readers' Choice" : "Readers' favourite so far"}</h2><div class="is-stories">${story(rc)}</div>
+        <p class="is-rc-note">${st.state === 'closed' ? `Chosen by readers' hearts.` : `Chosen by readers' hearts. It's final when the issue closes. Give a heart to any photo below.`}</p>`
+      : `<h2>Pick a favourite</h2><p class="mag-deck">Give a heart to the photos you like best. The one with the most (at least ${MIN_HEARTS}) wins Readers' Choice when the issue closes.</p>`}</section>` : ''}
     ${winners.length ? `<section class="mag-section"><p class="mag-kicker">Awards</p><h2>This issue's winners</h2><div class="is-stories">${winners.map(story).join('')}</div></section>` : ''}
     ${winners.length && winners.length === rows.length ? '' : `<section class="mag-section"><p class="mag-kicker">Behind the shot</p>
       <h2>${rows.length ? `${rows.length} photograph${rows.length === 1 ? '' : 's'} so far` : 'No photographs yet'}</h2>
@@ -42,5 +49,6 @@ export default async function issue(view, number) {
     ${issues.length > 1 ? `<section class="mag-section"><p class="mag-kicker">All issues</p><ul class="is-list">${issues.map((i) => `<li><a href="/issues/${i.number}" data-link><b>No. ${i.number}</b><span>${esc(i.theme || i.title)}</span><i>${esc(i.title)}</i></a></li>`).join('')}</ul></section>` : ''}
   </div>`;
   bindSubscribe(view);
-  view.querySelectorAll('.is-art').forEach((b) => (b.onclick = () => openBird(rows.find((r) => r.id === +b.dataset.id), d)));
+  view.querySelectorAll('.is-art').forEach((b) => (b.onclick = () => openBird(rows.find((r) => r.id === +b.dataset.id), d, { list: rows, all: wall })));
+  bindHearts(view, wall);
 }

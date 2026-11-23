@@ -4,11 +4,11 @@
 // Rule: always try the network first, so a push to GitHub shows up straight away, and keep a copy of every
 // successful answer. Only when the network fails is the copy used. Editor-only data and anything sent
 // (POST, PATCH, DELETE) is never cached. Raise VERSION to throw every cached copy away.
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'cba-' + VERSION;
 // Fetched at install, so the core of the site works offline even before a page has been visited.
 const CORE = ['/', '/this-season', '/css/atlas.css', '/css/magazine.css', '/js/app.js', '/js/util.js', '/js/wi.js', '/js/rotation.js',
-  '/js/refphoto.js', '/js/issues.js', '/js/regionmap.js', '/js/calendar.js', '/js/i18n.js', '/js/views/fieldwork.js', '/js/views/bird.js', '/js/views/theindex.js',
+  '/js/refphoto.js', '/js/issues.js', '/js/regionmap.js', '/js/calendar.js', '/js/i18n.js', '/js/hearts.js', '/js/viewer.js', '/js/stamps.js', '/js/sun.js', '/js/views/fieldwork.js', '/js/views/bird.js', '/js/views/theindex.js',
   '/js/views/fieldcard.js', '/js/views/cover.js', '/js/views/wall.js', '/data/wildindex.json', '/data/region-map.json', '/data/wall-samples.json',
   '/img/icon.svg', '/img/great-blue-heron.jpg'];
 const API_OK = ['/api/bootstrap', '/api/wall', '/api/issues']; // public data worth keeping a copy of

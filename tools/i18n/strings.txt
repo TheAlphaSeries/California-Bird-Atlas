@@ -244,3 +244,49 @@ Never assigned || Nunca se asigna || 不會被指派 || Hindi kailanman itinatal
 Introduced || Introducida || 引進種 || Ipinakilala || Du nhập || 도입종
 no points || sin puntos || 不計分 || walang puntos || không có điểm || 점수 없음
 No points || Sin puntos || 不計分 || Walang puntos || Không có điểm || 점수 없음
+Skip to the page || Saltar al contenido || 跳到頁面內容 || Lumaktaw sa pahina || Chuyển đến nội dung || 본문으로 건너뛰기
+This issue and language || Este número e idioma || 本期與語言 || Ang isyung ito at wika || Số này và ngôn ngữ || 이번 호와 언어
+The nine birds, by level || Las nueve aves, por nivel || 九種鳥，依難度 || Ang siyam na ibon, ayon sa antas || Chín loài chim, theo mức độ || 난이도별 아홉 마리 새
+Heart this photo. Hearts so far: || Dale un corazón a esta foto. Corazones hasta ahora: || 為這張照片按愛心。目前愛心數： || I-heart ang larawang ito. Mga heart sa ngayon: || Thả tim cho ảnh này. Số tim hiện tại: || 이 사진에 하트 주기. 지금까지 하트:
+Full screen || Pantalla completa || 全螢幕 || Full screen || Toàn màn hình || 전체 화면
+Previous photo || Foto anterior || 上一張照片 || Nakaraang larawan || Ảnh trước || 이전 사진
+Next photo || Foto siguiente || 下一張照片 || Susunod na larawan || Ảnh tiếp theo || 다음 사진
+About the photographer || Sobre el fotógrafo || 關於攝影者 || Tungkol sa photographer || Về nhiếp ảnh gia || 사진가 소개
+photos || fotos || 張照片 || larawan || ảnh || 장의 사진
+photo || foto || 張照片 || larawan || ảnh || 장의 사진
+hearts || corazones || 個愛心 || heart || tim || 개의 하트
+heart || corazón || 個愛心 || heart || tim || 개의 하트
+See the original || Ver el original || 查看原圖 || Tingnan ang orihinal || Xem bản gốc || 원본 보기
+Photographed by a reader and put up on the Bird Wall. || Fotografiada por un lector y puesta en el Muro de Aves. || 由讀者拍攝並放上鳥牆。 || Kinunan ng isang mambabasa at inilagay sa Bird Wall. || Do một độc giả chụp và đưa lên Bức tường chim. || 독자가 찍어 새 갤러리에 올린 사진입니다.
+A sample bird from Wikimedia Commons, standing in until readers send their own. Next week this spot goes to a reader’s photo and the story behind it. || Un ave de muestra de Wikimedia Commons, mientras llegan las de los lectores. Pronto este espacio será para la foto de un lector y su historia. || 這是來自 Wikimedia Commons 的範例照片，在讀者投稿前暫時使用。之後這個位置會留給讀者的照片和背後的故事。 || Isang sample na ibon mula sa Wikimedia Commons habang wala pang padala ang mga mambabasa. Sa susunod, mapupunta ang puwestong ito sa larawan ng mambabasa at sa kuwento nito. || Một ảnh chim mẫu từ Wikimedia Commons, dùng tạm cho đến khi độc giả gửi ảnh. Sắp tới vị trí này sẽ dành cho ảnh của độc giả và câu chuyện phía sau. || 독자 사진이 오기 전까지 쓰는 Wikimedia Commons 예시 사진입니다. 곧 이 자리는 독자의 사진과 그 뒷이야기가 차지합니다.
+Readers' Choice || Elección de los lectores || 讀者票選 || Pinili ng mga Mambabasa || Độc giả bình chọn || 독자 선정
+Readers' favourite so far || La favorita de los lectores hasta ahora || 目前讀者最愛 || Paborito ng mga mambabasa sa ngayon || Được độc giả yêu thích nhất hiện tại || 현재 독자 인기 1위
+Pick a favourite || Elige tu favorita || 選出你的最愛 || Pumili ng paborito || Chọn ảnh yêu thích || 마음에 드는 사진 고르기
+Chosen by readers' hearts. || Elegida con los corazones de los lectores. || 由讀者的愛心選出。 || Pinili sa pamamagitan ng mga heart ng mambabasa. || Được chọn bằng lượt tim của độc giả. || 독자의 하트로 선정되었습니다.
+Chosen by readers' hearts. It's final when the issue closes. Give a heart to any photo below. || Elegida con los corazones de los lectores. Es definitiva cuando cierra el número. Dale un corazón a cualquier foto de abajo. || 由讀者的愛心選出，本期截止時定案。為下方任何照片按愛心吧。 || Pinili sa pamamagitan ng mga heart ng mambabasa. Pinal ito pagsara ng isyu. Mag-heart sa alinmang larawan sa ibaba. || Được chọn bằng lượt tim của độc giả. Kết quả chốt khi số báo đóng. Hãy thả tim cho bất kỳ ảnh nào bên dưới. || 독자의 하트로 선정되며, 이번 호가 마감되면 확정됩니다. 아래 사진에 하트를 눌러 주세요.
+Play the year || Ver el año || 播放一整年 || I-play ang taon || Phát cả năm || 일 년 재생
+Stop || Detener || 停止 || Ihinto || Dừng || 정지
+Compare side by side || Comparar lado a lado || 並排比較 || Ikumpara nang magkatabi || So sánh cạnh nhau || 나란히 비교
+Hide the comparison || Ocultar la comparación || 隱藏比較 || Itago ang paghahambing || Ẩn phần so sánh || 비교 숨기기
+Points || Puntos || 分數 || Puntos || Điểm || 점수
+Protection || Protección || 保育狀態 || Proteksyon || Bảo tồn || 보호 현황
+In the field || En el campo || 野外觀察 || Sa field || Ngoài thực địa || 현장에서
+This page || Esta página || 本頁 || Ang pahinang ito || Trang này || 이 페이지
+Light today || Luz de hoy || 今日光線 || Liwanag ngayon || Ánh sáng hôm nay || 오늘의 빛
+Light tomorrow || Luz de mañana || 明日光線 || Liwanag bukas || Ánh sáng ngày mai || 내일의 빛
+Sunrise || Amanecer || 日出 || Pagsikat ng araw || Bình minh || 일출
+Golden hour || Hora dorada || 黃金時刻 || Golden hour || Giờ vàng || 골든아워
+Sunset || Atardecer || 日落 || Paglubog ng araw || Hoàng hôn || 일몰
+Field passport || Pasaporte de campo || 野外護照 || Field passport || Hộ chiếu thực địa || 필드 여권
+Your stamps || Tus sellos || 你的印章 || Iyong mga stamp || Con dấu của bạn || 나의 스탬프
+of 7 regions || de 7 regiones || ／7 個地區 || sa 7 rehiyon || / 7 vùng || / 7개 지역
+seasons || temporadas || 個季節 || season || mùa || 개 시즌
+season || temporada || 個季節 || season || mùa || 개 시즌
+A stamp for every region you photograph a bird in, and every season you take part. Add birds here or send them to the wall to collect them. Kept on this device only. || Un sello por cada región donde fotografíes un ave y por cada temporada en que participes. Añade aves aquí o envíalas al muro para conseguirlos. Solo se guardan en este dispositivo. || 在一個地區拍到鳥就得到該地區的印章，每參與一季也有一枚。在這裡新增鳥或傳送到鳥牆即可收集。只保存在這台裝置上。 || Isang stamp sa bawat rehiyong kinunan mo ng ibon, at sa bawat season na sinalihan mo. Magdagdag ng ibon dito o ipadala sa wall para makuha ang mga ito. Nasa device na ito lang. || Một con dấu cho mỗi vùng bạn chụp được chim, và mỗi mùa bạn tham gia. Thêm chim ở đây hoặc gửi lên tường để sưu tầm. Chỉ lưu trên thiết bị này. || 새를 찍은 지역마다, 참여한 시즌마다 스탬프를 하나씩 받아요. 여기에 새를 추가하거나 갤러리에 보내면 모을 수 있어요. 이 기기에만 저장됩니다.
+Took part || Participaste || 已參與 || Sumali || Đã tham gia || 참여함
+This season: not yet || Esta temporada: todavía no || 本季：尚未參與 || Ngayong season: hindi pa || Mùa này: chưa có || 이번 시즌: 아직
+Not collected yet || Aún no conseguido || 尚未收集 || Hindi pa nakukuha || Chưa sưu tầm || 아직 모으지 않음
+Region where you took it || Región donde la tomaste || 拍攝的地區 || Rehiyon kung saan mo kinunan || Vùng bạn đã chụp || 촬영한 지역
+Clearing your browser's site data deletes My Wall. Download the birds you want to keep. || Si borras los datos del sitio en tu navegador, se borra Mi muro. Descarga las aves que quieras conservar. || 清除瀏覽器的網站資料會刪除「我的鳥牆」。請下載你想保留的鳥。 || Mabubura ang Aking Wall kapag nilinis mo ang site data ng browser. I-download ang mga ibong gusto mong itago. || Xóa dữ liệu trang web của trình duyệt sẽ xóa Bức tường của tôi. Hãy tải về những con chim bạn muốn giữ. || 브라우저의 사이트 데이터를 지우면 나의 갤러리도 삭제됩니다. 간직하고 싶은 새는 내려받아 두세요.
+Add a bird photo. The background is removed right here in your browser, and the bird goes on your wall. || Añade una foto de un ave. El fondo se quita aquí mismo en tu navegador y el ave va a tu muro. || 新增一張鳥的照片。背景會直接在你的瀏覽器中去除，鳥就會出現在你的鳥牆上。 || Magdagdag ng larawan ng ibon. Aalisin ang background dito mismo sa browser mo, at mapupunta ang ibon sa wall mo. || Thêm một ảnh chim. Nền ảnh được xóa ngay trong trình duyệt, và con chim lên tường của bạn. || 새 사진을 추가하세요. 배경은 브라우저 안에서 바로 지워지고, 새가 나의 갤러리에 올라갑니다.
+A wall just for you. Photos you add here stay in this browser on this device. Nothing is uploaded unless you choose to send a bird to the public wall. || Un muro solo para ti. Las fotos que añades aquí se quedan en este navegador y dispositivo. No se sube nada a menos que decidas enviar un ave al muro público. || 只屬於你的鳥牆。在這裡新增的照片只留在這台裝置的瀏覽器中。除非你選擇傳送到公開鳥牆，否則不會上傳任何東西。 || Isang wall para sa iyo lang. Nananatili sa browser ng device na ito ang mga larawang idinagdag mo. Walang ina-upload maliban kung pipiliin mong ipadala sa pampublikong wall. || Bức tường chỉ dành cho bạn. Ảnh bạn thêm ở đây chỉ nằm trong trình duyệt trên thiết bị này. Không có gì được tải lên trừ khi bạn chọn gửi lên bức tường công khai. || 나만을 위한 갤러리입니다. 여기에 추가한 사진은 이 기기의 브라우저에만 남습니다. 공개 갤러리로 보내기 전에는 아무것도 업로드되지 않아요.

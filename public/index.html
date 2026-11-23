@@ -21,7 +21,8 @@
 <link rel="stylesheet" href="/css/magazine.css">
 </head>
 <body>
-<div class="strip" id="strip"></div>
+<a class="skip" href="#view">Skip to the page</a>
+<div class="strip" id="strip" role="region" aria-label="This issue and language"></div>
 <header class="masthead" id="masthead">
   <a class="wordmark" href="/" data-link><span class="wm-en">California Bird Atlas</span><span class="wm-tag">Bird photography, made in California</span></a>
   <button class="menu-toggle" id="menu-toggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span></button>
@@ -29,7 +30,7 @@
   <div class="utilities" id="utilities"></div>
 </header>
 <p class="tategaki" id="tategaki" aria-hidden="true" hidden></p>
-<main id="view"><p class="loading">Opening…</p></main>
+<main id="view" tabindex="-1"><p class="loading">Opening…</p></main>
 <footer class="colophon" id="colophon"></footer>
 <button class="quick-entry" id="quick-entry" hidden aria-label="Add observation">+ Observation</button>
 <div id="modal-root"></div>
