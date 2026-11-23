@@ -18,6 +18,19 @@ export const birdOptions = (d) => `<datalist id="bird-names">${d.birds.filter((b
 
 const MAX = 6; // photos per send; the daily limit per visitor is 12
 
+// A half-filled form is kept in this browser (IndexedDB, which can hold the photos too) until it is sent or cleared.
+const DRAFT_DB = 'wi-draft';
+function draftStore(mode) {
+  return new Promise((res, rej) => { const r = indexedDB.open(DRAFT_DB, 1); r.onupgradeneeded = () => r.result.createObjectStore('d'); r.onerror = () => rej(r.error); r.onsuccess = () => res(r.result.transaction('d', mode).objectStore('d')); });
+}
+const req = (r) => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+const loadDraft = async () => { try { return await req((await draftStore('readonly')).get('current')); } catch { return null; } };
+const saveDraft = async (v) => { try { await req((await draftStore('readwrite')).put(v, 'current')); } catch { /* private mode: nothing kept */ } };
+const clearDraft = async () => { try { await req((await draftStore('readwrite')).delete('current')); } catch { /* nothing to clear */ } };
+// Status links for photos sent from this browser, newest last.
+export const SENT_KEY = 'wi.sent';
+export const sentLinks = () => { try { return JSON.parse(localStorage.getItem(SENT_KEY) || '[]'); } catch { return []; } };
+
 export default async function submit(view) {
   const d = await wi();
   const issue = currentIssue(await loadIssues().catch(() => []));
@@ -28,6 +41,8 @@ export default async function submit(view) {
   view.innerHTML = `<div class="mag-wrap mag-page sub-page">
     <p class="mag-kicker">Send a photo</p>
     <h1 class="mag-h">Put your bird on the wall</h1>
+    ${sentLinks().length ? `<p class="sub-sent"><a class="linkish" href="/sent" data-link>Check on the photos you've sent</a></p>` : ''}
+    <p class="sub-restore" id="restore" hidden><span>We kept your unsent photos and answers from last time.</span><button type="button" class="linkish" id="restart">Start over</button></p>
     <p class="mag-deck">Send up to ${MAX} of your California bird photos at once. We review every one and add it to the Bird Wall with your name. The best ones run in the magazine.</p>
     ${issue ? `<p class="sub-issue"><b>Issue No. ${issue.number}: ${esc(issue.theme || issue.title)}.</b> ${esc(stateLine(issue).long)} <a class="linkish" href="/issues/${issue.number}" data-link>About this issue</a></p>` : ''}
     <form id="sf" novalidate>
@@ -58,7 +73,15 @@ export default async function submit(view) {
   const live = () => items.filter((x) => x.state !== 'removed' && x.state !== 'sent');
   const sync = () => { $('#sub-you', view).hidden = !live().length; btn.textContent = live().length > 1 ? `Send ${live().length} photos` : 'Send photo'; };
   const paintCut = (it) => { it.el.querySelector('.sp-cut').innerHTML = it.cut ? `<img src="${it.cutUrl}" alt="How it will look on the wall">` : `<span>${it.cutFailed ? 'No preview. We\'ll cut it out for you.' : 'Cutting out…'}</span>`; };
-  const add = (file, bird = '') => {
+  // Save the form as it is now. Called after any change; cheap enough to run on every keystroke batch.
+  let saveT = 0;
+  const persist = () => { clearTimeout(saveT); saveT = setTimeout(() => {
+    const v = Object.fromEntries(new FormData(form));
+    const kept = live().map((it) => ({ blob: it.file, name: it.file.name, type: it.file.type, bird: it.el.querySelector('.sp-bird').value, story: Object.fromEntries([...it.el.querySelectorAll('textarea[data-k]')].map((t) => [t.dataset.k, t.value])) }));
+    if (kept.length || v.credit_name) saveDraft({ items: kept, you: { credit_name: v.credit_name || '', contact: v.contact || '', region: v.region || '' } }); else clearDraft();
+  }, 400); };
+  form.addEventListener('input', persist); form.addEventListener('change', persist);
+  const add = (file, bird = '', story = {}) => {
     if (!/^image\/(jpeg|png|webp)/.test(file.type)) { toast(`"${file.name}" isn't a JPEG, PNG or WebP photo.`, true); return; }
     if (live().length >= MAX) { toast(`You can send ${MAX} at a time. Send these, then add more.`, true); return; }
     const it = { file, url: URL.createObjectURL(file), state: 'ready', cut: null };
@@ -73,7 +96,10 @@ export default async function submit(view) {
         <p class="sp-foot"><button type="button" class="linkish sp-del">Remove this photo</button><span class="sp-state" role="status"></span></p>
       </div>`;
     list.appendChild(it.el); items.push(it); paintCut(it); sync();
-    it.el.querySelector('.sp-del').onclick = () => { it.state = 'removed'; it.el.remove(); sync(); };
+    it.el.querySelectorAll('textarea[data-k]').forEach((t) => { if (story[t.dataset.k]) t.value = story[t.dataset.k]; });
+    if (Object.values(story).some(Boolean)) it.el.querySelector('.sp-story').open = true;
+    persist();
+    it.el.querySelector('.sp-del').onclick = () => { it.state = 'removed'; it.el.remove(); sync(); persist(); };
     // Cut-outs are made one at a time so a phone is not asked to do several at once.
     queue = queue.then(async () => { if (it.state === 'removed') return; try { it.cut = await autoCut(file); it.cutUrl = URL.createObjectURL(it.cut.blob); } catch { it.cutFailed = true; } if (it.state !== 'removed') paintCut(it); });
   };
@@ -82,6 +108,15 @@ export default async function submit(view) {
   drop.addEventListener('dragover', (e) => { e.preventDefault(); drop.classList.add('over'); });
   drop.addEventListener('dragleave', () => drop.classList.remove('over'));
   drop.addEventListener('drop', (e) => { e.preventDefault(); drop.classList.remove('over'); take(e.dataTransfer.files); });
+  // Bring back a half-filled form, unless this visit came from My Wall with a photo of its own.
+  const draft = pre?.blobKey ? null : await loadDraft();
+  if (draft && (draft.items?.length || draft.you?.credit_name)) {
+    warmClipper();
+    for (const x of draft.items || []) add(new File([x.blob], x.name || 'photo.jpg', { type: x.type || x.blob.type }), x.bird || '', x.story || {});
+    for (const [k, val] of Object.entries(draft.you || {})) { const f = form.elements[k]; if (f && val) f.value = val; }
+    $('#restore', view).hidden = false;
+    $('#restart', view).onclick = async () => { await clearDraft(); window.dispatchEvent(new Event('route')); };
+  }
   if (pre?.blobKey) {
     const { getMyBird } = await import('./mywall.js');
     const mine = await getMyBird(pre.blobKey);
@@ -104,16 +139,22 @@ export default async function submit(view) {
         fd.set('meta', JSON.stringify({ bird: it.b.n, credit_name: v.credit_name.trim(), contact: v.contact || '', region: v.region, story, consent: true, taken_at: ex.taken_at || null, camera: ex.camera || '', width: dv.width, height: dv.height, cut_w: it.cut?.width, cut_h: it.cut?.height }));
         fd.set('display', dv.display, 'display.jpg'); fd.set('thumb', dv.thumb, 'thumb.jpg');
         if (it.cut) fd.set('cutout', it.cut.blob, 'cutout.png');
-        await api('/submissions', { method: 'POST', form: fd });
+        const res = await api('/submissions', { method: 'POST', form: fd });
+        if (res?.key) { const list = sentLinks(); list.push({ s: `${res.id}.${res.key}`, bird: it.b.n, at: new Date().toISOString() }); try { localStorage.setItem(SENT_KEY, JSON.stringify(list.slice(-60))); } catch { /* storage off */ } it.statusPair = `${res.id}.${res.key}`; }
         if (v.keep && !pre?.blobKey) await addToMyWall({ bird: it.b.n, sci: it.b.sci, photo: dv.display, taken_at: ex.taken_at || null }).catch(() => {});
         it.state = 'sent'; sent++; names.push(it.b.n); stEl.textContent = 'Sent'; it.el.classList.add('done');
       } catch (err) { stEl.textContent = err.message; toast(err.message, true); break; }
     }
     btn.disabled = false; sync();
     if (sent && !live().length) {
+      await clearDraft();
+      const link = `${location.origin}/sent?s=${items.filter((x) => x.statusPair).map((x) => x.statusPair).join(',')}`;
       view.querySelector('.sub-page').innerHTML = `<p class="mag-kicker">Sent</p><h1 class="mag-h">Thank you.</h1>
+        <div class="sub-status"><p><b>Your private status link.</b> It shows whether each photo is waiting, on the wall or declined. Only people with the link can see it, so keep it somewhere safe. This browser remembers it too.</p>
+          <p class="sub-link"><input readonly value="${esc(link)}" aria-label="Status link"><button type="button" class="mag-btn" id="cp">Copy link</button></p></div>
         <p class="mag-deck" style="font-size:19px">${sent === 1 ? `Your ${esc(names[0])} is` : `Your ${sent} photos are`} in the review queue. Approved photos go on the Bird Wall with your name, usually within a week.</p>
         <p class="wall-ctas"><a class="mag-btn solid" href="/submit" data-link>Send more</a><a class="mag-btn" href="/wall" data-link>See the Bird Wall</a>${v.keep ? '<a class="mag-btn" href="/my-wall" data-link>My Wall</a>' : ''}</p>`;
+      const cp = view.querySelector('#cp'); if (cp) cp.onclick = async () => { try { await navigator.clipboard.writeText(link); toast('Link copied.'); } catch { view.querySelector('.sub-link input').select(); } };
       window.scrollTo(0, 0);
     }
   };

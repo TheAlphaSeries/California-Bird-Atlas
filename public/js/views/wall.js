@@ -7,7 +7,9 @@ export default async function wall(view) {
   // Until the first real birds go up, show the built-in sample birds (openly licensed Wikimedia Commons photos).
   const samples = !rows.length;
   if (samples) rows = (await fetch('/data/wall-samples.json').then((r) => r.json()).catch(() => [])).map((x, i) => ({ ...x, id: 'sample-' + i, credit_name: x.credit, cut_w: x.w, cut_h: x.h, sample: 1, static: true }));
-  let region = '', q = new URLSearchParams(location.search).get('by') || '';
+  let region = '', q = new URLSearchParams(location.search).get('by') || '', order = 'new';
+  let names = false; try { names = localStorage.getItem('wi.wallnames') === '1'; } catch { /* storage off */ }
+  const WEEK = 7 * 864e5, fresh = (r) => r.approved_at && Date.now() - Date.parse(r.approved_at) < WEEK;
   view.innerHTML = `<div class="wall-page">
     <header class="mag-wrap wall-head one-line">
       <p class="mag-kicker">Photographed by readers</p>
@@ -19,6 +21,8 @@ export default async function wall(view) {
     ${rows.length ? `<div class="ix-bar"><div class="mag-wrap ix-row1">
       <label class="ix-search"><span class="vh">Search</span><input id="wq" type="search" placeholder="Search by bird or photographer" value="${esc(q)}"></label>
       <div class="seg small" role="group" aria-label="Region"><button type="button" data-r="" aria-pressed="true">All regions</button>${Object.entries(REGION_NAMES).map(([k, n]) => `<button type="button" data-r="${k}" aria-pressed="false">${esc(n)}</button>`).join('')}</div>
+      <div class="wall-opts"><label><span>Order</span><select id="wo"><option value="new">Newest first</option><option value="family">By family</option><option value="region">By region</option></select></label>
+        <button type="button" class="seg-btn" id="wn" aria-pressed="${names}">Show names</button></div>
     </div></div>` : ''}
     <div class="mag-wrap">
       <p class="ix-count" id="wc" aria-live="polite"></p>
@@ -30,18 +34,25 @@ export default async function wall(view) {
   const list = $('#wl', view);
   const draw = () => {
     const ql = q.trim().toLowerCase();
-    const shown = rows.filter((r) => (!region || r.region === region) && (!ql || r.bird.toLowerCase().includes(ql) || (r.credit_name || '').toLowerCase().includes(ql)));
+    const famOf = (r) => d.byName.get(r.bird)?.fam || '';
+    const shown = rows.filter((r) => (!region || r.region === region) && (!ql || r.bird.toLowerCase().includes(ql) || (r.credit_name || '').toLowerCase().includes(ql)))
+      .sort(order === 'family' ? (a, b) => famOf(a).localeCompare(famOf(b)) || a.bird.localeCompare(b.bird)
+        : order === 'region' ? (a, b) => (REGION_NAMES[a.region] || '').localeCompare(REGION_NAMES[b.region] || '') || a.bird.localeCompare(b.bird)
+        : (a, b) => (b.featured - a.featured) || String(b.approved_at || '').localeCompare(String(a.approved_at || '')));
+    list.classList.toggle('names', names);
     $('#wc', view).textContent = `${shown.length} bird${shown.length === 1 ? '' : 's'} on the wall${region ? ` from the ${REGION_NAMES[region]}` : ''}`;
     list.innerHTML = shown.map((r, i) => {
       const wide = r.cut_w && r.cut_h && r.cut_w / r.cut_h > 1.35;
       return `<button type="button" class="wb${wide ? ' wide' : ''}${r.featured ? ' big' : ''}" data-i="${rows.indexOf(r)}" style="--d:${(i % 12) * 40}ms" aria-label="${esc(r.bird)}, photographed by ${esc(r.credit_name)}">
         <img loading="lazy" src="${r.static ? r.src : `/media/sub/${r.id}/cutout`}" alt="" width="${r.cut_w || ''}" height="${r.cut_h || ''}">
-        <span class="wb-cap"><span class="nm">${esc(r.bird)}</span><span class="rg">${esc(REGION_NAMES[r.region] || '')}</span><span class="by">Photo ● ${esc(r.credit_name)}</span></span>
+        ${fresh(r) ? '<span class="wb-new">New</span>' : ''}<span class="wb-cap"><span class="nm">${esc(r.bird)}</span><span class="rg">${esc(REGION_NAMES[r.region] || '')}</span><span class="by">Photo ● ${esc(r.credit_name)}</span></span>
       </button>`;
     }).join('') || '<p class="mag-deck">No birds match.</p>';
     $$('.wb', list).forEach((b) => (b.onclick = () => openBird(rows[+b.dataset.i], d)));
   };
   $('#wq', view).addEventListener('input', (e) => { q = e.target.value; draw(); });
+  $('#wo', view).onchange = (e) => { order = e.target.value; draw(); };
+  $('#wn', view).onclick = (e) => { names = !names; e.currentTarget.setAttribute('aria-pressed', names); try { localStorage.setItem('wi.wallnames', names ? '1' : '0'); } catch { /* storage off */ } draw(); };
   $$('[data-r]', view).forEach((b) => (b.onclick = () => { region = b.dataset.r; $$('[data-r]', view).forEach((x) => x.setAttribute('aria-pressed', x === b)); draw(); }));
   draw();
 }

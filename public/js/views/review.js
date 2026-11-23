@@ -56,11 +56,30 @@ export default async function review(view) {
       return;
     }
     const shown = rows.filter((r) => r.status === tab);
-    list.innerHTML = shown.map((r) => `<button type="button" class="rv-card" data-id="${r.id}">
-      <img loading="lazy" src="/media/sub/${r.id}/${r.cut_w ? 'cutout' : 'thumb'}" alt="" class="${r.cut_w ? 'cut' : ''}">
-      <span class="rv-t"><b>${esc(r.bird)}</b><span>${esc(r.credit_name)} · ${esc(REGION_NAMES[r.region] || r.region || '')}</span><span>${esc(fmtDate(r.created_at))}${r.cut_w ? ' · cut out' : ''}${r.featured ? ' · featured' : ''}${r.sample ? ' · sample' : ''}</span></span></button>`).join('')
-      || `<p class="mag-deck" style="padding-top:20px">${tab === 'pending' ? 'Nothing waiting. New submissions show up here.' : 'None yet.'}</p>`;
+    // Likely duplicates: the same bird from the same person, with the same capture time or the same image size.
+    const dupOf = (r) => rows.find((x) => x.id !== r.id && x.status !== 'rejected' && x.bird === r.bird && x.credit_name === r.credit_name
+      && ((r.taken_at && x.taken_at === r.taken_at) || (r.width && x.width === r.width && x.height === r.height)));
+    const sel = new Set();
+    list.innerHTML = (tab === 'pending' && shown.length ? `<div class="rv-bulk"><label><input type="checkbox" id="rv-all"> Select all</label><button type="button" class="mag-btn solid" id="rv-pubsel" disabled>Publish selected</button><span id="rv-bn"></span></div>` : '')
+      + (shown.map((r) => { const dup = dupOf(r);
+        return `<div class="rv-item">${tab === 'pending' ? `<label class="rv-sel" title="${r.cut_w ? 'Select' : 'Cut out first to publish'}"><input type="checkbox" data-sel="${r.id}" ${r.cut_w ? '' : 'disabled'}><span class="vh">Select ${esc(r.bird)}</span></label>` : ''}
+        <button type="button" class="rv-card" data-id="${r.id}">
+        <img loading="lazy" src="/media/sub/${r.id}/${r.cut_w ? 'cutout' : 'thumb'}" alt="" class="${r.cut_w ? 'cut' : ''}">
+        <span class="rv-t"><b>${esc(r.bird)}</b><span>${esc(r.credit_name)} · ${esc(REGION_NAMES[r.region] || r.region || '')}</span><span>${esc(fmtDate(r.created_at))}${r.cut_w ? ' · cut out' : ' · not cut out'}${r.featured ? ' · featured' : ''}${r.sample ? ' · sample' : ''}</span>
+        ${dup ? `<span class="rv-dup">Possible duplicate of #${dup.id}</span>` : ''}</span></button></div>`; }).join('')
+      || `<p class="mag-deck" style="padding-top:20px">${tab === 'pending' ? 'Nothing waiting. New submissions show up here.' : 'None yet.'}</p>`);
     $$('.rv-card', list).forEach((b) => (b.onclick = () => openSub(rows.find((r) => r.id === +b.dataset.id), d)));
+    const pubsel = $('#rv-pubsel', list);
+    if (pubsel) {
+      const upd = () => { pubsel.disabled = !sel.size; pubsel.textContent = sel.size ? `Publish ${sel.size} to the wall` : 'Publish selected'; };
+      $$('[data-sel]', list).forEach((c) => (c.onchange = () => { c.checked ? sel.add(+c.dataset.sel) : sel.delete(+c.dataset.sel); upd(); }));
+      $('#rv-all', list).onchange = (e) => { $$('[data-sel]:not(:disabled)', list).forEach((c) => { c.checked = e.target.checked; c.onchange(); }); };
+      pubsel.onclick = async () => {
+        pubsel.disabled = true; let n = 0;
+        for (const id of sel) { try { await api(`/submissions/${id}`, { method: 'PATCH', body: { status: 'approved' } }); n++; $('#rv-bn', list).textContent = `${n} of ${sel.size} published`; } catch (err) { toast(err.message, true); break; } }
+        toast(`Published ${n} to the Bird Wall.`); window.dispatchEvent(new Event('route'));
+      };
+    }
   };
   $('#smp-add', view).onclick = async (e) => {
     const b = e.currentTarget, st = $('#smp-s', view); b.disabled = true;

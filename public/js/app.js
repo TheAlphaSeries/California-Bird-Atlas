@@ -26,6 +26,8 @@ const routes = [
   [/^\/issues\/?$/, () => import('./views/issue.js'), 'issue'],
   [/^\/issues\/(\d+)\/?$/, () => import('./views/issue.js'), 'issue'],
   [/^\/board\/?$/, () => import('./views/board.js'), 'board'],
+  [/^\/field-card\/?$/, () => import('./views/fieldcard.js'), 'fieldcard'],
+  [/^\/sent\/?$/, () => import('./views/sent.js'), 'sent'],
   [/^\/unsubscribe\/?$/, () => import('./views/unsubscribe.js'), 'unsubscribe'],
   [/^\/my-wall\/?$/, () => import('./views/mywall.js'), 'mywall'],
   [/^\/review\/?$/, () => import('./views/review.js'), 'review'],
@@ -39,7 +41,7 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
-const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review', 'issue', 'board', 'unsubscribe']);
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review', 'issue', 'board', 'unsubscribe', 'fieldcard', 'sent']);
 let renderSeq = 0;
 
 // Every page uses the magazine shell. Photo pages are black; everything else is printed on white paper.
@@ -156,6 +158,8 @@ $('#quick-entry').onclick = () => openObservation();
     await loadAll(); loadIssues().then((x) => { ISSUES = x; renderChrome(); }).catch(() => {}); await render(); if (S.owner) syncDrafts();
     const warm = () => { import('./wi.js').then((w) => w.wi()); ['cover', 'wall', 'fieldwork', 'theindex', 'bird', 'about', 'submit'].forEach((v) => import(`./views/${v}.js`)); };
     (window.requestIdleCallback || setTimeout)(warm);
+    // Offline support (public/sw.js). Not on localhost, where it would only get in the way of development.
+    if ('serviceWorker' in navigator && !/^(localhost|127\.)/.test(location.hostname)) navigator.serviceWorker.register('/sw.js').catch(() => {});
   }
   catch (e) { $('#view').innerHTML = `<div class="wrap"><p class="empty">The atlas could not be opened: ${esc(e.message)}</p></div>`; }
 })();

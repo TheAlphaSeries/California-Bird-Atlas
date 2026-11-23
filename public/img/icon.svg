@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Site icon: a black bird in profile on a yellow ground. -->
+  <rect width="64" height="64" rx="12" fill="#ffcc00"/>
+  <g transform="translate(-1 -6)"><path fill="#151515" d="M15 40c5-3 9-11 17-14 5-2 10-1 13 2l9 1-8 3c0 9-7 17-17 18-5 1-10-1-14-3l-8 3 5-6c-1-1-1-3 3-4z"/>
+  <circle cx="42" cy="30" r="1.9" fill="#ffcc00"/></g>
+</svg>

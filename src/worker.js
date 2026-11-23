@@ -29,12 +29,14 @@
 // WHO CAN DO WHAT: `owner` is true when the request carries the editor's signed session cookie. Routes call
 // need() before any change. Visitors get only public rows, with locations stripped (publicPhoto, publicObs).
 //
+// PAGE ADDRESSES listed in wrangler.jsonc's run_worker_first also pass through here, only to get link previews (withPreview).
+//
 // ROUTES (search for "r === '<name>'")
 //   /media/<id>/<variant>, /media/sub/<id>/<variant>   image files
 //   session, login, logout     editor sign-in
 //   bootstrap                  everything the pages need at start: species, families, settings
 //   species, reference, reports, observations, photos
-//   wall (GET public list, POST editor adds a bird), samples, submissions (POST public; the rest editor only)
+//   wall (GET public list, POST editor adds a bird), samples, submissions (POST public; the rest editor only), status (a sender's own photos)
 //   issues (GET public; POST/PATCH editor), subscribe, unsubscribe, subscribers (editor)
 //   fields, views, settings, export
 import seed from './seed.json';
@@ -205,6 +207,52 @@ async function deleteBlobs(env, id, store) {
   }
 }
 
+// The key in a sender's status link. Derived from the submission id and the site secret, so nothing extra is stored.
+async function statusKey(env, id) { return (await hmac(env.ADMIN_PASSWORD || 'wild-index', 'status|' + id)).slice(0, 16); }
+
+// ---------- link previews ----------
+const SITE = 'California Bird Atlas';
+const DEFAULT_DESC = "Nine California birds to photograph every two weeks, and a wall of everyone's photos.";
+async function previewFor(env, url) {
+  const db = env.DB, o = url.origin, p = url.pathname.replace(/\/$/, '') || '/';
+  const wallPic = async (bird) => {
+    const row = await db.prepare(`SELECT id FROM submissions WHERE status = 'approved' AND sample = 0 ${bird ? 'AND bird = ?' : ''} ORDER BY featured DESC, approved_at DESC LIMIT 1`).bind(...(bird ? [bird] : [])).first();
+    return row ? `${o}/media/sub/${row.id}/display` : null;
+  };
+  const heron = `${o}/img/great-blue-heron.jpg`;
+  let m;
+  if ((m = /^\/birds\/(WI-\d{3})$/.exec(p))) {
+    const wi = await (await env.ASSETS.fetch(new Request(o + '/data/wildindex.json'))).json();
+    const b = wi.birds.find((x) => x.id === m[1]);
+    if (!b) return null;
+    const sp = await db.prepare(`SELECT ref_url FROM species WHERE common_name = ?`).bind(b.n).first();
+    return { title: `${b.n} (${b.sci})`, desc: `Where and when to photograph the ${b.n} in California, with readers' photos. Plate no. ${+b.id.slice(3)}.`, image: (await wallPic(b.n)) || (sp?.ref_url ? new URL(sp.ref_url, o).href : heron) };
+  }
+  if ((m = /^\/issues(?:\/(\d+))?$/.exec(p))) {
+    const it = m[1] ? await db.prepare(`SELECT * FROM issues WHERE number = ?`).bind(Number(m[1])).first() : await db.prepare(`SELECT * FROM issues ORDER BY (opens_at <= datetime('now')) DESC, number DESC LIMIT 1`).first();
+    if (!it) return null;
+    return { title: `Issue No. ${it.number}: ${it.theme || it.title}`, desc: it.blurb || DEFAULT_DESC, image: (await wallPic()) || heron };
+  }
+  if (p === '/wall') return { title: 'The Bird Wall', desc: 'Birds of California, by the people who found them.', image: (await wallPic()) || heron };
+  if (p === '/this-season') return { title: 'Your nine birds', desc: 'Nine birds for your region, new every two weeks. Find them, photograph them, send them in.', image: heron };
+  if (p === '/about') return { title: 'Photograph every bird in California', desc: DEFAULT_DESC, image: heron };
+  return { title: SITE, desc: DEFAULT_DESC, image: heron };
+}
+async function withPreview(res, request, env, url) {
+  const pv = await previewFor(env, url);
+  if (!pv) return res;
+  const title = pv.title === SITE ? SITE : `${pv.title} | ${SITE}`;
+  const set = (v) => ({ element(e) { e.setAttribute('content', v); } });
+  return new HTMLRewriter()
+    .on('title', { element(e) { e.setInnerContent(title); } })
+    .on('meta[property="og:title"]', set(title))
+    .on('meta[property="og:description"]', set(pv.desc))
+    .on('meta[name="description"]', set(pv.desc))
+    .on('meta[property="og:image"]', set(pv.image))
+    .on('head', { element(e) { e.append(`<meta property="og:url" content="${url.origin}${url.pathname}">`, { html: true }); } })
+    .transform(res);
+}
+
 // ---------- issues and Behind the Shot ----------
 // The issue a new photo belongs to: the one whose window is open, otherwise the next one to open.
 async function issueFor(db) {
@@ -281,7 +329,13 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const path = url.pathname;
-    if (!path.startsWith('/api/') && !path.startsWith('/media/')) return env.ASSETS.fetch(request);
+    if (!path.startsWith('/api/') && !path.startsWith('/media/')) {
+      // Pages that people share get a link preview (title, description, picture) written into the page shell,
+      // because the apps that draw previews read the HTML and never run the site's scripts.
+      const res = await env.ASSETS.fetch(request);
+      if (request.method !== 'GET' || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+      try { await ensureReady(env); return await withPreview(res, request, env, url); } catch { return res; }
+    }
     try {
       await ensureReady(env);
       return await route(request, env, url, path);
@@ -558,6 +612,17 @@ async function route(request, env, url, path) {
         return json({ id: sid });
       }
     }
+    // A sender's private status link: /sent?s=<id>.<key>,... shows only those photos, with no account.
+    if (r === 'status' && method === 'GET') {
+      const pairs = String(url.searchParams.get('s') || '').split(',').slice(0, 50).map((x) => x.split('.'));
+      const out = [];
+      for (const [id, key] of pairs) {
+        if (!id || !key || key !== await statusKey(env, Number(id))) continue;
+        const row = await db.prepare(`SELECT id, bird, status, created_at, approved_at, cut_w, award FROM submissions WHERE id = ?`).bind(Number(id)).first();
+        if (row) out.push(row);
+      }
+      return json(out);
+    }
     if (r === 'submissions') {
       const id = Number(seg[2]);
       if (method === 'POST' && !seg[2]) {
@@ -590,7 +655,7 @@ async function route(request, env, url, path) {
           await putBlob(env, `subs/${sid}/display`, await display.arrayBuffer(), 'image/jpeg');
           await putBlob(env, `subs/${sid}/thumb`, await thumb.arrayBuffer(), 'image/jpeg');
         } catch (e) { await deleteSubBlobs(env, sid, store); await db.prepare(`DELETE FROM submissions WHERE id = ?`).bind(sid).run(); throw e; }
-        return json({ id: sid });
+        return json({ id: sid, key: await statusKey(env, sid) });
       }
       need();
       if (method === 'GET') {

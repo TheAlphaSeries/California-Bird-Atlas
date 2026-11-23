@@ -1,6 +1,7 @@
 import { S, api, esc } from '../util.js';
 import { seasonCards, latestOccurrence } from '../rotation.js';
 import { openBird } from './wall.js';
+import { loadMap, mapSvg } from '../regionmap.js';
 import { birdPic, refCredit, bindReports } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, CATEGORY, dbSpecies, levelOf, lvSpan, pointsLabel, currentSeason, myRegion, birdLink } from '../wi.js';
 
@@ -21,6 +22,10 @@ export default async function bird(view, id) {
     : b.lv ? `Not dependable in the ${d.region_names[mine]}. The table shows where it is.` : '';
   const i = d.birds.indexOf(b), prev = d.birds[i - 1], next = d.birds[i + 1];
   const shots = (await api('/wall').catch(() => [])).filter((r) => r.bird === b.n);
+  const g = b.lv ? await loadMap().catch(() => null) : null;
+  // Look-alikes: the note names one or more other birds; show any that are on the list beside this one.
+  const alikes = b.look ? d.birds.filter((x) => x !== b && new RegExp(`(^|[^A-Za-z'-])${x.n.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^A-Za-z'-])`).test(b.look)).slice(0, 2) : [];
+  const mini = (x) => { const p = birdPic(x, 'thumb'); return `<a class="bp-alike" href="${birdLink(x)}" data-link><span class="art">${p ? `<img loading="lazy" src="${esc(p.src)}" alt="">` : `<b>${+x.id.slice(3)}</b>`}</span><b>${esc(x.n)}</b><i>${esc(x.sci)}</i></a>`; };
   const pic = birdPic(b, 'display');
   const seasons = SEASON_ORDER.filter((s) => b.lv && b.lv[s].replace(/-/g, ''));
   const grid = b.lv ? `<div class="lv-grid"><table>
@@ -28,7 +33,12 @@ export default async function bird(view, id) {
       <tbody>${d.regions.map((r, i) => `<tr><td>${esc(d.region_names[r])}</td>${seasons.map((s) => `<td>${lvSpan(levelOf(b, i, s))}</td>`).join('')}</tr>`).join('')}</tbody>
     </table></div>` : '';
   view.innerHTML = `<div class="mag-wrap mag-page"><article class="bird">
-    <figure class="art">${pic ? `<img src="${esc(pic.src)}" alt="${esc(b.n)}${pic.kind === 'ref' ? ' (reference photo)' : ''}">${refCredit(pic)}` : '<div class="ph">Not yet photographed</div>'}</figure>
+    <div class="bp-left"><figure class="art">${pic ? `<img src="${esc(pic.src)}" alt="${esc(b.n)}${pic.kind === 'ref' ? ' (reference photo)' : ''}">${refCredit(pic)}` : '<div class="ph">Not yet photographed</div>'}</figure>
+      ${g ? `<section class="bp-map" aria-label="How hard it is to find, by region">
+        <div class="bp-map-head"><h2>Where it's easiest</h2><div class="seg small" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" data-ms="${s}" aria-pressed="${s === season}">${SEASONS[s]}</button>`).join('')}</div></div>
+        <div id="bp-mapbox"></div>
+        <p class="bp-key"><span class="k l1"></span>Easy <span class="k l2"></span>Takes a trip <span class="k l3"></span>Hard <span class="k none"></span>Not dependable</p></section>` : ''}
+    </div>
     <div class="facts">
       <p class="plate-no"><a href="/birds" data-link>All birds</a><span class="pn"><i>Plate no.</i>${+b.id.slice(3)}</span></p>
       <h1 class="mag-h" style="font-size:clamp(40px,5vw,68px)">${esc(b.n)}</h1>
@@ -47,6 +57,9 @@ export default async function bird(view, id) {
       ${S.owner && sp ? `<p style="margin-top:28px"><a class="mag-btn" href="/species/${sp.id}" data-link>Open in the atlas tools</a></p>` : ''}
     </div>
   </article>
+  ${alikes.length ? `<section class="mag-section"><p class="mag-kicker">Look-alike</p><h2>Easy to mix up with</h2>
+    <div class="bp-alikes">${mini(b)}<span class="vs" aria-hidden="true">or</span>${alikes.map(mini).join('<span class="vs" aria-hidden="true">or</span>')}</div>
+    <p class="mag-deck" style="margin-top:14px">Open each page to compare where and when they turn up.</p></section>` : ''}
   <section class="mag-section bp-wall">
     <p class="mag-kicker">On the Bird Wall</p>
     <h2>${shots.length ? `${shots.length} photograph${shots.length === 1 ? '' : 's'} of this bird` : 'Nobody has sent this bird yet'}</h2>
@@ -57,6 +70,12 @@ export default async function bird(view, id) {
     ${prev ? `<a href="${birdLink(prev)}" data-link><i>Previous, no. ${+prev.id.slice(3)}</i><b>${esc(prev.n)}</b></a>` : '<span></span>'}
     ${next ? `<a href="${birdLink(next)}" data-link class="nx"><i>Next, no. ${+next.id.slice(3)}</i><b>${esc(next.n)}</b></a>` : '<span></span>'}
   </nav></div>`;
+  if (g) {
+    const paint = (s) => { view.querySelector('#bp-mapbox').innerHTML = mapSvg(g, (r) => { const v = levelOf(b, d.regions.indexOf(r), s); return typeof v === 'number' ? 'l' + v : 'none'; },
+      { title: (r) => { const v = levelOf(b, d.regions.indexOf(r), s); return `${d.region_names[r]}: ${typeof v === 'number' ? ['easy to find', 'takes a trip', 'hard to find'][v - 1] : 'not dependable'}`; } }); };
+    view.querySelectorAll('[data-ms]').forEach((x) => (x.onclick = () => { view.querySelectorAll('[data-ms]').forEach((y) => y.setAttribute('aria-pressed', y === x)); paint(x.dataset.ms); }));
+    paint(season);
+  }
   view.querySelectorAll('.bp-shots [data-k]').forEach((x) => (x.onclick = () => openBird(shots[+x.dataset.k], d)));
   bindReports(view);
 }

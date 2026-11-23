@@ -30,7 +30,7 @@ function badge(b, i, season) {
 
 export default async function theIndex(view) {
   const d = await wi();
-  if (!st) st = { q: '', season: currentSeason(), show: 'here', sort: 'family' };
+  if (!st) st = { q: '', season: currentSeason(), show: 'here', sort: 'family', look: 'list' };
   st.region = myRegion(d);
   const n = (c) => d.birds.filter((b) => c.includes(b.cat)).length;
   view.innerHTML = `<div class="ix">
@@ -47,6 +47,7 @@ export default async function theIndex(view) {
       <label class="ix-search"><span class="vh">Search</span><input id="ixq" type="search" placeholder="Search 696 birds by name" value="${esc(st.q)}"></label>
       <div class="seg" role="group" aria-label="Show">${SHOW.map(([k, l]) => `<button type="button" data-show="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
       <div class="seg small" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" data-s="${s}" aria-pressed="${st.season === s}">${SEASONS[s]}</button>`).join('')}</div>
+      <div class="seg small" role="group" aria-label="View"><button type="button" data-look="list" aria-pressed="${st.look === 'list'}">List</button><button type="button" data-look="photos" aria-pressed="${st.look === 'photos'}">Photos</button></div>
       <label class="ix-sort"><span class="vh">Order</span><select id="ixsort"><option value="family" ${st.sort === 'family' ? 'selected' : ''}>By family</option><option value="level" ${st.sort === 'level' ? 'selected' : ''}>Easiest first</option></select></label>
       <button type="button" class="region-chip" id="ixreg">Region: <b>${esc(d.region_names[st.region])}</b></button>
     </div></div>
@@ -73,35 +74,42 @@ export default async function theIndex(view) {
     for (const b of rows) { const g = groups[groups.length - 1]; if (g && g.fam === b.fam) g.birds.push(b); else groups.push({ fam: b.fam, birds: [b] }); }
     const what = { here: `you can find in the ${d.region_names[st.region]} this ${SEASONS[st.season].toLowerCase()}`, rare: 'scarce or rare in California', out: 'that are never assigned, to protect them or because they need a boat', all: 'on the state list' }[st.show];
     $('#ixc', view).textContent = `${rows.length} bird${rows.length === 1 ? '' : 's'} ${what}, in ${groups.length} famil${groups.length === 1 ? 'y' : 'ies'}`;
-    const row = (b) => `<a class="ixr" href="${birdLink(b)}" data-link>
+    let row = (b) => `<a class="ixr" href="${birdLink(b)}" data-link>
         <span class="no">${+b.id.slice(3)}</span>${thumb(b)}
         <span class="nm"><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span></span>
         ${badge(b, i, st.season)}${b.lv ? strip(b, i) : '<span class="ixc-strip"></span>'}
       </a>`;
+    // Photo view: the same birds as square tiles.
+    const tile = (b) => { const pic = birdPic(b, 'thumb'), v = levelOf(b, i, st.season);
+      return `<a class="ixt" href="${birdLink(b)}" data-link><span class="art">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : `<b>${+b.id.slice(3)}</b>`}</span>
+        <span class="cap"><span class="bn">${esc(b.n)}</span>${typeof v === 'number' ? `<span class="ixc-badge l${v}" title="Level ${v}">${v}</span>` : ''}</span></a>`; };
+    if (st.look === 'photos') row = tile;
+    const wrap = (html) => (st.look === 'photos' ? `<div class="ix-tiles">${html}</div>` : `<div class="ix-rows">${html}</div>`);
     const byLevel = st.sort === 'level';
     view.querySelector('.ix-body2').classList.toggle('flat', byLevel);
     const fold = $('#ixfold', view); fold.hidden = byLevel || groups.length < 2;
     if (byLevel) {
       // One flat list: level 1 first, then 2, 3, then birds with no level here this season.
       const rank = (b) => { const v = levelOf(b, i, st.season); return typeof v === 'number' ? v : 9; };
-      list.innerHTML = `<div class="ix-rows">${rows.slice().sort((a, b) => rank(a) - rank(b) || a.n.localeCompare(b.n)).map(row).join('')}</div>` || '';
+      list.innerHTML = wrap(rows.slice().sort((a, b) => rank(a) - rank(b) || a.n.localeCompare(b.n)).map(row).join(''));
       $('#ixrail', view).innerHTML = '';
       return;
     }
     list.innerHTML = groups.map((g, gi) => `<details class="ix-fam" id="fam-${gi}" open>
       <summary><h2><span>${esc(g.fam)}</span><span class="ct">${g.birds.length}</span></h2></summary>
-      <div class="ix-rows">${g.birds.map(row).join('')}</div></details>`).join('') || '<p class="mag-deck" style="padding:40px 0">No birds match. Try another region, season or spelling.</p>';
+      ${wrap(g.birds.map(row).join(''))}</details>`).join('') || '<p class="mag-deck" style="padding:40px 0">No birds match. Try another region, season or spelling.</p>';
     $('#ixrail', view).innerHTML = groups.map((g, gi) => `<button type="button" data-f="${gi}"><span>${esc(g.fam)}</span><i>${g.birds.length}</i></button>`).join('');
     $$('#ixrail [data-f]', view).forEach((x) => (x.onclick = () => { const f = document.getElementById('fam-' + x.dataset.f); if (f) f.open = true; f?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' }); }));
   };
   const press = (sel, key) => $$(sel, view).forEach((b) => (b.onclick = () => {
-    st[key] = b.dataset[key === 'show' ? 'show' : key === 'region' ? 'r' : 's'];
+    st[key] = b.dataset[key === 'show' ? 'show' : key === 'look' ? 'look' : key === 'region' ? 'r' : 's'];
     $$(sel, view).forEach((x) => x.setAttribute('aria-pressed', x === b));
     draw();
   }));
   press('[data-show]', 'show'); press('[data-s]', 'season');
   $('#ixreg', view).onclick = pickRegion;
   $('#ixsort', view).onchange = (e) => { st.sort = e.target.value; draw(); };
+  press('[data-look]', 'look');
   $('#ixfold', view).onclick = (e) => { const all = $$('details.ix-fam', view), open = all.some((x) => x.open); all.forEach((x) => (x.open = !open)); e.target.textContent = open ? 'Expand all families' : 'Collapse all families'; };
   $('#ixq', view).addEventListener('input', (e) => { st.q = e.target.value; draw(); });
   draw();

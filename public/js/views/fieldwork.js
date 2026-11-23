@@ -3,6 +3,9 @@ import { birdPic } from '../refphoto.js';
 import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, levelOf } from '../wi.js';
 import { seasonCards, latestOccurrence, windowSpan, WINDOWS } from '../rotation.js';
 import { subscribeForm, bindSubscribe, loadIssues, currentIssue, stateLine } from '../issues.js';
+import { loadMap, mapSvg } from '../regionmap.js';
+import { setRegion } from '../wi.js';
+import { calendarFile } from '../calendar.js';
 
 const DAY = 864e5;
 const fmt = (ms) => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
@@ -44,9 +47,12 @@ export default async function fieldwork(view, seasonArg) {
         <div>
           <p class="mag-kicker">${esc(occLabel(season, occ.year))}, assignment ${shownIdx + 1} of ${WINDOWS}</p>
           <h1 class="mag-h">${isNow ? 'Your nine birds' : 'Nine birds'}</h1>
-          <p class="fw-for">${esc(d.region_names[region])}, ${esc(range(span))}. <button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button></p>
+          <p class="fw-for">${esc(d.region_names[region])}, ${esc(range(span))}. ${region === myRegion(d) ? `<button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button>`
+            : `<button type="button" class="linkish" id="mine">Make this my region</button> <button type="button" class="linkish" id="back">Back to the ${esc(d.region_names[myRegion(d)])}</button>`}</p>
+          <p class="fw-tools"><a class="mag-btn" href="/field-card?r=${region}&s=${season}&a=${shownIdx}" data-link>Print a field card</a>${occ.live ? '<button type="button" class="mag-btn" id="cal">Add the next dates to my calendar</button>' : ''}</p>
         </div>
-        ${occ.live ? `<p class="fw-count"><b>${daysLeft}</b><span>day${daysLeft === 1 ? '' : 's'} until<br>${nextLabel.toLowerCase()}</span></p>` : ''}
+        <div class="fw-side"><div class="fw-map" id="fw-map" aria-label="Choose a region to see its nine birds"></div>
+        ${occ.live ? `<p class="fw-count"><b>${daysLeft}</b><span>day${daysLeft === 1 ? '' : 's'} until<br>${nextLabel.toLowerCase()}</span></p>` : ''}</div>
       </header>
       <div class="fw-ctl">
         <span class="fw-lbl" id="fw-s">Season</span>
@@ -91,7 +97,16 @@ export default async function fieldwork(view, seasonArg) {
         <p class="mag-deck" style="margin-top:20px">No points for photos taken with bait, playback, or by flushing birds or disturbing nests. No exact location is ever published for a scarce or rare bird.</p>
       </section>
     </div>`;
-    $('#chg', view).onclick = pickRegion;
+    const chg = $('#chg', view); if (chg) chg.onclick = pickRegion;
+    const mine = $('#mine', view); if (mine) mine.onclick = () => { setRegion(region); window.dispatchEvent(new Event('route')); };
+    const back = $('#back', view); if (back) back.onclick = () => { region = myRegion(d); pick = null; draw(); };
+    const cal = $('#cal', view); if (cal) cal.onclick = () => calendarFile(d, region);
+    // The map: the region on show is yellow, the reader's own region is outlined. Clicking shows another region's nine.
+    loadMap().then((g) => {
+      const box = $('#fw-map', view); if (!box) return;
+      box.innerHTML = mapSvg(g, (r) => (r === region ? 'on' : r === myRegion(d) ? 'home' : ''), { labels: false, title: (r) => `See the nine birds for the ${d.region_names[r]}` });
+      box.querySelectorAll('[data-mr]').forEach((p) => (p.onclick = () => { region = p.dataset.mr; pick = null; draw(); }));
+    }).catch(() => {});
     bindSubscribe(view);
     $$('[data-s]', view).forEach((b) => (b.onclick = () => { season = b.dataset.s; pick = null; draw(); }));
     $$('[data-c]', view).forEach((b) => (b.onclick = () => { pick = +b.dataset.c; draw(); }));
