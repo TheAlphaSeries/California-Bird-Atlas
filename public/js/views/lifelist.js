@@ -1,4 +1,4 @@
-import { S, $, $$, api, esc, toast, plate, modal, fmtDate, goalSpecies, inGoal, STATUS, NATIVE, SEASON, PRIORITY } from '../util.js';
+import { S, $, $$, api, esc, toast, plate, modal, goalSpecies, inGoal, STATUS, NATIVE, SEASON, PRIORITY } from '../util.js';
 import { DataGrid } from '../grid.js';
 
 let tab = 'editorial', chip = 'all';

@@ -1,4 +1,13 @@
-import { S, $, $$, api, loadAll, toast, modal, go, esc } from './util.js';
+// The page shell: routing, the menu bar and the footer. No framework and no build step.
+//
+// - `routes` maps a URL to a view module in ./views. A view is `export default async function (el, ...urlParts)`
+//   that fills `el` with its page.
+// - Magazine pages (MAG) are built off-screen and swapped in, so there is never a half-drawn page. PAPER lists
+//   which of them are white reading pages; the rest are black.
+// - S (from util.js) is the shared state loaded once from /api/bootstrap: species, families, settings, owner.
+// - To add a page: write views/<name>.js, add a line to `routes`, add its nav key to MAG (and PAPER if white),
+//   and add it to PUBLIC_NAV if it belongs in the menu.
+import { S, $, $$, api, loadAll, toast, modal, esc } from './util.js';
 import { openObservation, syncDrafts, draftCount } from './observe.js';
 import { regionName, pickRegion } from './wi.js';
 
@@ -31,12 +40,12 @@ let renderSeq = 0;
 // Reading pages are printed on paper; photo pages (cover, walls) stay black.
 const PAPER = new Set(['fieldwork', 'index', 'about', 'submit', 'add', 'review', 'gallery']);
 // The sideways section label in the left margin, one per section.
-const TATEGAKI = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs' };
+const MARGIN_LABEL = { fieldwork: 'Field assignments', wall: 'Reader photos', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs' };
 function swapIn(view, tmp, mag, nav = '') {
   const apply = () => {
     document.body.classList.toggle('mag', mag);
     document.body.classList.toggle('paper', mag && PAPER.has(nav));
-    const t = document.getElementById('tategaki'); if (t) { t.textContent = (mag && TATEGAKI[nav]) || ''; t.hidden = !t.textContent; }
+    const t = document.getElementById('tategaki'); if (t) { t.textContent = (mag && MARGIN_LABEL[nav]) || ''; t.hidden = !t.textContent; }
     view.replaceChildren(tmp);
     if (!location.hash) window.scrollTo(0, 0);
   };

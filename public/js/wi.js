@@ -1,4 +1,24 @@
-// WILD INDEX data: regional levels, seasonal cards and scoring, from /data/wildindex.json.
+// The field guide data: every bird, how hard it is to find in each region and season, and the scoring rules.
+// Loaded once from /data/wildindex.json (written by tools/wildindex/export_site_data.py; never edit the JSON by hand).
+//
+// Shape of the object wi() resolves to:
+//   regions       ['BAY','NC','CV','SN','CC','SC','DES']   region codes; the ORDER matters (see lv and rr below)
+//   region_names  { BAY: 'Bay Area', ... }
+//   scoring       { base, stars, reupload, bonus, activity }   point values shown on This Season
+//   birds[]       all 696 species, in official checklist order:
+//     id    'WI-382'       permanent plate number, used in URLs (/birds/WI-382)
+//     n     common name    the join key to the database's species table (S.spByName)
+//     sci   scientific name
+//     fam   family, in English
+//     kind  status on the state list, e.g. 'Native', 'Introduced', 'Rare visitor (review list)'
+//     cat   one of CATEGORY's keys; decides scoring and whether the bird can be assigned
+//     lv    { W, P, S, F }  one 7-character string per season, one character per region in `regions` order:
+//           '1' easy, '2' takes a trip, '3' hard, '-' not dependable. Example: W: '222-222'. Only assignable birds have it.
+//     rr    7 characters, one per region: 'y' regular, 'r' rare there, '-' absent
+//     why, prot, note, look, conf   optional notes (why not assigned, protection, field note, look-alike, confidence)
+//   byId, byName  Maps added here for lookups
+//
+// Use levelOf(bird, regionIndex, seasonCode) to read a level; don't index the strings directly.
 import { S, esc, modal } from './util.js';
 
 export const SEASONS = { W: 'Winter', P: 'Spring', S: 'Summer', F: 'Fall' };
@@ -10,16 +30,19 @@ export const CATEGORY = {
 // Photos that ship with the site, shown until uploaded photographs replace them.
 export const BUILT_IN = { 'Great Blue Heron': { src: '/img/great-blue-heron.jpg', caption: 'Found all year in every region of California.' } };
 
-let data = null;
-export async function wi() {
-  if (!data) {
-    const res = await fetch('/data/wildindex.json');
-    if (!res.ok) throw new Error('The bird index could not be loaded.');
-    data = await res.json();
-    data.byId = new Map(data.birds.map((b) => [b.id, b]));
-    data.byName = new Map(data.birds.map((b) => [b.n, b]));
+let dataP = null; // the promise is cached, so pages that load together share one download
+export function wi() {
+  if (!dataP) {
+    dataP = (async () => {
+      const res = await fetch('/data/wildindex.json');
+      if (!res.ok) throw new Error('The bird index could not be loaded.');
+      const data = await res.json();
+      data.byId = new Map(data.birds.map((b) => [b.id, b]));
+      data.byName = new Map(data.birds.map((b) => [b.n, b]));
+      return data;
+    })().catch((e) => { dataP = null; throw e; });
   }
-  return data;
+  return dataP;
 }
 
 export function currentSeason(d = new Date()) {
@@ -76,7 +99,6 @@ export function pointsLabel(b, d) {
 }
 
 // The species record in the database for an index bird (for photographs), if any.
-export const dbSpecies = (b) => S.species.find((s) => s.common_name === b.n);
+export const dbSpecies = (b) => S.spByName.get(b.n);
 export const birdLink = (b) => `/birds/${b.id}`;
 export const lvSpan = (v) => v == null ? '<span class="lv none">–</span>' : v === 'r' ? '<span class="lv none">rare</span>' : `<span class="lv l${v}">${v}</span>`;
-export const birdName = (b) => `<span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>`;

@@ -11,6 +11,8 @@ A photography-led website about California's native birds.
 It runs on Cloudflare: one Worker (`src/worker.js`) serves the pages in `public/` and an API, with a D1 database
 for records and photos. There is no build step.
 
+How the code and data are organised: see [ARCHITECTURE.md](ARCHITECTURE.md). Before pushing a change, run `npm run check`.
+
 ## Go live (Cloudflare dashboard, about 10 minutes)
 
 The D1 database `california-bird-atlas` already exists in your Cloudflare account, and `wrangler.jsonc` points at it.

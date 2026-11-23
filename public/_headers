@@ -1,0 +1,17 @@
+# Caching for static files (Cloudflare reads this file; it is not served).
+# Pages, scripts and styles keep the default: the browser checks for a new version on every visit,
+# so a push to GitHub shows up straight away. The files below change rarely or never.
+
+# The cut-out tool's runtime and model: about 19 MB, downloaded once per device.
+/vendor/*
+  Cache-Control: public, max-age=31536000, immutable
+/models/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Photos that ship with the site. A changed photo should get a new file name.
+/img/*
+  Cache-Control: public, max-age=604800
+
+# Field guide data and the sample wall: small, and refreshed within the hour after a change.
+/data/*
+  Cache-Control: public, max-age=3600

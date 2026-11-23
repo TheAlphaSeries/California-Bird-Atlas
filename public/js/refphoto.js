@@ -4,7 +4,7 @@ import { BUILT_IN } from './wi.js';
 // The picture to show for a bird: a published photograph, the built-in cover photo, or a credited reference photo
 // from Wikimedia Commons. Returns null when there is none.
 export function birdPic(b, size = 'display') {
-  const sp = S.species.find((s) => s.common_name === b.n);
+  const sp = S.spByName.get(b.n);
   if (sp?.photo_id) return { src: `/media/${sp.photo_id}/${size}`, kind: 'own', sp };
   if (BUILT_IN[b.n]) return { src: BUILT_IN[b.n].src, kind: 'built', sp };
   if (sp?.ref_url) return { src: size === 'thumb' ? (sp.ref_thumb || sp.ref_url) : sp.ref_url, kind: 'ref', sp, credit: sp.ref_credit, license: sp.ref_license, license_url: sp.ref_license_url, source: sp.ref_source_url };
@@ -22,7 +22,7 @@ export function refCredit(pic) {
 const REASONS = [['wrong-species', "It's a different bird"], ['plumage', "Right bird, but not how it usually looks in California"], ['not-photo', "It's a drawing, map or diagram"], ['quality', 'Too small, blurry or dark to tell'], ['other', 'Something else']];
 
 export function reportPhoto(spId) {
-  const sp = S.species.find((s) => s.id === spId);
+  const sp = S.spById.get(spId);
   if (!sp) return;
   const el = document.createElement('div'); el.className = 'modal mag-modal';
   el.innerHTML = `<div class="sheet" role="dialog" aria-modal="true" aria-label="Report this photo"><button class="x" type="button">Close</button>

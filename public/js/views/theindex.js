@@ -1,6 +1,6 @@
 import { $, $$, S, esc } from '../util.js';
 import { birdPic } from '../refphoto.js';
-import { wi, SEASONS, SEASON_ORDER, CATEGORY, BUILT_IN, currentSeason, myRegion, pickRegion, birdLink, levelOf } from '../wi.js';
+import { wi, SEASONS, SEASON_ORDER, CATEGORY, currentSeason, myRegion, pickRegion, birdLink, levelOf } from '../wi.js';
 
 let st = null;
 const SHOW = [['here', 'Findable here now'], ['rare', 'Rare finds'], ['out', 'Off-limits'], ['all', 'All birds']];

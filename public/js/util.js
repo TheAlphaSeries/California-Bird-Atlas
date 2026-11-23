@@ -20,6 +20,7 @@ export async function loadAll() {
   Object.assign(S, d);
   S.famById = new Map(S.families.map((f) => [f.id, f]));
   S.spById = new Map(S.species.map((s) => [s.id, s]));
+  S.spByName = new Map(S.species.map((s) => [s.common_name, s])); // joins a field-guide bird (wildindex.json) to its database record
   try { S.goal = JSON.parse(S.settings.goal || 'null') || DEFAULT_GOAL; } catch { S.goal = DEFAULT_GOAL; }
   return S;
 }

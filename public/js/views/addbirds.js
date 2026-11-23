@@ -1,4 +1,4 @@
-import { S, $, $$, api, esc, toast } from '../util.js';
+import { S, $, api, esc, toast } from '../util.js';
 import { wi, REGIONS, REGION_NAMES, myRegion } from '../wi.js';
 import { readExif, derivatives } from '../exif.js';
 import { openClipper, autoCut, warmClipper } from '../clip.js';

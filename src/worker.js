@@ -1,4 +1,37 @@
-// California Bird Atlas — Cloudflare Worker (API + media). Static pages are served from ./public.
+// California Bird Atlas: the Cloudflare Worker. It answers /api/* and /media/*; everything else is a static file
+// from ./public (see wrangler.jsonc). One file, no build step. Full map of the project: ARCHITECTURE.md.
+//
+// TABLES (created by SCHEMA below; D1 is SQLite)
+//   settings       key/value. Holds schema_version, the cover (JSON), the editor's goal and default visibility.
+//   families       bird families, seeded from src/seed.json.
+//   species        the 696 birds on the state list, seeded once. ref_* columns hold the reference photo
+//                  (a Wikimedia Commons link, never a stored file). common_name is the join key to the
+//                  field guide data in public/data/wildindex.json.
+//   observations   the editor's own sightings. Private unless visibility = 'public'; exact places never leave the server.
+//   photos         the editor's own photographs, attached to a species (and optionally an observation).
+//   submissions    EVERY bird on or headed for the Bird Wall, whoever added it:
+//                    status   'pending' (waiting in Review) | 'approved' (on the wall) | 'rejected'
+//                    sample   1 = an openly licensed Wikimedia photo added by "Fill with sample birds"
+//                    cut_w/h  size of the cut-out; a bird only shows on the wall once it has one
+//                  Readers' photos arrive pending; the editor's own (POST /api/wall) arrive approved.
+//   photo_reports  readers' "wrong reference photo" reports, open until the editor keeps or replaces the photo.
+//   blobs          image files, in chunks, until R2 is switched on (see putBlob). Keys:
+//                    photos/<photo id>/thumb|display|original      subs/<submission id>/thumb|display|cutout
+//   custom_fields, saved_views, sources   support the editor's tool pages.
+//
+// CHANGING THE SCHEMA: add the column to SCHEMA for new databases, add an ALTER in init() for existing ones,
+// and raise SCHEMA_VERSION so init() runs once more on the live database.
+//
+// WHO CAN DO WHAT: `owner` is true when the request carries the editor's signed session cookie. Routes call
+// need() before any change. Visitors get only public rows, with locations stripped (publicPhoto, publicObs).
+//
+// ROUTES (search for "r === '<name>'")
+//   /media/<id>/<variant>, /media/sub/<id>/<variant>   image files
+//   session, login, logout     editor sign-in
+//   bootstrap                  everything the pages need at start: species, families, settings
+//   species, reference, reports, observations, photos
+//   wall (GET public list, POST editor adds a bird), samples, submissions (POST public; the rest editor only)
+//   fields, views, settings, export
 import seed from './seed.json';
 
 const SCHEMA_VERSION = '4';
@@ -125,13 +158,16 @@ async function patchRow(db, table, id, body, allowed) {
 }
 
 // ---------- media storage: R2 when bound, otherwise D1 chunks (display copies only) ----------
+// Image storage: R2 when the PHOTOS bucket is bound (wrangler.jsonc), otherwise the blobs table in D1.
+// Each photo or submission records which one it used in its `store` column ('r2' or 'd1').
 const CHUNK = 900 * 1024;
 async function putBlob(env, key, buf, type) {
   if (env.PHOTOS) { await env.PHOTOS.put(key, buf, { httpMetadata: { contentType: type } }); return; }
+  // D1 rows have a size limit, so a file is stored as numbered chunks under one key.
+  // Clear the key first: a smaller file saved over a larger one must not keep the old file's extra chunks.
   const bytes = new Uint8Array(buf);
-  const stmts = [];
-  for (let i = 0, n = 0; i < bytes.length; i += CHUNK, n++) stmts.push(env.DB.prepare(`INSERT OR REPLACE INTO blobs (key, idx, data) VALUES (?,?,?)`).bind(key, n, bytes.slice(i, i + CHUNK)));
-  for (const s of stmts) await s.run();
+  await env.DB.prepare(`DELETE FROM blobs WHERE key = ?`).bind(key).run();
+  for (let i = 0, n = 0; i < bytes.length; i += CHUNK, n++) await env.DB.prepare(`INSERT INTO blobs (key, idx, data) VALUES (?,?,?)`).bind(key, n, bytes.slice(i, i + CHUNK)).run();
 }
 async function getBlob(env, key, store) {
   if (store === 'r2') { if (!env.PHOTOS) return null; const o = await env.PHOTOS.get(key); return o ? o.body : null; }

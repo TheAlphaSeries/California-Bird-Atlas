@@ -1,6 +1,6 @@
 import { $, $$, esc } from '../util.js';
 import { birdPic } from '../refphoto.js';
-import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, birdName, levelOf } from '../wi.js';
+import { wi, SEASONS, SEASON_ORDER, currentSeason, myRegion, pickRegion, hasRegion, birdLink, levelOf } from '../wi.js';
 import { seasonCards, latestOccurrence, windowSpan, WINDOWS } from '../rotation.js';
 
 const DAY = 864e5;

@@ -1,6 +1,6 @@
 import { S, esc } from '../util.js';
 import { birdPic, refCredit, bindReports } from '../refphoto.js';
-import { wi, SEASONS, SEASON_ORDER, CATEGORY, BUILT_IN, dbSpecies, levelOf, lvSpan, pointsLabel } from '../wi.js';
+import { wi, SEASONS, SEASON_ORDER, CATEGORY, dbSpecies, levelOf, lvSpan, pointsLabel } from '../wi.js';
 
 export default async function bird(view, id) {
   document.body.classList.add('mag');
