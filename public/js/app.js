@@ -92,6 +92,8 @@ export function renderChrome() {
     <button type="button" id="u-region" class="region-chip" aria-label="Your region: ${regionName()}. Change region"><span class="rl">Region: </span><b>${regionName()}</b></button>
     ${S.owner && onTool ? `<button type="button" class="cta" id="u-add">Add observation</button>${n ? `<button type="button" id="u-drafts">${n} draft${n > 1 ? 's' : ''} waiting</button>` : ''}` : ''}
     ${S.owner ? '<a href="/settings" data-link>Settings</a>' : ''}`;
+  let cv = {}; try { cv = JSON.parse(S.settings?.cover || '{}'); } catch { cv = {}; }
+  $('#strip').innerHTML = `<span><b>${esc(cv.issue || 'No. 1')}</b> ${esc(cv.season || 'Winter 2026–27')}</span><span>Free to read. Made from readers' photographs.</span>`;
   $('#u-region').onclick = pickRegion;
   if (S.owner && onTool) { $('#u-add').onclick = () => openObservation(); const d = $('#u-drafts'); if (d) d.onclick = () => syncDrafts(true); }
   $('#quick-entry').hidden = !S.owner;

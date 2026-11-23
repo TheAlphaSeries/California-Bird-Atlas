@@ -163,3 +163,133 @@ body.mag.paper #view [style*="e6e2da"] { color: var(--j-ink) !important; }
 .wb-cap .by { color: var(--mag-faint); }
 .cv-cap .cr, .ref-cap .cr { display: block; }
 .ref-cap > span > b { display: block; }
+
+/* ================= GUSTO: poster cover, heavy condensed heads, hard blocks of yellow and ink ================= */
+:root { --j-heavy: 900 1em/1 var(--j-sans); }
+
+/* issue strip above the masthead */
+.strip { display: none; }
+body.mag .strip { display: flex; justify-content: space-between; gap: 16px; padding: 6px 24px; background: var(--j-yellow); color: var(--j-ink); font: 600 12px/1.2 var(--j-sans); }
+.strip b { font-weight: 900; margin-right: 6px; }
+body.mag .masthead { border-top: 0; }
+body.mag .wordmark .wm-en { font: 900 25px/1 var(--j-sans); font-stretch: 68%; text-transform: uppercase; letter-spacing: .005em; }
+.wm-tag { font-size: 11px; }
+@media (max-width: 640px) { .strip span:last-child { display: none; } }
+
+/* heads: heavy, condensed, set tight */
+.mag-h, .ix-title { font: 900 clamp(60px, 10.5vw, 164px)/.84 var(--j-sans); font-stretch: 62%; text-transform: uppercase; letter-spacing: -.012em; margin: 16px 0 18px; }
+.wall-head .ix-title { font-size: clamp(46px, 7.6vw, 118px); max-width: 13ch; }
+.bird h1.mag-h { font-size: clamp(48px, 6.6vw, 104px) !important; }
+.modal.mag-modal h2 { font-family: var(--j-mincho); font-weight: 700; }
+.mag-kicker { transform: rotate(-1.5deg); font-size: 13px; padding: 6px 10px 5px; }
+.mag-deck { max-width: 54ch; }
+
+/* buttons: a hard printed shadow on paper */
+.mag-btn { font-weight: 700; min-height: 46px; border-width: 2px; }
+body.mag.paper #view .mag-btn { box-shadow: 4px 4px 0 var(--j-ink); transition: transform .08s, box-shadow .08s; }
+body.mag.paper #view .mag-btn:hover { transform: translate(2px, 2px); box-shadow: 2px 2px 0 var(--j-ink); }
+body.mag.paper #view .mag-btn:active { transform: translate(4px, 4px); box-shadow: none; }
+body.mag.paper #view .mag-btn.solid { border-color: var(--j-ink); }
+body.mag.paper #view .mag-btn:disabled { box-shadow: none; opacity: .45; transform: none; }
+
+/* ---------- the poster cover ---------- */
+.cv2 { --ts: clamp(70px, 17.4vw, 252px); position: relative; display: grid; grid-template-columns: minmax(0, 46fr) minmax(0, 54fr); max-width: 1440px; margin: 0 auto; padding: 22px 24px 0; }
+.cv2-title { grid-column: 1 / -1; position: relative; z-index: 2; margin: 0; font: 900 var(--ts)/.8 var(--j-sans); font-stretch: 62%; text-transform: uppercase; letter-spacing: -.012em; color: var(--j-yellow); }
+.cv2-text { position: relative; z-index: 4; padding: 30px 12px 40px 0; align-self: end; }
+.cv2-hl { margin: 14px 0 0; font: 900 clamp(44px, 6.2vw, 92px)/.86 var(--j-sans); font-stretch: 66%; text-transform: uppercase; white-space: pre-line; color: #fff; }
+.cv2-dk { margin: 16px 0 0; max-width: 400px; font: 500 clamp(17px, 1.6vw, 22px)/1.45 var(--j-mincho); }
+.cv2-lines { list-style: none; margin: 28px 0 0; padding: 0; max-width: 400px; }
+.cv2-lines li { display: flex; gap: 12px; align-items: baseline; padding: 9px 0; border-top: 1px solid #333; font: 600 16px/1.3 var(--j-sans); }
+.cv2-lines li::before { content: ''; flex: none; width: 9px; height: 9px; background: var(--j-yellow); }
+.cv2-bird { margin: calc(-1.42 * var(--ts)) 0 0; }
+.cv2-art { position: relative; }
+.cv2-art .base { position: relative; z-index: 1; display: block; width: 100%; height: auto; }
+.cv2-art .cut { position: absolute; z-index: 3; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.cv2-art .mk { position: absolute; z-index: 5; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; background: var(--j-yellow); color: var(--j-ink); font: 900 14px/26px var(--j-sans); text-align: center; box-shadow: 0 0 0 3px rgba(0, 0, 0, .55); }
+.cv2 .cv-cap { position: relative; z-index: 4; margin: 12px 0 26px; max-width: 560px; color: #cfcfc8; }
+.cv-cap .notes { display: block; margin-top: 8px; color: #fff; }
+.cv-cap .notes b { display: inline-block; width: 18px; height: 18px; border-radius: 50%; background: var(--j-yellow); color: var(--j-ink); font: 900 11px/18px var(--j-sans); text-align: center; margin: 0 4px 0 6px; }
+.cv-cap .notes b:first-child { margin-left: 0; }
+.cv2-sticker { position: absolute; z-index: 6; left: 39%; top: calc(1.75 * var(--ts)); width: 148px; height: 148px; margin: 0; border-radius: 50%; background: #fff; color: var(--j-ink); transform: rotate(-11deg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; font: 800 14px/1.15 var(--j-sans); box-shadow: 6px 6px 0 var(--j-yellow); }
+.cv2-sticker b { font: 900 62px/.8 var(--j-sans); font-stretch: 70%; margin-bottom: 4px; }
+.cv2 .cover-actions { grid-column: 1 / -1; position: relative; z-index: 4; justify-content: flex-start; margin: 0 0 20px; }
+.cv2-band { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; padding: 16px max(24px, calc((100vw - 1392px) / 2)); background: var(--j-yellow); color: var(--j-ink); text-decoration: none; }
+.cv2-band .lead { font: 900 22px/1 var(--j-sans); font-stretch: 70%; text-transform: uppercase; }
+.cv2-band .names { display: flex; flex-wrap: wrap; gap: 4px 0; flex: 1 1 520px; font: 600 15px/1.35 var(--j-mincho); }
+.cv2-band .names span:not(:last-child)::after { content: '/'; margin: 0 9px; opacity: .45; }
+.cv2-band .go { font: 800 14px var(--j-sans); background: var(--j-ink); color: #fff; padding: 11px 14px; }
+.cv2-band:hover .go { background: #fff; color: var(--j-ink); }
+.how { border-top: 0; }
+@media (max-width: 860px) {
+  .cv2 { grid-template-columns: 1fr; --ts: 20.5vw; padding-top: 14px; }
+  .cv2-bird { order: 2; margin: calc(-.55 * var(--ts)) -8px 0 8%; }
+  .cv2-text { order: 3; padding: 4px 0 30px; }
+  .cv2-sticker { left: 14px; top: calc(2.3 * var(--ts)); width: 104px; height: 104px; font-size: 11px; box-shadow: 4px 4px 0 var(--j-yellow); }
+  .cv2-sticker b { font-size: 42px; }
+}
+
+/* ---------- This Season: big level numerals, a numbered run of nine ---------- */
+.levels { counter-reset: nine; gap: 28px; }
+.level { border-top: 0; padding-top: 0; }
+.level .top { align-items: stretch; background: var(--j-ink); color: #fff; }
+.level h3 { display: flex; align-items: stretch; gap: 14px; font: 900 22px/1 var(--j-sans); font-stretch: 70%; text-transform: uppercase; }
+.level h3 .lvn { display: flex; align-items: center; justify-content: center; min-width: 74px; padding: 6px 0 2px; background: var(--j-yellow); color: var(--j-ink); font: 900 68px/.9 var(--j-sans); font-stretch: 62%; }
+.level h3 .lvw { align-self: center; }
+.level .pts { align-self: center; padding-right: 14px; color: #fff; font-weight: 700; }
+body.mag:not(.paper) .level .top { background: #fff; color: var(--j-ink); } body.mag:not(.paper) .level .pts { color: var(--j-ink); }
+.level .bl { margin: 12px 0 10px; }
+.level a.bird.has-thumb { counter-increment: nine; gap: 16px; padding: 10px 0; position: relative; }
+.level a.bird .bt { width: 84px; height: 84px; border-radius: 0; position: relative; overflow: visible; }
+.level a.bird .bt img { position: absolute; inset: 0; }
+.level a.bird .bt::after { content: counter(nine, decimal-leading-zero); position: absolute; left: -2px; top: -2px; padding: 3px 5px 2px; background: var(--j-yellow); color: var(--j-ink); font: 900 12px/1 var(--j-sans); }
+.level .bn { font: 700 23px/1.15 var(--j-mincho); }
+.rot-next { border-left-width: 8px; font-size: 16px; }
+body.mag.paper #view .rot-next { background: var(--j-yellow); }
+.steps-inline li { border-width: 2px !important; border-color: var(--j-ink) !important; }
+.steps-inline li::before { display: inline-block; min-width: 34px; padding: 4px 6px 1px; text-align: center; background: var(--j-yellow); color: var(--j-ink) !important; font: 900 26px/1 var(--j-sans); font-stretch: 66%; }
+body.mag.paper #view .pill, body.mag.paper #view .seg button { border-width: 2px; border-color: var(--j-ink); font-weight: 600; }
+body.mag.paper #view .pill.locked { border-style: dashed; }
+
+/* ---------- All Birds ---------- */
+.ix-stats { border-top: 6px solid var(--mag-ink); gap: 18px 44px; }
+.ix-stats dd { font: 900 clamp(56px, 7.4vw, 104px)/.86 var(--j-sans); font-stretch: 62%; margin-top: 4px; }
+body.mag.paper #view .ix-stats dd { background: linear-gradient(transparent 62%, var(--j-yellow) 62%); display: inline-block; padding: 0 6px 0 2px; }
+.ix-fam h2 { border-bottom: 3px solid var(--mag-ink); font: 900 clamp(26px, 3vw, 38px)/1 var(--j-sans); font-stretch: 68%; text-transform: uppercase; }
+.ix-fam h2 .ct { background: var(--j-yellow); color: var(--j-ink) !important; padding: 3px 6px; font-weight: 900; letter-spacing: 0; }
+body.mag.paper #view .ixc { border-width: 2px; border-color: var(--j-ink); transition: transform .08s, box-shadow .08s; }
+body.mag.paper #view .ixc:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--j-yellow); }
+.ixc-no { font-weight: 900; color: var(--mag-ink); }
+.ixc .bn { font-weight: 700; }
+.ixc-badge { font-weight: 800; border-width: 2px; }
+
+/* ---------- bird page ---------- */
+.plate .pn { display: inline-flex; align-items: baseline; gap: 8px; padding: 0 0 0 14px; border-left: 6px solid var(--j-yellow); font: 900 54px/.9 var(--j-sans); font-stretch: 62%; }
+.plate .pn i { font: 700 12px/1 var(--j-sans); font-stretch: 100%; color: var(--mag-faint); }
+.bird dt { margin-top: 22px; padding-top: 10px; border-top: 2px solid var(--mag-ink); color: var(--mag-ink) !important; font-weight: 800 !important; }
+body.mag.paper #view .bird .art img { border: 2px solid var(--j-ink); box-shadow: 10px 10px 0 var(--j-yellow); }
+
+/* ---------- Bird Wall ---------- */
+.wall-sample-note { border-left-width: 8px; }
+.wb-cap .nm { font-weight: 700; font-size: 18px; }
+.wb:hover .nm, .wb:focus-visible .nm { background: var(--j-yellow); color: var(--j-ink); box-shadow: 0 0 0 4px var(--j-yellow); }
+
+/* ---------- how it works ---------- */
+.how h2, .mag-section h2 { font: 900 clamp(38px, 5.2vw, 78px)/.9 var(--j-sans); font-stretch: 64%; text-transform: uppercase; max-width: 16ch; }
+.mag-sub { font: 900 clamp(26px, 3vw, 40px)/.95 var(--j-sans); font-stretch: 66%; text-transform: uppercase; }
+.how-steps li { border-top: 0; padding-top: 0; }
+.how-steps .n { display: inline-block; min-width: 62px; padding: 8px 8px 2px; background: var(--j-yellow); color: var(--j-ink) !important; text-align: center; font: 900 58px/.9 var(--j-sans); font-stretch: 62%; }
+.how-steps h3 { margin-top: 14px; font: 900 27px/1 var(--j-sans); font-stretch: 70%; text-transform: uppercase; }
+
+/* ---------- back cover ---------- */
+body.mag .colophon { display: block; margin-top: 80px; padding: 34px 24px 44px; background: var(--j-ink); color: #cfcfc8 !important; border-top: 10px solid var(--j-yellow) !important; }
+body.mag .colophon::before { content: 'California Bird Atlas'; display: block; margin-bottom: 18px; color: var(--j-yellow); font: 900 clamp(48px, 11vw, 168px)/.8 var(--j-sans); font-stretch: 62%; text-transform: uppercase; letter-spacing: -.012em; }
+body.mag .colophon span { display: block; margin-top: 6px; font-size: 14px; }
+body.mag .colophon a { color: #fff; }
+
+/* review fixes */
+.cv2 { --ts: clamp(64px, 15.3vw, 222px); }
+.cv2-bird { margin-top: calc(-1.5 * var(--ts)); }
+.cv2-sticker { top: calc(2.1 * var(--ts)); }
+.steps-inline li::before { display: block; width: fit-content; margin-bottom: 10px; }
+@media (max-width: 860px) { .cv2 { --ts: 20.5vw; } .cv2-bird { margin-top: calc(-.55 * var(--ts)); } .cv2-sticker { top: calc(2.3 * var(--ts)); } }

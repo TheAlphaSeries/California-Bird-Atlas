@@ -44,7 +44,7 @@ export default async function fieldwork(view, seasonArg) {
       <div class="pills" role="group" aria-label="Season"><span class="pills-lbl">Season</span>${SEASON_ORDER.map((s) => `<button type="button" class="pill" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
       <div class="pills rot-cards" role="group" aria-label="Card"><span class="pills-lbl">Cards</span>${cards.slice(0, occ.window + 1).map((_, i) => `<button type="button" class="pill" data-c="${i}" aria-pressed="${i === shownIdx}">${range(windowSpan(season, occ.year, i))}${occ.live && i === occ.window ? ' (now)' : ''}</button>`).join('')}${occ.live && occ.window < WINDOWS - 1 ? `<span class="pill locked" title="Revealed on ${fmt(curSpan.end)}">${WINDOWS - 1 - occ.window} more to come</span>` : ''}</div>
       <div class="levels">${[1, 2, 3].map((L) => `<section class="level" aria-label="Level ${L}">
-        <div class="top"><h3>Level ${L}</h3><span class="pts">${sc.base.assign[L - 1]} points each</span></div>
+        <div class="top"><h3 aria-label="Level ${L}: ${['easy to find', 'takes a trip', 'hard to find'][L - 1]}"><span class="lvn">${L}</span><span class="lvw">${['Easy to find', 'Takes a trip', 'Hard to find'][L - 1]}</span></h3><span class="pts">${sc.base.assign[L - 1]} points each</span></div>
         <p class="bl">${BLURB[L]}</p>
         ${card[String(L)].map((id) => d.byId.get(id)).map((b) => { const pic = birdPic(b, 'thumb'); return `<a class="bird has-thumb" href="${birdLink(b)}" data-link><span class="bt">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : ''}</span><span>${birdName(b)}</span></a>`; }).join('') || '<p class="bl">To be announced.</p>'}
       </section>`).join('')}</div>

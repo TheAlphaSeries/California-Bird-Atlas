@@ -1,5 +1,6 @@
 import { S, $, api, esc, modal, toast } from '../util.js';
-import { BUILT_IN, REGION_NAMES, REGIONS, hasRegion, myRegion, setRegion, pickRegion } from '../wi.js';
+import { wi, BUILT_IN, REGION_NAMES, REGIONS, hasRegion, myRegion, setRegion, pickRegion, currentSeason } from '../wi.js';
+import { seasonCards, latestOccurrence } from '../rotation.js';
 
 export const DEFAULT_COVER = {
   line1: 'The Marshes at Dawn', line2: "California's Great Herons", line3: 'A Coastal Sanctuary',
@@ -19,23 +20,38 @@ export default async function cover(view) {
   document.body.classList.add('mag');
   const c = coverData();
   const lines = [c.line1, c.line2, c.line3].filter(Boolean);
-  view.innerHTML = `<article class="cv" aria-label="This issue's cover">
-    <div class="cv-text">
-      <p class="cv-top"><span class="cv-no">${esc(c.issue)}</span><span>${esc(c.season)}</span></p>
-      <h1 class="cv-title">California<br>Bird Atlas</h1>
-      <div class="cv-feature">
-        <p class="cv-hl">${esc(c.headline)}</p>
-        <p class="cv-dk">${esc(c.deck)}</p>
-      </div>
-      ${lines.length ? `<ul class="cv-lines" aria-label="Also in this issue">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
+  const builtIn = !c.photo_id && (c.bird === 'Great Blue Heron' || !BUILT_IN[c.bird]);
+  // The nine birds assigned right now in the reader's region, as cover lines.
+  const d = await wi();
+  const region = myRegion(d), season = currentSeason(), occ = latestOccurrence(season);
+  const card = seasonCards(d, region, season, occ.year)[occ.window];
+  const nine = [...card[1], ...card[2], ...card[3]].map((id) => d.byId.get(id).n);
+  view.innerHTML = `<article class="cv2" aria-label="This issue's cover">
+    <h1 class="cv2-title">California<br>Bird Atlas</h1>
+    <div class="cv2-text">
+      <p class="mag-kicker">Cover story</p>
+      <p class="cv2-hl">${esc(c.headline)}</p>
+      <p class="cv2-dk">${esc(c.deck)}</p>
+      ${lines.length ? `<ul class="cv2-lines" aria-label="Also in this issue">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
     </div>
-    <figure class="cv-art">
-      <img src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
-      <p class="cv-side" aria-hidden="true">Birds of California, photographed by the people who found them</p>
-      <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}${c.credit ? ` <span class="cr">Photo ● ${esc(c.credit)}</span>` : ''}</figcaption>
+    <figure class="cv2-bird">
+      <div class="cv2-art">
+        <img class="base" src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
+        ${builtIn ? `<img class="cut" src="/img/great-blue-heron-cut.webp" alt="" aria-hidden="true">
+        <span class="mk" style="left:47%;top:8%">1</span><span class="mk" style="left:83%;top:33%">2</span><span class="mk" style="left:60%;top:70%">3</span>` : ''}
+      </div>
+      <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}
+        ${builtIn ? '<span class="notes"><b>1</b> Black plumes trail from the crown. <b>2</b> A dagger bill for spearing fish. <b>3</b> Long breast plumes in the breeding season.</span>' : ''}
+        ${c.credit ? `<span class="cr">Photo ● ${esc(c.credit)}</span>` : ''}</figcaption>
     </figure>
+    <p class="cv2-sticker" aria-hidden="true"><b>9</b>new birds<br>every 2 weeks</p>
     ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
   </article>
+  <a class="cv2-band" href="/this-season" data-link>
+    <span class="lead">Assigned now in the ${esc(d.region_names[region])}</span>
+    <span class="names">${nine.map((n) => `<span>${esc(n)}</span>`).join('')}</span>
+    <span class="go">See your nine birds</span>
+  </a>
   <section class="how" aria-labelledby="how-h">
     <div class="mag-wrap">
       <p class="mag-kicker">How it works</p>
