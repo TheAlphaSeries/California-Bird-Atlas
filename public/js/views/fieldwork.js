@@ -31,25 +31,32 @@ export default async function fieldwork(view, seasonArg) {
     const nextLabel = occ.window < WINDOWS - 1 ? 'New birds' : `${SEASONS[SEASON_ORDER[(SEASON_ORDER.indexOf(season) + 1) % 4]]} birds`;
     const seasonEnd = windowSpan(season, occ.year, WINDOWS - 1).end - DAY;
     const frequent = d.birds.filter((b) => b.cat === 'assign' && levelOf(b, ri, season) && ![...card['1'], ...card['2'], ...card['3']].includes(b.id)).length;
-    view.innerHTML = `<div class="mag-wrap mag-page">
-      <p class="mag-kicker">${esc(occLabel(season, occ.year))}, assignment ${shownIdx + 1} of ${WINDOWS}</p>
-      <h1 class="mag-h">${isNow ? 'Your nine birds' : `Nine birds, ${esc(range(span))}`}</h1>
-      <p class="mag-deck" style="font-size:19px;color:#e6e2da">For birders in the <b style="color:var(--mag-accent);font-weight:600">${esc(d.region_names[region])}</b>${isNow ? ' right now' : ''}. <button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button></p>
-      ${occ.live ? `<p class="rot-next"><b>${nextLabel} in ${daysLeft} day${daysLeft === 1 ? '' : 's'}</b> · ${fmt(curSpan.end)}. A new set of nine every two weeks, all season long.</p>` : ''}
-      <ol class="steps-inline">
-        <li><b>Find</b> any of these birds in your region this season. Tap a bird for where and when to look.</li>
-        <li><b>Photograph</b> it. Any of the nine counts, and birds from earlier cards this season still count until ${fmt(seasonEnd)}. Harder levels score more points.</li>
-        <li><b>Share</b> your best photo. <a href="/submit" data-link style="color:var(--mag-accent)">Send it in</a> and it goes on the Bird Wall with your name.</li>
-      </ol>
-      <div class="pills" role="group" aria-label="Season"><span class="pills-lbl">Season</span>${SEASON_ORDER.map((s) => `<button type="button" class="pill" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
-      <div class="pills rot-cards" role="group" aria-label="Card"><span class="pills-lbl">Cards</span>${cards.slice(0, occ.window + 1).map((_, i) => `<button type="button" class="pill" data-c="${i}" aria-pressed="${i === shownIdx}">${range(windowSpan(season, occ.year, i))}${occ.live && i === occ.window ? ' (now)' : ''}</button>`).join('')}${occ.live && occ.window < WINDOWS - 1 ? `<span class="pill locked" title="Revealed on ${fmt(curSpan.end)}">${WINDOWS - 1 - occ.window} more to come</span>` : ''}</div>
-      <div class="levels">${[1, 2, 3].map((L) => `<section class="level" aria-label="Level ${L}">
-        <div class="top"><h3 aria-label="Level ${L}: ${['easy to find', 'takes a trip', 'hard to find'][L - 1]}"><span class="lvn">${L}</span><span class="lvw">${['Easy to find', 'Takes a trip', 'Hard to find'][L - 1]}</span></h3><span class="pts">${sc.base.assign[L - 1]} points each</span></div>
-        <p class="bl">${BLURB[L]}</p>
-        ${card[String(L)].map((id) => d.byId.get(id)).map((b) => { const pic = birdPic(b, 'thumb'); return `<a class="bird has-thumb" href="${birdLink(b)}" data-link><span class="bt">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : ''}</span><span>${birdName(b)}</span></a>`; }).join('') || '<p class="bl">To be announced.</p>'}
+    const tile = (b) => { const pic = birdPic(b, 'thumb'); return `<a class="nb" href="${birdLink(b)}" data-link>
+        <span class="nb-art">${pic ? `<img loading="lazy" src="${esc(pic.src)}" alt="">` : `<span class="nb-ph"><b>${+b.id.slice(3)}</b><i>${esc(b.fam)}</i></span>`}</span>
+        <span class="nb-nm">${esc(b.n)}</span><span class="nb-sc mag-sci">${esc(b.sci)}</span></a>`; };
+    view.innerHTML = `<div class="mag-wrap mag-page fw">
+      <header class="fw-head">
+        <div>
+          <p class="mag-kicker">${esc(occLabel(season, occ.year))}, assignment ${shownIdx + 1} of ${WINDOWS}</p>
+          <h1 class="mag-h">${isNow ? 'Your nine birds' : 'Nine birds'}</h1>
+          <p class="fw-for">${esc(d.region_names[region])}, ${esc(range(span))}. <button type="button" class="linkish" id="chg">${hasRegion() ? 'Change region' : 'Not your region? Choose yours'}</button></p>
+        </div>
+        ${occ.live ? `<p class="fw-count"><b>${daysLeft}</b><span>day${daysLeft === 1 ? '' : 's'} until<br>${nextLabel.toLowerCase()}</span></p>` : ''}
+      </header>
+      <div class="fw-ctl">
+        <span class="fw-lbl" id="fw-s">Season</span>
+        <div class="seg" role="group" aria-labelledby="fw-s">${SEASON_ORDER.map((s) => `<button type="button" data-s="${s}" aria-pressed="${s === season}">${SEASONS[s]}${s === now ? ' (now)' : ''}</button>`).join('')}</div>
+        <span class="fw-lbl" id="fw-a">Assignment</span>
+        <div class="seg" role="group" aria-labelledby="fw-a">${cards.slice(0, occ.window + 1).map((_, i) => `<button type="button" data-c="${i}" aria-pressed="${i === shownIdx}">${i + 1}<small>${range(windowSpan(season, occ.year, i))}</small></button>`).join('')}${occ.live && occ.window < WINDOWS - 1 ? `<span class="fw-more">${WINDOWS - 1 - occ.window} more to come</span>` : ''}</div>
+      </div>
+      <div class="fw-levels">${[1, 2, 3].map((L) => `<section class="fw-level" aria-label="Level ${L}">
+        <div class="fw-lv"><span class="lvn">${L}</span><h3>${['Easy to find', 'Takes a trip', 'Hard to find'][L - 1]}</h3><p class="pts">${sc.base.assign[L - 1]} points each</p><p class="bl">${BLURB[L]}</p></div>
+        <div class="fw-birds">${card[String(L)].map((id) => tile(d.byId.get(id))).join('') || '<p class="bl">To be announced.</p>'}</div>
       </section>`).join('')}</div>
-      <p class="mag-deck" style="margin-top:28px">Spotted something else? ${frequent} other birds can be found in the ${esc(d.region_names[region])} this ${SEASONS[season].toLowerCase()}. Photos of those count too, as frequent visitors. <a href="/birds" data-link style="color:var(--mag-accent)">See them all</a>.</p>
-      <p class="mag-deck">Birds are drawn at random from those findable in your region this season, three per level, with no repeats until every bird has had a turn and a mix of bird families on every card. Everyone in your region gets the same nine. <a href="/about#rotation" data-link style="color:var(--mag-accent)">How the draw works</a>.</p>
+      <div class="fw-do">
+        <p><b>Find one, photograph it, send it in.</b> Any of the nine counts, and so does any bird from an earlier assignment this season, until ${fmt(seasonEnd)}. ${frequent} other birds can be found in the ${esc(d.region_names[region])} this ${SEASONS[season].toLowerCase()}, and photos of those count too. <a class="linkish" href="/birds" data-link>See them all</a>. <a class="linkish" href="/about#rotation" data-link>How the nine are drawn</a>.</p>
+        <a class="mag-btn solid" href="/submit" data-link>Send a photo</a>
+      </div>
 
       <section class="mag-section" aria-labelledby="sc-h">
         <p class="mag-kicker">Scoring</p>

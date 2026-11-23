@@ -26,24 +26,39 @@ export default async function cover(view) {
   const region = myRegion(d), season = currentSeason(), occ = latestOccurrence(season);
   const card = seasonCards(d, region, season, occ.year)[occ.window];
   const nine = [...card[1], ...card[2], ...card[3]].map((id) => d.byId.get(id).n);
-  view.innerHTML = `<article class="cv2" aria-label="This issue's cover">
-    <h1 class="cv2-title">California<br>Bird Atlas</h1>
-    <div class="cv2-text">
-      <p class="mag-kicker">Cover story</p>
-      <p class="cv2-hl">${esc(c.headline)}</p>
-      <p class="cv2-dk">${esc(c.deck)}</p>
-      ${lines.length ? `<ul class="cv2-lines" aria-label="Also in this issue">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}
-    </div>
-    <figure class="cv2-bird">
-      <div class="cv2-art">
+  // Slides: this edition's cover first, then featured birds from the Bird Wall.
+  let wallRows = await api('/wall').catch(() => []);
+  if (!wallRows.length) wallRows = (await fetch('/data/wall-samples.json').then((r) => r.json()).catch(() => [])).map((x) => ({ ...x, credit_name: x.credit, static: true }));
+  const picks = [...wallRows.filter((r) => r.featured), ...wallRows.filter((r) => !r.featured)].slice(0, 5);
+  const slides = [{ edition: true }, ...picks.map((r) => ({
+    bird: r.bird, src: r.static ? r.src : `/media/sub/${r.id}/cutout`, region: REGION_NAMES[r.region] || '',
+    credit: r.credit_name + (r.license ? `, ${r.license}, via Wikimedia Commons` : ''),
+  }))];
+  const textOf = (sl) => sl.edition
+    ? `<p class="mag-kicker">Cover story</p><p class="cv2-hl">${esc(c.headline)}</p><p class="cv2-dk">${esc(c.deck)}</p>
+      ${lines.length ? `<ul class="cv2-lines" aria-label="Also in this issue">${lines.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>` : ''}`
+    : `<p class="mag-kicker">From the Bird Wall</p><p class="cv2-hl">${esc(sl.bird.replace(/ (?=[^ ]+$)/, '\n'))}</p>
+      <p class="cv2-dk">${sl.region ? `Photographed in the ${esc(sl.region)}. ` : ''}One of the birds readers have put on the wall.</p>
+      <p style="margin-top:24px"><a class="mag-btn solid" href="/wall" data-link>See the Bird Wall</a></p>`;
+  const artOf = (sl) => sl.edition
+    ? `<div class="cv2-art">
         <img class="base" src="${esc(coverSrc(c))}" alt="${esc(c.bird)} on the cover" fetchpriority="high">
         ${builtIn ? `<img class="cut" src="/img/great-blue-heron-cut.webp" alt="" aria-hidden="true">
         <span class="mk" style="left:47%;top:8%">1</span><span class="mk" style="left:83%;top:33%">2</span><span class="mk" style="left:60%;top:70%">3</span>` : ''}
       </div>
       <figcaption class="cv-cap"><b>${esc(c.bird)}.</b> ${esc(c.aside)}
         ${builtIn ? '<span class="notes"><b>1</b> Black plumes trail from the crown. <b>2</b> A dagger bill for spearing fish. <b>3</b> Long breast plumes in the breeding season.</span>' : ''}
-        ${c.credit ? `<span class="cr">Photo ● ${esc(c.credit)}</span>` : ''}</figcaption>
-    </figure>
+        ${c.credit ? `<span class="cr">Photo ● ${esc(c.credit)}</span>` : ''}</figcaption>`
+    : `<div class="cv2-art cutonly"><img src="${esc(sl.src)}" alt="${esc(sl.bird)}"></div>
+      <figcaption class="cv-cap"><b>${esc(sl.bird)}.</b> <span class="cr">Photo ● ${esc(sl.credit)}</span></figcaption>`;
+  view.innerHTML = `<article class="cv2" aria-label="This issue's cover" aria-roledescription="carousel">
+    <h1 class="cv2-title">California<br>Bird Atlas</h1>
+    <div class="cv2-text"><div id="cv-text" aria-live="polite">${textOf(slides[0])}</div>
+      ${slides.length > 1 ? `<div class="cv2-nav" role="group" aria-label="Cover birds">
+        <button type="button" id="cv-prev" aria-label="Previous bird">←</button><span id="cv-count">1 / ${slides.length}</span><button type="button" id="cv-next" aria-label="Next bird">→</button>
+        <button type="button" id="cv-pause" aria-pressed="false">Pause</button></div>` : ''}
+    </div>
+    <figure class="cv2-bird" id="cv-bird">${artOf(slides[0])}</figure>
     <p class="cv2-sticker" aria-hidden="true"><b>9</b>new birds<br>every 2 weeks</p>
     ${S.owner ? '<div class="cover-actions"><button type="button" class="mag-btn" id="edit-cover">Edit cover</button></div>' : ''}
   </article>
@@ -70,6 +85,31 @@ export default async function cover(view) {
   view.querySelectorAll('.how-regions [data-r]').forEach((b) => (b.onclick = () => { setRegion(b.dataset.r); window.dispatchEvent(new Event('route')); }));
   $('#how-which', view).onclick = pickRegion;
   if (S.owner) $('#edit-cover', view).onclick = () => editCover(c);
+  if (slides.length < 2) return;
+  // Rotate the cover bird. Stops for good when the reader pauses it, and never auto-plays with reduced motion.
+  slides.slice(1).forEach((sl) => { const im = new Image(); im.src = sl.src; });
+  const root = view.querySelector('.cv2');
+  let at = 0, paused = matchMedia('(prefers-reduced-motion: reduce)').matches, busy = false;
+  const show = (i) => {
+    if (busy) return; busy = true;
+    at = (i + slides.length) % slides.length;
+    root.classList.add('swap');
+    setTimeout(() => {
+      $('#cv-text', view).innerHTML = textOf(slides[at]); $('#cv-bird', view).innerHTML = artOf(slides[at]);
+      $('#cv-count', view).textContent = `${at + 1} / ${slides.length}`;
+      root.classList.remove('swap'); busy = false;
+    }, 240);
+  };
+  const pauseBtn = $('#cv-pause', view);
+  const setPaused = (v) => { paused = v; pauseBtn.setAttribute('aria-pressed', v); pauseBtn.textContent = v ? 'Play' : 'Pause'; };
+  setPaused(paused);
+  $('#cv-prev', view).onclick = () => { setPaused(true); show(at - 1); };
+  $('#cv-next', view).onclick = () => { setPaused(true); show(at + 1); };
+  pauseBtn.onclick = () => setPaused(!paused);
+  const timer = setInterval(() => {
+    if (!document.body.contains(root)) return clearInterval(timer);
+    if (!paused && !document.hidden) show(at + 1);
+  }, 7000);
 }
 
 async function editCover(c) {

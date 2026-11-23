@@ -10,7 +10,7 @@ function thumb(b) {
   const pic = birdPic(b, 'thumb');
   return pic
     ? `<span class="ixc-img${pic.kind === 'ref' ? ' ref' : ''}"><img loading="lazy" src="${esc(pic.src)}" alt="">${pic.kind === 'ref' ? '<span class="ref-tag">Reference</span>' : ''}</span>`
-    : `<span class="ixc-img blank" aria-hidden="true"><span class="no">${esc(b.id.replace('WI-', 'No. '))}</span><span class="sc">No photo yet</span></span>`;
+    : '<span class="ixc-img blank" aria-hidden="true"></span>';
 }
 
 function strip(b, i) {
@@ -24,7 +24,7 @@ function strip(b, i) {
 function badge(b, i, season) {
   if (b.cat !== 'assign') return `<span class="ixc-badge cat">${esc(CATEGORY[b.cat])}</span>`;
   const v = levelOf(b, i, season);
-  if (typeof v === 'number') return `<span class="ixc-badge l${v}">Level ${v}</span>`;
+  if (typeof v === 'number') return `<span class="ixc-badge l${v}" title="Level ${v}">${v}<span class="vh"> level</span></span>`;
   return `<span class="ixc-badge off">${v === 'r' ? 'Rare here' : 'Not this season'}</span>`;
 }
 
@@ -35,32 +35,28 @@ export default async function theIndex(view) {
   st.region = myRegion(d);
   const n = (c) => d.birds.filter((b) => c.includes(b.cat)).length;
   view.innerHTML = `<div class="ix">
-    <header class="mag-wrap ix-head">
-      <p class="mag-kicker">All birds</p>
-      <h1 class="ix-title">Every bird<br>in California</h1>
-      <p class="mag-deck">All ${d.birds.length} species on the official state list. Search for a bird, or see which ones you can find in your region this season and how hard each one is.</p>
+    <header class="mag-wrap ix-head2">
+      <div><p class="mag-kicker">Field guide</p>
+        <h1 class="ix-title">Every bird in California</h1></div>
       <dl class="ix-stats">
         <div><dt>Species</dt><dd>${d.birds.length}</dd></div>
-        <div><dt>On the cards</dt><dd>${n(['assign'])}</dd></div>
+        <div><dt>Assigned</dt><dd>${n(['assign'])}</dd></div>
         <div><dt>Rare finds</dt><dd>${n(['rare', 'scarce'])}</dd></div>
-        <div><dt>Regions</dt><dd>${d.regions.length}</dd></div>
       </dl>
     </header>
-    <div class="ix-bar"><div class="mag-wrap">
-      <div class="ix-row1">
-        <label class="ix-search"><span class="vh">Search</span><input id="ixq" type="search" placeholder="Search by name" value="${esc(st.q)}"></label>
-        <div class="seg" role="group" aria-label="Show">${SHOW.map(([k, l]) => `<button type="button" data-show="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
-      </div>
-      <div class="ix-row2">
-        <p class="ix-where">Levels for the <b>${esc(d.region_names[st.region])}</b> <button type="button" class="linkish" id="ixreg">Change region</button></p>
-        <div class="seg small" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" data-s="${s}" aria-pressed="${st.season === s}">${SEASONS[s]}</button>`).join('')}</div>
-      </div>
+    <div class="ix-bar"><div class="mag-wrap ix-tools">
+      <label class="ix-search"><span class="vh">Search</span><input id="ixq" type="search" placeholder="Search 696 birds by name" value="${esc(st.q)}"></label>
+      <div class="seg" role="group" aria-label="Show">${SHOW.map(([k, l]) => `<button type="button" data-show="${k}" aria-pressed="${st.show === k}">${l}</button>`).join('')}</div>
+      <div class="seg small" role="group" aria-label="Season">${SEASON_ORDER.map((s) => `<button type="button" data-s="${s}" aria-pressed="${st.season === s}">${SEASONS[s]}</button>`).join('')}</div>
+      <button type="button" class="region-chip" id="ixreg">Region: <b>${esc(d.region_names[st.region])}</b></button>
     </div></div>
-    <div class="mag-wrap ix-body">
-      <p class="ix-count" id="ixc" aria-live="polite"></p>
-      <p class="ix-legend"><b>How to read a card.</b> The badge is how hard the bird is to find in your region this season: <span class="ixc-badge l1">Level 1</span> easy, <span class="ixc-badge l2">Level 2</span> takes a trip, <span class="ixc-badge l3">Level 3</span> hard. The four bars show the same thing for <span class="sq l1"><i></i></span> winter, spring, summer and fall, so you can see when to look.</p>
-      <div id="ixl"></div>
-
+    <div class="mag-wrap ix-body2">
+      <nav class="ix-rail" aria-label="Bird families"><p>Families</p><div id="ixrail"></div></nav>
+      <div>
+        <p class="ix-count" id="ixc" aria-live="polite"></p>
+        <p class="ix-legend2"><span class="ixc-badge l1">1</span> easy to find <span class="ixc-badge l2">2</span> takes a trip <span class="ixc-badge l3">3</span> hard to find, in your region this season. The four bars show winter, spring, summer and fall.</p>
+        <div id="ixl"></div>
+      </div>
     </div>
   </div>`;
   const list = $('#ixl', view);
@@ -77,13 +73,15 @@ export default async function theIndex(view) {
     for (const b of rows) { const g = groups[groups.length - 1]; if (g && g.fam === b.fam) g.birds.push(b); else groups.push({ fam: b.fam, birds: [b] }); }
     const what = { here: `you can find in the ${d.region_names[st.region]} this ${SEASONS[st.season].toLowerCase()}`, rare: 'scarce or rare in California', out: 'that are never assigned, to protect them or because they need a boat', all: 'on the state list' }[st.show];
     $('#ixc', view).textContent = `${rows.length} bird${rows.length === 1 ? '' : 's'} ${what}, in ${groups.length} famil${groups.length === 1 ? 'y' : 'ies'}`;
-    list.innerHTML = groups.map((g) => `<section class="ix-fam">
+    list.innerHTML = groups.map((g, gi) => `<section class="ix-fam" id="fam-${gi}">
       <h2><span>${esc(g.fam)}</span><span class="ct">${g.birds.length}</span></h2>
-      <div class="ix-grid">${g.birds.map((b) => `<a class="ixc" href="${birdLink(b)}" data-link>
-        ${thumb(b)}
-        <span class="ixc-txt"><span class="ixc-no">No. ${+b.id.slice(3)}</span><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span>
-        <span class="ixc-foot">${badge(b, i, st.season)}${b.lv ? strip(b, i) : ''}</span></span>
+      <div class="ix-rows">${g.birds.map((b) => `<a class="ixr" href="${birdLink(b)}" data-link>
+        <span class="no">${+b.id.slice(3)}</span>${thumb(b)}
+        <span class="nm"><span class="bn">${esc(b.n)}</span><span class="bs mag-sci">${esc(b.sci)}</span></span>
+        ${badge(b, i, st.season)}${b.lv ? strip(b, i) : '<span class="ixc-strip"></span>'}
       </a>`).join('')}</div></section>`).join('') || '<p class="mag-deck" style="padding:40px 0">No birds match. Try another region, season or spelling.</p>';
+    $('#ixrail', view).innerHTML = groups.map((g, gi) => `<button type="button" data-f="${gi}"><span>${esc(g.fam)}</span><i>${g.birds.length}</i></button>`).join('');
+    $$('#ixrail [data-f]', view).forEach((x) => (x.onclick = () => document.getElementById('fam-' + x.dataset.f)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })));
   };
   const press = (sel, key) => $$(sel, view).forEach((b) => (b.onclick = () => {
     st[key] = b.dataset[key === 'show' ? 'show' : key === 'region' ? 'r' : 's'];
