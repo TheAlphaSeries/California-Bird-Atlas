@@ -17,6 +17,7 @@ export function nineBirdsEmail(d, region, issue, origin = location.origin) {
   const text = [
     `Your nine birds for the ${name}, ${fmt(span.start)} to ${until} (${SEASONS[season].toLowerCase()} assignment ${occ.window + 1} of 6).`, '',
     ...groups.flatMap((g) => [`${g.label.toUpperCase()} (${g.pts} points each)`, ...g.birds.map((b) => `  ${b.n}  ${origin}/birds/${b.id}`), '']),
+    'Print these nine on one page to take with you:', `${origin}/field-card?r=${region}`, '',
     'Find one, photograph it, send it in:', `${origin}/submit`, '', issueLine, '',
     `You are getting this because you signed up at ${origin}. To stop, go to ${origin}/unsubscribe or reply to this email.`,
   ].filter((l, i, a) => !(l === '' && a[i - 1] === '')).join('\n');
@@ -26,7 +27,8 @@ export function nineBirdsEmail(d, region, issue, origin = location.origin) {
   <p style="margin:0 0 20px;color:#4d4d48">${fmt(span.start)} to ${until}. ${SEASONS[season]} assignment ${occ.window + 1} of 6.</p>
   ${groups.map((g) => `<table role="presentation" width="100%" style="border-collapse:collapse;margin:0 0 18px"><tr><td style="background:#151515;color:#fff;padding:8px 12px;font-weight:bold"><span style="background:#ffcc00;color:#151515;padding:2px 8px;margin-right:8px">${g.L}</span>${g.label} <span style="font-weight:normal;color:#cfcfc8">${g.pts} points each</span></td></tr>
     ${g.birds.map((b) => `<tr><td style="padding:10px 12px;border-bottom:1px solid #dadad3"><a href="${origin}/birds/${b.id}" style="color:#151515;font-size:18px;font-weight:bold;text-decoration:none">${b.n}</a><br><i style="color:#8a8a84;font-size:13px">${b.sci}</i></td></tr>`).join('')}</table>`).join('')}
-  <p style="margin:24px 0"><a href="${origin}/submit" style="background:#ffcc00;color:#151515;padding:12px 18px;font-weight:bold;text-decoration:none;border:2px solid #151515">Send a photo</a></p>
+  <p style="margin:24px 0"><a href="${origin}/submit" style="background:#ffcc00;color:#151515;padding:12px 18px;font-weight:bold;text-decoration:none;border:2px solid #151515">Send a photo</a>
+    &nbsp; <a href="${origin}/field-card?r=${region}" style="color:#151515;padding:12px 18px;font-weight:bold;text-decoration:none;border:2px solid #151515">Print the field card</a></p>
   ${issueLine ? `<p style="color:#4d4d48">${issueLine}</p>` : ''}
   <p style="font-size:12px;color:#8a8a84;border-top:1px solid #dadad3;padding-top:12px">You are getting this because you signed up at ${origin}. To stop, <a href="${origin}/unsubscribe" style="color:#8a8a84">unsubscribe here</a> or reply to this email.</p>
 </div>`;

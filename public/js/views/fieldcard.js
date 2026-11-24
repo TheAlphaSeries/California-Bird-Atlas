@@ -24,6 +24,11 @@ export default async function fieldCard(view) {
   let n = 0;
   view.innerHTML = `<div class="fc-page">
     <div class="fc-bar no-print"><a class="linkish" href="/this-season" data-link>Back to This Season</a><button type="button" class="mag-btn solid" id="fc-print">Print this card</button></div>
+    <form class="fc-pick no-print" aria-label="Choose a card">
+      <label><span>Region</span><select name="r">${REGIONS.map((r) => `<option value="${r}"${r === region ? ' selected' : ''}>${esc(d.region_names[r])}</option>`).join('')}</select></label>
+      <label><span>Season</span><select name="s">${SEASON_ORDER.map((x) => `<option value="${x}"${x === season ? ' selected' : ''}>${SEASONS[x]}</option>`).join('')}</select></label>
+      <label><span>Assignment</span><select name="a">${Array.from({ length: (season === currentSeason() && occ.live ? occ.window : WINDOWS - 1) + 1 }, (_, i) => { const sp = windowSpan(season, occ.year, i); return `<option value="${i}"${i === a ? ' selected' : ''}>${i + 1}: ${fmt(sp.start)} – ${fmt(sp.end - 864e5)}</option>`; }).join('')}</select></label>
+    </form>
     <article class="fc-sheet" aria-label="Field card">
       <header class="fc-head">
         <div><p class="fc-kick">Field card</p><h1>Nine birds</h1></div>
@@ -35,5 +40,10 @@ export default async function fieldCard(view) {
         <p><b>Send your photos</b> ${esc(location.host)}/submit</p></footer>
     </article></div>`;
   view.querySelector('#fc-print').onclick = () => window.print();
+  const f = view.querySelector('.fc-pick');
+  f.onchange = (e) => { // a different card: keep the address in step so the link can be shared or bookmarked
+    const q = new URLSearchParams(new FormData(f)); if (e.target.name === 's') q.delete('a');
+    history.replaceState({}, '', `/field-card?${q}`); window.dispatchEvent(new Event('route'));
+  };
   void ri;
 }

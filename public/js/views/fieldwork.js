@@ -76,6 +76,15 @@ export default async function fieldwork(view, seasonArg) {
         <a class="mag-btn solid" href="/submit" data-link>Send a photo</a>
       </div>
 
+      <section class="fw-take" aria-labelledby="fw-take-h">
+        <a class="fw-mini" href="/field-card?r=${region}&s=${season}&a=${shownIdx}" data-link aria-hidden="true" tabindex="-1">
+          <span class="fm-k">Field card</span><span class="fm-h">Nine birds</span>
+          ${[1, 2, 3].map((L) => `<span class="fm-l"><b>${L}</b>${card[L].map((id) => `<i>${esc(d.byId.get(id).n)}</i>`).join('')}</span>`).join('')}
+          <span class="fm-f">Seen ☐ Photographed ☐</span></a>
+        <div><p class="mag-kicker">Take it with you</p><h2 id="fw-take-h">Your nine birds on one page</h2>
+          <p class="fw-take-p">A printable card with a picture of each bird, boxes to tick when you've seen it and when you've photographed it, and a line for where and when. Fold it into a pocket or a field guide.</p>
+          <p class="fw-take-b"><a class="mag-btn solid" href="/field-card?r=${region}&s=${season}&a=${shownIdx}" data-link>Print your field card</a></p></div>
+      </section>
       ${arriving.length ? `<section class="mag-section fw-arr"><p class="mag-kicker">Arriving this ${SEASONS[season].toLowerCase()}</p>
         <h2>${arriving.length} birds that weren't here in ${SEASONS[prev].toLowerCase()}</h2>
         <p class="fw-arr-list">${arriving.map((b) => `<a href="${birdLink(b)}" data-link>${esc(b.n)}</a>`).join('')}</p></section>` : ''}

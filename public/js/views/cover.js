@@ -109,7 +109,7 @@ export default async function cover(view) {
         <li><span class="n">2</span><h3>Get your nine birds</h3><p>Every two weeks your region gets nine new birds: three easy, three that take a trip, three that are hard to find.</p>
           <a class="mag-btn solid" href="/this-season" data-link>See this season's birds</a></li>
         <li><span class="n">3</span><h3>Go out and photograph them</h3><p>Send your best shot. We cut the bird out and add it to the Bird Wall with your name. The best are published in the magazine.</p>
-          <a class="mag-btn" href="/wall" data-link>See the Bird Wall</a></li>
+          <span class="how-btns"><a class="mag-btn" href="/field-card" data-link>Print your field card</a><a class="mag-btn" href="/wall" data-link>See the Bird Wall</a></span></li>
       </ol>
     </div>
   </section>`;
