@@ -21,6 +21,7 @@ const routes = [
   [/^\/(?:birds|the-index)\/?$/, () => import('./views/theindex.js'), 'index'],
   [/^\/(?:birds|the-index)\/(WI-\d{3})\/?$/, () => import('./views/bird.js'), 'index'],
   [/^\/about\/?$/, () => import('./views/about.js'), 'about'],
+  [/^\/(?:progress|the-count)\/?$/, () => import('./views/progress.js'), 'progress'],
   [/^\/wall\/?$/, () => import('./views/wall.js'), 'wall'],
   [/^\/submit\/?$/, () => import('./views/submit.js'), 'submit'],
   [/^\/add\/?$/, () => import('./views/addbirds.js'), 'add'],
@@ -42,13 +43,13 @@ const routes = [
   [/^\/settings\/?$/, () => import('./views/settings.js'), ''],
 ];
 
-const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review', 'issue', 'board', 'unsubscribe', 'fieldcard', 'sent']);
+const MAG = new Set(['cover', 'gallery', 'fieldwork', 'index', 'about', 'wall', 'submit', 'add', 'mywall', 'review', 'issue', 'board', 'unsubscribe', 'fieldcard', 'sent', 'progress']);
 let renderSeq = 0;
 
 // Every page uses the magazine shell. Photo pages are black; everything else is printed on white paper.
 const BLACK = new Set(['cover', 'wall', 'mywall']);
 // The sideways section label in the left margin, one per section.
-const MARGIN_LABEL = { fieldwork: 'This season', wall: 'Bird Wall', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs', issue: 'The issue', board: 'Scoreboard' };
+const MARGIN_LABEL = { progress: 'The count', fieldwork: 'This season', wall: 'Bird Wall', index: 'Field guide', about: 'How it works', submit: 'Send a photo', add: 'Add birds', mywall: 'My Wall', review: 'Editor', gallery: 'Photographs', issue: 'The issue', board: 'Scoreboard' };
 
 // Put a finished page on screen. The page is built off-screen first, so the old page stays whole until this
 // moment; then the menu, the page colours and the content all change together and the new page fades in.
@@ -93,7 +94,7 @@ async function render() {
   commit(view, page, '');
 }
 
-const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/about', 'about', 'How It Works']];
+const PUBLIC_NAV = [['/', 'cover', 'Home'], ['/this-season', 'fieldwork', 'This Season'], ['/wall', 'wall', 'Bird Wall'], ['/birds', 'index', 'All Birds'], ['/progress', 'progress', 'The Count'], ['/about', 'about', 'How It Works']];
 const TOOLS_NAV = [['/review', 'review', 'Review'], ['/atlas', 'atlas', 'Atlas'], ['/guide', 'guide', 'Field Guide'], ['/life-list', 'life-list', 'Life List'], ['/journal', 'journal', 'Journal'], ['/explore', 'explore', 'Explore'], ['/archive', 'archive', 'Photo archive']];
 const TOOL_PATHS = [/^\/review/, /^\/atlas/, /^\/guide/, /^\/species\//, /^\/life-list/, /^\/journal/, /^\/explore/, /^\/archive/, /^\/settings/];
 export function renderChrome() {

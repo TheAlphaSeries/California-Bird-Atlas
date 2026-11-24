@@ -145,3 +145,11 @@ Built to Apple's Human Interface Guidelines and Google's Material/Android guidan
 - motion stops when the reader's device asks for reduced motion; the cover never auto-plays then;
 - zoom is never blocked; `<html lang>` follows the chosen language.
 To re-check after changes, run axe on each public page at phone and desktop widths.
+
+## The Count (/progress)
+
+The editor's progress toward photographing every bird in California (`public/js/views/progress.js`). A bird counts
+once there is a confirmed photo of it in the atlas tools, or the editor has put it on the Bird Wall from /add
+(`submissions.by_editor = 1`). The goal, meaning which kinds of birds count, is the editor's Settings choice
+(native residents and migrants by default). Rare visitors photographed outside the goal are shown as a bonus line.
+Bird pages say whether each bird is on the count. Nothing is entered by hand.

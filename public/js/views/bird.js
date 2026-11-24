@@ -1,6 +1,7 @@
 import { S, api, esc, go } from '../util.js';
 import { seasonCards, latestOccurrence } from '../rotation.js';
 import { openBird } from './wall.js';
+import { editorCount } from './progress.js';
 import { onSwipe, openFull } from '../viewer.js';
 import { loadMap, mapSvg } from '../regionmap.js';
 import { birdPic, refCredit, bindReports } from '../refphoto.js';
@@ -47,6 +48,9 @@ export default async function bird(view, id) {
       <p class="mag-sci" style="font-size:18px;margin:0">${esc(b.sci)}</p>
       ${assignedIn.length ? `<p class="bp-now"><b>One of the nine right now</b> in the ${esc(assignedIn.map((r) => d.region_names[r]).join(', ').replace(/, ([^,]*)$/, ' and $1'))}. <a class="linkish" href="/this-season" data-link>This season</a></p>` : ''}
       ${when ? `<p class="bp-when">${esc(when)}</p>` : ''}
+      ${(() => { const c = editorCount(allWall), w = c.get(b.n); return c.has(b.n)
+        ? `<p class="bp-count on"><a href="/progress" data-link>On the count</a>${w ? `, photographed ${esc(new Date(w.length <= 10 ? w + 'T12:00:00' : w).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }))}` : ''}.</p>`
+        : `<p class="bp-count"><a href="/progress" data-link>Not on the count yet</a>.</p>`; })()}
       <dl>
         <dt>Family</dt><dd>${esc(b.fam)}</dd>
         <dt>Status</dt><dd>${esc(b.kind)}${b.why && b.cat !== 'assign' ? `. ${esc(b.why)}.` : ''}</dd>

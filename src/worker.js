@@ -14,6 +14,7 @@
 //                    sample   1 = an openly licensed Wikimedia photo added by "Fill with sample birds"
 //                    cut_w/h  size of the cut-out; a bird only shows on the wall once it has one
 //                  Readers' photos arrive pending; the editor's own (POST /api/wall) arrive approved.
+//                    by_editor 1 = the editor's own photo (added from /add); counts toward the editor's progress page
 //                    issue_id the issue it was sent for; caption = the Behind the Shot story shown to readers
 //                    (drafted from the sender's answers in `story`, edited in Review); award = e.g. 'Best Level 3 find'
 //   issues         one per season: number, title, theme, blurb and the submission window (opens_at, closes_at, UTC).
@@ -43,7 +44,7 @@
 //   fields, views, settings, export
 import seed from './seed.json';
 
-const SCHEMA_VERSION = '6';
+const SCHEMA_VERSION = '7';
 const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS settings (key TEXT PRIMARY KEY, value TEXT)`,
   `CREATE TABLE IF NOT EXISTS families (id INTEGER PRIMARY KEY, ord TEXT, family TEXT, family_common TEXT, seq INTEGER)`,
@@ -106,9 +107,12 @@ async function init(env) {
   await db.batch(SCHEMA.map((s) => db.prepare(s)));
   // Columns added after the first release; each fails harmlessly if it is already there.
   for (const col of [`license TEXT DEFAULT ''`, `license_url TEXT DEFAULT ''`, `source_url TEXT DEFAULT ''`, `sample INTEGER DEFAULT 0`,
-    `issue_id INTEGER`, `story TEXT DEFAULT '{}'`, `caption TEXT DEFAULT ''`, `award TEXT DEFAULT ''`]) {
+    `issue_id INTEGER`, `story TEXT DEFAULT '{}'`, `caption TEXT DEFAULT ''`, `award TEXT DEFAULT ''`, `by_editor INTEGER DEFAULT 0`]) {
     try { await db.prepare(`ALTER TABLE submissions ADD COLUMN ${col}`).run(); } catch { /* exists */ }
   }
+  // Birds the editor put on the wall themselves (POST /api/wall) count toward the editor's progress. Readers'
+  // photos always carry an ip hash and samples are flagged, so older editor rows are the ones with neither.
+  await db.prepare(`UPDATE submissions SET by_editor = 1 WHERE ip IS NULL AND COALESCE(sample, 0) = 0 AND by_editor = 0`).run();
   // The first issue, so the site has an open call from day one. The editor can change everything about it.
   if (!(await db.prepare(`SELECT COUNT(*) n FROM issues`).first('n'))) {
     await db.prepare(`INSERT INTO issues (number, title, theme, blurb, opens_at, closes_at, created_at) VALUES (1, ?, ?, ?, ?, ?, ?)`)
@@ -239,6 +243,7 @@ async function previewFor(env, url) {
   }
   if (p === '/wall') return { title: 'The Bird Wall', desc: 'Birds of California, by the people who found them.', image: (await wallPic()) || heron };
   if (p === '/this-season') return { title: 'Your nine birds', desc: 'Nine birds for your region, new every two weeks. Find them, photograph them, send them in.', image: heron };
+  if (p === '/progress') return { title: 'Every bird in California: the count', desc: 'One photographer, every bird in California. See how many are done and which are still to find.', image: heron };
   if (p === '/about') return { title: 'Photograph every bird in California', desc: DEFAULT_DESC, image: heron };
   return { title: SITE, desc: DEFAULT_DESC, image: heron };
 }
@@ -570,7 +575,7 @@ async function route(request, env, url, path) {
       const sp = await db.prepare(`SELECT common_name, scientific_name FROM species WHERE lower(common_name) = lower(?)`).bind(String(meta.bird || '').trim()).first();
       if (!sp) return fail(400, 'Choose a bird from the California list.');
       const store = env.PHOTOS ? 'r2' : 'd1', now = new Date().toISOString();
-      const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, region, note, taken_at, camera, width, height, store, status, cut_w, cut_h, approved_at, featured) VALUES (?,?,?,?,?,?,?,?,?,?,?,'approved',?,?,?,?)`)
+      const res = await db.prepare(`INSERT INTO submissions (created_at, bird, sci, credit_name, region, note, taken_at, camera, width, height, store, status, cut_w, cut_h, approved_at, featured, by_editor) VALUES (?,?,?,?,?,?,?,?,?,?,?,'approved',?,?,?,?,1)`)
         .bind(now, sp.common_name, sp.scientific_name, String(meta.credit_name || 'California Bird Atlas').slice(0, 80), String(meta.region || '').slice(0, 40), String(meta.note || '').slice(0, 600), clean(meta.taken_at), String(meta.camera || '').slice(0, 80), clean(meta.width), clean(meta.height), store, clean(meta.cut_w), clean(meta.cut_h), now, meta.featured ? 1 : 0).run();
       const sid = res.meta.last_row_id;
       await db.prepare(`UPDATE submissions SET issue_id = ?, caption = ? WHERE id = ?`).bind(await issueFor(db), String(meta.caption || '').slice(0, 2000), sid).run();
@@ -582,7 +587,7 @@ async function route(request, env, url, path) {
       return json({ id: sid });
     }
     if (r === 'wall' && method === 'GET') {
-      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award, (SELECT COUNT(*) FROM hearts h WHERE h.sub_id = submissions.id) hearts FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
+      const rows = (await db.prepare(`SELECT id, bird, sci, credit_name, region, taken_at, camera, width, height, cut_w, cut_h, approved_at, featured, license, license_url, source_url, sample, issue_id, caption, award, by_editor, (SELECT COUNT(*) FROM hearts h WHERE h.sub_id = submissions.id) hearts FROM submissions WHERE status = 'approved' AND cut_w IS NOT NULL ORDER BY featured DESC, approved_at DESC, id DESC LIMIT 2000`).all()).results;
       return json(rows, 200, { 'cache-control': 'public, max-age=60' });
     }
     // A reader's heart on a wall photo: POST toggles it. One per photo per device; at most 300 a day from one connection.

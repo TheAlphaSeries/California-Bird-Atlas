@@ -18,7 +18,7 @@ export default async function about(view) {
   view.innerHTML = `<div class="mag-wrap mag-page ab">
     <p class="mag-kicker">Our mission</p>
     <h1 class="mag-h">Photograph every bird in California.</h1>
-    <p class="ab-lede">California Bird Atlas is one photographer's attempt to photograph every bird in the state that I can, and an open invitation to do it with me. Share your photos. See everyone else's. Get outside.</p>
+    <p class="ab-lede">California Bird Atlas is one photographer's attempt to photograph every bird in the state that I can (<a class="linkish" href="/progress" data-link>here's how far I've got</a>), and an open invitation to do it with me. Share your photos. See everyone else's. Get outside.</p>
     <div class="ab-progress" role="img" aria-label="${done} of ${total} species photographed so far">
       <p><b>${done}</b><span>of ${total} species photographed so far</span></p>
       <div class="bar"><i style="width:${Math.max(0.4, (done / total) * 100)}%"></i></div>

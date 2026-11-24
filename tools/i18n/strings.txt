@@ -295,3 +295,21 @@ Your nine birds on one page || Tus nueve aves en una página || 一頁看完你�
 A printable card with a picture of each bird, boxes to tick when you've seen it and when you've photographed it, and a line for where and when. Fold it into a pocket or a field guide. || Una tarjeta para imprimir con una imagen de cada ave, casillas para marcar cuando la veas y cuando la fotografíes, y una línea para dónde y cuándo. Dóblala y guárdala en el bolsillo o en tu guía de campo. || 可列印的卡片，每種鳥都有圖片，看到和拍到時都有方框可以打勾，還有一行寫下地點和時間。摺起來放進口袋或野外圖鑑。 || Isang card na puwedeng i-print, may larawan ng bawat ibon, mga kahong lalagyan ng tsek kapag nakita mo at nakunan mo ito, at linya para sa saan at kailan. Itupi at ilagay sa bulsa o field guide. || Một tấm thẻ in được, có hình từng loài chim, ô để đánh dấu khi bạn thấy và khi bạn chụp được, và một dòng ghi nơi chốn, thời gian. Gấp lại bỏ túi hoặc kẹp vào sách hướng dẫn. || 새마다 사진이 있고, 봤을 때와 찍었을 때 체크할 칸, 장소와 시간을 적을 줄이 있는 인쇄용 카드예요. 접어서 주머니나 도감에 넣어 다니세요.
 Print your field card || Imprime tu tarjeta de campo || 列印你的野外卡 || I-print ang field card mo || In thẻ thực địa của bạn || 현장 카드 인쇄하기
 Choose a card || Elige una tarjeta || 選擇卡片 || Pumili ng card || Chọn thẻ || 카드 선택
+The Count || El conteo || 拍攝進度 || Ang Bilang || Tiến độ || 기록 현황
+The count || El conteo || 拍攝進度 || Ang bilang || Tiến độ || 기록 현황
+Every bird in California || Todas las aves de California || 加州的每一種鳥 || Bawat ibon sa California || Mọi loài chim ở California || 캘리포니아의 모든 새
+My goal is to photograph every bird in California that I can. This is how far I've got. Every square below is one bird; the yellow ones are done. || Mi meta es fotografiar todas las aves de California que pueda. Esto es lo que llevo. Cada cuadro de abajo es un ave; las amarillas ya están. || 我的目標是盡可能拍下加州的每一種鳥。這是目前的進度。下面每個方格代表一種鳥，黃色的是已經拍到的。 || Layunin kong kunan ng larawan ang bawat ibon sa California na kaya ko. Ito na ang narating ko. Bawat parisukat sa ibaba ay isang ibon; tapos na ang mga dilaw. || Mục tiêu của tôi là chụp mọi loài chim ở California mà tôi có thể. Đây là tiến độ hiện tại. Mỗi ô bên dưới là một loài; ô vàng là đã chụp. || 제 목표는 캘리포니아의 새를 가능한 한 모두 찍는 것입니다. 지금까지의 진행 상황이에요. 아래 네모 하나가 새 한 종이고, 노란색은 이미 찍은 새입니다.
+Progress || Progreso || 進度 || Progreso || Tiến độ || 진행 상황
+Done || Hecho || 已完成 || Tapos na || Đã xong || 완료
+Left to go || Faltan || 尚餘 || Natitira || Còn lại || 남은 새
+Next milestone || Próxima meta || 下一個里程碑 || Susunod na milestone || Mốc tiếp theo || 다음 목표
+Photographed || Fotografiada || 已拍到 || Nakunan || Đã chụp || 찍음
+Not yet || Todavía no || 尚未 || Hindi pa || Chưa || 아직
+Latest || Lo último || 最新 || Pinakabago || Mới nhất || 최근
+Most recently photographed || Fotografiadas más recientemente || 最近拍到的鳥 || Pinakabagong nakunan || Mới chụp gần đây || 최근에 찍은 새
+Still to find || Por encontrar || 尚待尋找 || Hahanapin pa || Còn phải tìm || 아직 찾을 새
+By family || Por familia || 依科別 || Ayon sa pamilya || Theo họ || 과별
+Where the gaps are || Dónde faltan || 還缺哪些 || Kung saan may kulang || Còn thiếu ở đâu || 빈 곳은 어디
+On the count || En el conteo || 已列入進度 || Nasa bilang || Đã có trong tiến độ || 기록 완료
+Not on the count yet || Aún no está en el conteo || 尚未列入進度 || Wala pa sa bilang || Chưa có trong tiến độ || 아직 기록 안 됨
+here's how far I've got || esto es lo que llevo || 這是目前的進度 || ito na ang narating ko || đây là tiến độ của tôi || 지금까지의 진행 상황
